@@ -886,6 +886,16 @@
                 "title": "Thrive Architect",
                 "path": "builders/thrive-architect",
                 "icon": "layout"
+              },
+              {
+                "title": "Breakdance",
+                "path": "builders/breakdance",
+                "icon": "layout"
+              },
+              {
+                "title": "Flatsome",
+                "path": "builders/flatsome",
+                "icon": "layout"
               }
             ]
           }
