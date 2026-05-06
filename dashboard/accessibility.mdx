@@ -1,0 +1,87 @@
+---
+title: "WCAG Scanner"
+description: "Free WCAG 2.1 AA scanner for any public URL. Paste a link, get a shareable accessibility report. No account required."
+---
+
+# WCAG Scanner
+
+The Respira [WCAG Scanner](https://www.respira.press/dashboard/accessibility) at `dashboard/accessibility` is a free, anonymous WCAG 2.1 AA scanner. Paste any public URL, get a structured accessibility report. No account needed for the scan itself; an account lets you save reports and rerun them.
+
+## What it does
+
+The scanner runs a headless browser against the URL you give it, then evaluates the rendered DOM against the WCAG 2.1 AA success criteria using axe-core plus a small set of Respira-specific rules tuned for WordPress page builders.
+
+For each issue it finds, the report shows:
+
+- **Severity** — critical / serious / moderate / minor
+- **WCAG criterion** — the specific clause (e.g. *1.4.3 Contrast (Minimum)*)
+- **Affected element** — DOM selector + a snippet of the source HTML
+- **Why it matters** — plain-language explanation of the user impact
+- **How to fix** — actionable guidance (often a snippet of CSS or alt-text suggestion)
+
+It does **not** evaluate AAA criteria, manual-only criteria (like keyboard testing of complex widgets), or browser-specific rendering. It's a coverage check, not a sign-off — sites that pass the scanner can still have accessibility issues that need human review.
+
+## Running a scan
+
+1. Open [dashboard/accessibility](https://www.respira.press/dashboard/accessibility)
+2. Paste a URL into the input (must be publicly reachable)
+3. Click *Scan*
+4. Wait 5–15 seconds while the headless browser loads the page
+
+The result page shows the issue count grouped by severity at the top, then the full issue list below. Use the filter chips to narrow by severity or WCAG criterion.
+
+## Sharing reports
+
+Every scan gets a permanent shareable URL. Click *Copy share link* on the report page — the URL embeds the scan ID and renders the same report for anyone who opens it (no Respira account needed to view).
+
+Useful for:
+
+- Sending a client a before/after report on accessibility improvements
+- Pasting in a GitHub issue when a PR needs to address an accessibility regression
+- Embedding in your own internal QA dashboard
+
+Shared reports are read-only. Only the account that ran the scan can rerun it.
+
+## Rerunning a scan
+
+If you've fixed issues and want to re-check, click *Rerun scan* on any saved report. This requires a Respira account so the rerun gets attributed and stored in your scan history.
+
+The rerun produces a fresh report with the same shareable URL pattern but a new scan ID. The dashboard's [Sites](/dashboard/sites) audit log links to all your scan reruns for that site.
+
+## Limits
+
+| Plan | Scans per month | Saved scans | Rerun history |
+| --- | --- | --- | --- |
+| Anonymous (no account) | unlimited (rate-limited per IP) | 0 (one-shot URLs only) | — |
+| Lite (free) | 50 | 30 days | last 5 reruns |
+| Maker / Builder / Studio | unlimited | unlimited | unlimited |
+
+If you hit the rate limit as an anonymous user, sign up for a free Lite account — same email you'd use for the trial.
+
+## What it doesn't catch
+
+The scanner is a useful baseline but not a complete accessibility audit. Things it can't evaluate:
+
+- **Keyboard navigation** of complex JavaScript widgets — needs human testing
+- **Screen reader announcement order** — needs a real screen reader
+- **Motion sensitivity** for users who set `prefers-reduced-motion` — partial coverage only
+- **Cognitive load** of language complexity, layout density, or task flow — entirely out of scope
+- **Performance issues** that affect users on slow connections or older devices
+
+Use the scanner to catch the obvious, mechanical issues (alt text, contrast, heading hierarchy, ARIA labels, form labels). Then layer on manual testing for the rest.
+
+## Scanning sites you've connected to Respira
+
+If the URL belongs to a [connected site](/dashboard/sites), the report links back to the site's audit log entry. Reruns from connected sites are attributed and tracked there.
+
+You can also run scans directly from the [CLI](/cli/introduction):
+
+```
+respira scan accessibility https://example.com
+```
+
+Same scanner, same report format, callable from any terminal where the CLI is installed.
+
+## Privacy
+
+Scans against public URLs are stored in our database with the URL, the report, and (if logged in) your account ID. We do not retain page content beyond the snapshot needed to render the report. Anonymous scans are rate-limited per IP and not associated with any account.

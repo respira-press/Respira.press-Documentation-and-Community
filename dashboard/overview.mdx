@@ -1,0 +1,82 @@
+---
+title: "Dashboard Overview"
+description: "Tour of the Respira dashboard — sidebar navigation, command palette, theme toggle, activity strip, and where to find each subpage."
+---
+
+# Dashboard Overview
+
+The Respira dashboard at [respira.press/dashboard](https://www.respira.press/dashboard) is your control surface for connected sites, MCP setup, the CLI, accessibility scans, partner program, billing, and account settings. It rebuilt across May 2026 onto a single shared chrome with real light/dark mode, a command palette, and a per-account activity strip.
+
+## Layout
+
+The dashboard is split into three areas:
+
+- **Sidebar** — navigation grouped by intent (Workspace, Build, Account)
+- **Top bar** — breadcrumbs, system status pill, theme toggle, profile menu
+- **Main area** — page-specific content
+
+### Sidebar groups
+
+The sidebar is grouped semantically rather than alphabetically:
+
+**Workspace**
+- **Dashboard** — your home page with the activity strip and the feed
+- **Sites** — the connected-sites table; add, remove, audit log
+- **Stats** — usage metrics across sites (tool calls, edits, agents)
+
+**Build**
+- **Skills** — Claude Skills you have installed for WordPress workflows
+- **MCP Setup** — generate per-account or per-site MCP configs
+- **CLI** — the Respira CLI quick-start and command reference
+- **WCAG Scanner** — free WCAG 2.1 AA scanner for any URL
+- **Downloads** — plugin, MCP server, WooCommerce add-on, release history
+
+**Account**
+- **Billing** — subscription, invoices, plan changes
+- **Affiliate** — your referral link, commission tier, payouts
+- **Documentation** — links to this site
+- **Support** — open a ticket, browse community
+- **Settings** — account profile, notifications, security
+
+## Command palette (⌘K)
+
+Press <kbd>⌘ K</kbd> on macOS or <kbd>Ctrl K</kbd> on Windows / Linux to open the command palette. It's the fastest way to navigate without using the sidebar:
+
+- Type to fuzzy-match a page name (`sites`, `mcp`, `wcag`)
+- Use it to run quick actions (toggle theme, copy your install command, jump to a specific site)
+- Hit <kbd>Enter</kbd> on any result
+
+The palette is available from any page in the dashboard.
+
+## Theme toggle
+
+The dashboard ships with a real light theme — not just an inverted dark mode. Toggle from the top bar (sun / moon icon) or via the command palette.
+
+The choice persists across sessions in `localStorage` under the key `respira-theme`.
+
+## "My activity (30d)" strip
+
+The home page shows your account's last 30 days of activity at the top:
+
+- **Tool calls** — how many MCP tool invocations were made on your behalf
+- **Pages edited** — count of pages and posts that received writes
+- **Sites bridged** — how many of your connected sites saw activity
+- **Top tool** — the single most-called tool, with its share of the total
+
+This is account-scoped, not site-scoped. To drill into per-site activity, open *Sites* and click the audit log link on any row.
+
+## Live feed
+
+Below the activity strip, the home page surfaces three streams interleaved chronologically:
+
+1. **Releases** — plugin, MCP server, WooCommerce add-on
+2. **Articles** — monthly recaps, case studies, deep-dive guides
+3. **Demo videos** — screencasts pulled from the Respira YouTube playlist
+
+Filter by kind using the chips above the list. Each item links out to the full content.
+
+## Where to go next
+
+- New here? Connect your first site: [Connecting Your Site](/dashboard/connecting-your-site)
+- Already connected? Set up your AI assistant: [Installation Guide](/installation)
+- Reach for the terminal? [Respira CLI](/cli/introduction)

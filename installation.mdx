@@ -38,9 +38,17 @@ Make sure you have:
 
 ## Step 2: Connect the site to your Respira account
 
-1. Open your site in **WordPress Admin → Respira**
-2. Use the dashboard connection flow to link the site to your Respira account
-3. Confirm the site appears under **respira.press → Dashboard → Sites**
+The fastest way is the auto-connect handshake. One click in WordPress admin, one click in the Respira dashboard, done.
+
+1. Open **WordPress Admin → Respira**. The Overview tab loads with a *Connect to Respira* block at the top.
+2. Click **Connect to Respira**. A new browser tab opens at `respira.press` with a single-use state token attached.
+3. If you're not already signed in to Respira, sign in (or create a free account). The dashboard then mints a per-site auth token paired to the state token and shows a *Site connected* confirmation page.
+4. The browser tab redirects back to your WordPress admin. The plugin verifies the confirmation code, exchanges it for the auth token, and stores the token in WordPress under a hashed key.
+5. Confirm the site appears at [respira.press/dashboard/sites](https://www.respira.press/dashboard/sites) with status *Token ready*.
+
+A 2-minute screencast of the full flow on a fresh WordPress install: [Watch on YouTube →](https://www.youtube.com/watch?v=agzpWabYPZg).
+
+If auto-connect fails (firewall, SSO-locked admin, plugin pre-v6.10.1), use the manual fallback: copy the site token from **WordPress Admin → Respira → Settings**, then on the dashboard click *Add site manually* and paste the URL + token. Full troubleshooting: [Connecting Your Site](/dashboard/connecting-your-site).
 
 <Callout kind="alert">
 MCP configs and site tokens grant access to connected sites. Treat them like passwords: never commit to git or paste into public chats/tickets.
@@ -55,6 +63,19 @@ Go to **respira.press → Dashboard → MCP Setup**. Use one of the generated se
 - Copy AI setup prompt
 
 This flow is account-wide and supports stacked plans + multi-site inventories automatically.
+
+### Per-site one-click install (alternative)
+
+If you want to scope your AI assistant to *just one* of your connected sites — for a contractor handover, a focused demo, or to keep environments isolated — use the one-click install buttons in the *Connected Sites* table at the bottom of the MCP Setup page (or on the [Sites page](https://www.respira.press/dashboard/sites)).
+
+Each button on a site row generates a config that knows about *only that site*:
+
+- **Claude Desktop** — downloads a `.mcpb` bundle. Double-click on macOS / Windows to install.
+- **Cursor** — opens a `cursor://` deep link that drops the config straight into Cursor's settings.
+- **Codex** — copies a TOML block to your clipboard. Paste into Codex's MCP config.
+- **Claude Code** — copies a single shell command. Run it in any terminal where Claude Code is installed.
+
+The account-wide config (above) and per-site configs are not exclusive — you can run both at once if your AI assistant supports multiple MCP server entries.
 
 ### Quick setup with add-mcp
 

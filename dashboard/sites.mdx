@@ -1,0 +1,121 @@
+---
+title: "Sites"
+description: "Manage every WordPress site connected to your Respira account: status, one-click installs, audit log, token rotation, and removal."
+---
+
+# Sites
+
+The [Sites page](https://www.respira.press/dashboard/sites) at `dashboard/sites` is your inventory of every WordPress install bridged to your Respira account. Anything you can do to a site — connect it, install it into an AI assistant, audit its activity, rotate its token, disconnect it — happens here.
+
+## Anatomy of the table
+
+Each row is one connected WordPress site, with five columns:
+
+| Column | What it shows |
+| --- | --- |
+| **Site** | The site's display name and URL. The display name is editable; the URL is canonical. |
+| **ID** | The site's stable internal identifier. Used by the CLI and direct API calls. Click to copy. |
+| **Status** | `Token ready` (green) or `Pending` (amber). Token-ready sites can receive AI edits. Pending sites are queued for first verification. |
+| **One-click install** | Four buttons to install the site into Claude Desktop, Cursor, Codex, or Claude Code — scoped to *just that site*. |
+| **Actions** | The three-dot menu: rotate token, edit display name, disconnect site. |
+
+Below the table, an **Excluded sites** disclosure lists sites that are deliberately omitted from the multi-site config bundle. Excluded sites still receive edits if you point an AI assistant at them directly; they just don't auto-mount in the bundle.
+
+## Adding a site
+
+Two paths:
+
+**Auto-connect** (recommended). Install the plugin in WordPress, click *Connect to Respira* on the plugin's Overview tab, approve the handshake. The site shows up here in seconds. Full walkthrough: [Connecting Your Site](/dashboard/connecting-your-site).
+
+**Manual.** Click *Add site manually* on this page. Enter the site URL and paste the site token from the plugin's Settings tab. The dashboard verifies the token and adds the site.
+
+## Per-site one-click installs
+
+Each row's One-click install column has four buttons. Each one mints a config that knows about *only that one site* — different from the account-wide setup at [MCP Setup](https://www.respira.press/dashboard/mcp), which bundles every connected site.
+
+When to use which:
+
+- **Account-wide config** (`/dashboard/mcp`) — the default. Your AI assistant can address any of your sites by name. Use this when you regularly switch between sites.
+- **Per-site config** (the buttons here) — scope-limited. Use this when you're handing a specific site over to a contractor, or when you want to demo the workflow on one site without exposing the others.
+
+Each button generates a different artifact:
+
+- **Claude Desktop** — downloads a `.mcpb` bundle. Double-click on macOS / Windows to install.
+- **Cursor** — opens a deep link (`cursor://...`) that drops the MCP server config straight into Cursor's settings.
+- **Codex** — copies a TOML block to your clipboard. Paste it into Codex's MCP config file.
+- **Claude Code** — copies a single shell command to your clipboard. Run it in any terminal where Claude Code is installed.
+
+The same buttons exist on the [MCP Setup](https://www.respira.press/dashboard/mcp) page in the *Connected Sites* table at the bottom — they're equivalent.
+
+## Per-site audit log
+
+Click the site's display name in the Site column to open its detail page. The audit log shows every write operation Respira has run against that site:
+
+- Tool name (e.g. `respira_update_element`)
+- Agent that called it (Claude Code, Cursor, Codex, Claude Desktop, Browser AI)
+- Timestamp
+- Affected resource (page slug, post ID, element ID)
+- Snapshot ID (for restorable writes)
+- Outcome (success / error)
+
+Click any row's snapshot ID to restore the page to its pre-write state.
+
+**Audit log retention:**
+
+| Plan | Retention |
+| --- | --- |
+| Anonymous reads | none — no login, no log |
+| Lite | 30 days |
+| Maker / Builder / Studio | unlimited |
+| Founder | unlimited + extended export to S3 |
+
+## Status states explained
+
+**Token ready** (green). The site responded successfully to a signed validation request. AI edits will route through cleanly. Most sites are in this state most of the time.
+
+**Pending** (amber). The site hasn't responded to a validation request yet. Common reasons:
+
+- The site was just connected and the verification hasn't completed yet (resolves in seconds; refresh)
+- The site is behind a firewall or VPN that's blocking outbound requests
+- The plugin was deactivated on the WordPress side
+- The token was rotated on one side but not the other
+
+Click the row's *Rotate token* action to mint a fresh token if the pending state persists past a few minutes.
+
+## Rotating tokens
+
+Tokens are rotated for two reasons:
+
+- **Routine hygiene.** If a token may have been exposed (committed to a repo, pasted in a chat, shared with a contractor who's no longer on the project), rotate it.
+- **Forced rotation by Respira.** Rare. If we detect anomalous activity tied to a token, we'll rotate it on your behalf and email you.
+
+Rotation is one click: *Actions → Rotate token*. The old token is invalidated immediately. The plugin on the WordPress side picks up the new token on its next handshake (typically within 60 seconds, or you can click *Refresh token* on the plugin's Overview tab).
+
+If you embedded the old token in a non-Respira config (e.g. you wrote your own MCP setup that references the raw token), you'll need to update that config manually. The Respira-generated configs at MCP Setup or per-site refresh automatically.
+
+## Disconnecting a site
+
+*Actions → Disconnect site*. The token is invalidated, the site is removed from your account inventory, and any AI configs pointing at it stop working.
+
+The plugin remains installed and active on the WordPress side. You can re-connect the same site to the same (or a different) Respira account at any time using the auto-connect flow.
+
+## Site limits per plan
+
+| Plan | Sites included | Stackable? |
+| --- | --- | --- |
+| Anonymous | 0 (no login required for public reads) | — |
+| Lite | 1 | no |
+| Maker | 3 | yes (buy multiple) |
+| Builder | 10 | yes |
+| Studio | unlimited | — |
+| Founder | unlimited + transferable | — |
+
+Stacking is additive: two Maker plans = 6 sites. The Sites table shows your current usage in the header (`X of Y connected`).
+
+When you're at the cap, the *Add site* button is disabled with a tooltip pointing at [Billing](https://www.respira.press/dashboard/billing) to upgrade or stack.
+
+## What's next
+
+- Connect your first site: [Connecting Your Site](/dashboard/connecting-your-site)
+- Plug a connected site into your AI assistant: [Installation Guide](/installation)
+- Reach a site from the terminal: [Respira CLI: Sites](/cli/commands/sites)

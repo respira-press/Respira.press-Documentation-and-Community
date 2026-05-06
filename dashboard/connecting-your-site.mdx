@@ -1,0 +1,93 @@
+---
+title: "Connecting Your Site"
+description: "One-click handshake to link your WordPress site to your Respira account. No manual API keys, no copy-paste tokens."
+---
+
+# Connecting Your Site
+
+Respira's auto-connect handshake is the fastest path from "plugin installed" to "site visible in the dashboard". One click in WordPress admin, one click in the Respira dashboard, done. No API key copy-paste, no manual token entry.
+
+## Prerequisites
+
+- Respira for WordPress plugin **v6.10.1 or later** installed and activated on the site
+- A Respira account at [respira.press](https://www.respira.press) (free trial works)
+- Logged in to that account in the same browser you'll use for the handshake
+
+If your plugin is older than v6.10.1, update first via **Plugins → Updates** in WordPress, or download the latest from [respira.press/releases](https://www.respira.press/releases).
+
+## The handshake, step by step
+
+### Step 1 — Open the Respira plugin in WordPress admin
+
+In your WordPress admin sidebar, click **Respira**. The Overview tab loads with a *Connect to Respira* block at the top.
+
+### Step 2 — Click *Connect to Respira*
+
+The button generates a short-lived single-use state token bound to your WordPress site, then opens a new browser tab pointing at `respira.press` with that state attached.
+
+### Step 3 — Approve the handshake on respira.press
+
+The Respira dashboard verifies you're logged in (if not, it prompts you to sign in or create an account, then resumes the handshake), then mints a per-site auth token and a confirmation code paired to the state token.
+
+You'll see a brief *Site connected* confirmation page.
+
+### Step 4 — Return to WordPress admin
+
+The browser tab redirects back to your WordPress admin with the confirmation code in the URL. The plugin verifies the code against the original state token, exchanges them for the per-site auth token, and stores the token in `wp_options` under a hashed key.
+
+The Overview tab now shows your site as **Connected** with the active account name.
+
+### Step 5 — Confirm in the Respira dashboard
+
+Open [respira.press/dashboard/sites](https://www.respira.press/dashboard/sites). The site you just connected appears in the table with status *Token ready*.
+
+You can now use any of the per-site one-click MCP install buttons on that row — Claude Desktop, Cursor, Codex, or Claude Code — to plug the site into your AI assistant.
+
+## Watch the flow in action
+
+A 2-minute screencast of the full dashboard rebuild plus the auto-connect handshake on a fresh WordPress install:
+
+[Watch on YouTube →](https://www.youtube.com/watch?v=agzpWabYPZg)
+
+## What if auto-connect fails?
+
+The handshake can fail for a handful of reasons. The plugin and dashboard both log the failure mode; the typical fixes:
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| Browser redirect lands on `respira.press/login?redirect=...` | You're not logged in to your Respira account | Log in, then click *Connect to Respira* again |
+| Plugin shows *handshake expired* after returning to wp-admin | The 10-minute single-use state token timed out before you completed the dashboard step | Click *Connect to Respira* again — generates a fresh token |
+| Dashboard shows the site as *Pending* even after success | A caching plugin or CDN is serving a stale wp-admin response | Purge the site's cache, then refresh the Respira dashboard |
+| Plugin redirects to wp-admin root instead of the Respira admin page | Older plugin version (pre-v6.10.1) had this bug | Update the plugin to v6.10.1 or later |
+
+If none of those apply, the manual fallback below always works.
+
+## Manual fallback: connect by URL + admin token
+
+If auto-connect can't run for some reason (firewall blocking the redirect, SSO-locked WordPress admin, headless environment), you can connect a site manually:
+
+1. In WordPress admin, go to **Respira → Settings**
+2. Copy the **Site Token** value (a long random string)
+3. In the Respira dashboard, open [Sites](https://www.respira.press/dashboard/sites) and click *Add site manually*
+4. Enter the site URL (with `https://`) and paste the site token
+5. Click *Verify and add*
+
+The dashboard validates the token by making a signed request to your WordPress site's Respira REST endpoint. If the validation succeeds, the site is added with status *Token ready*.
+
+## Security notes
+
+- The site token is **specific to one WordPress site** and one Respira account. It cannot be used to access other sites or other accounts.
+- The token grants **edit-level access** to that site through the Respira plugin's REST endpoints. Treat it like a password: never commit it to git, never paste it in public chats.
+- You can **rotate the token** at any time from *Sites* by clicking *Rotate token* on the site's row. The old token is invalidated immediately. You'll need to re-link the site to your AI assistant if you had embedded the token in a non-Respira config.
+- You can **disconnect a site** the same way: click *Disconnect* on the site's row. The plugin remains installed and configured, but the link to your Respira account is severed and the token is invalidated.
+
+## What happens next
+
+Once your site is connected:
+
+- It appears in your **MCP Setup** config exports (`/dashboard/mcp` includes every connected site automatically)
+- Per-site one-click install buttons are unlocked on the *Connected Sites* table
+- The site's edits show up in your **30-day audit log** (Lite) or unlimited audit log (full plan)
+- Usage from this site contributes to the **My Activity (30d)** strip on your dashboard home
+
+Next up: head to [MCP Setup](/installation#step-3-set-up-mcp) to plug the site into your AI assistant of choice.

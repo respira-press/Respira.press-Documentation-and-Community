@@ -81,6 +81,37 @@
             ]
           },
           {
+            "group": "Dashboard",
+            "icon": "layout-dashboard",
+            "pages": [
+              {
+                "title": "Overview",
+                "path": "dashboard/overview",
+                "icon": "dashboard"
+              },
+              {
+                "title": "Connecting Your Site",
+                "path": "dashboard/connecting-your-site",
+                "icon": "link"
+              },
+              {
+                "title": "Sites",
+                "path": "dashboard/sites",
+                "icon": "globe"
+              },
+              {
+                "title": "WCAG Scanner",
+                "path": "dashboard/accessibility",
+                "icon": "accessibility"
+              },
+              {
+                "title": "Partner Program",
+                "path": "dashboard/partner",
+                "icon": "handshake"
+              }
+            ]
+          },
+          {
             "group": "CLI (Command Line)",
             "icon": "terminal",
             "pages": [
