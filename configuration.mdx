@@ -1,6 +1,6 @@
 ---
 title: Configuration Guide
-description: Configure Respira for WordPress with Cursor, Codex, Claude Code, and other AI clients using dashboard-generated MCP setup and multi-site config.
+description: Configure Respira for WordPress with Claude Cowork, Cursor, Codex, Claude Code, and other AI clients using dashboard-generated MCP setup and multi-site config.
 ---
 
 This page focuses on the **standalone Respira MCP server** configuration path.
@@ -127,6 +127,47 @@ npx @respira/wordpress-mcp-server --setup
 ```
 
 Restart Claude Code or Claude Desktop to load the configuration.
+
+## Claude Cowork
+
+Configure Respira to work with [Claude Cowork](https://respira.press/cowork), the AI editing surface inside the Claude desktop app. The Cowork plugin is bundled with eight slash commands and 30 skills for WordPress editing without writing prompts.
+
+### Install the Cowork plugin
+
+In Claude:
+
+1. Open **Customize > Plugins > Add Custom Plugin**.
+2. Paste `https://github.com/respira-press/cowork-plugin-wordpress`.
+3. Click **Install**.
+
+(Marketplace approval pending with Anthropic. Until it lands, install directly from the GitHub repo.)
+
+### Connect your sites
+
+Cowork reads the same `~/.respira/config.json` file that the Claude Desktop bundle uses. If Claude Desktop is already set up on this machine, you are done. open a new Cowork chat and every site is immediately editable.
+
+If this is a fresh machine:
+
+1. Open [your respira.press dashboard](https://respira.press/dashboard/mcp).
+2. Click **Download Cowork config** on the Cowork card.
+3. Save the file to `~/.respira/config.json`.
+4. Open a new Cowork chat. the plugin picks up the file on startup.
+
+Or run `/respira:connect-site` inside Cowork and the skill walks you through it in plain language.
+
+### What is bundled
+
+- **8 slash commands** including `/respira:connect-site`, `/respira:edit-page`, `/respira:undo-last-change`, `/respira:audit-site`, `/respira:duplicate-page`, `/respira:preview-changes`, `/respira:add-section`, `/respira:help`.
+- **30 skills** that auto-activate when the conversation matches: safety, page-builder detection, multi-site context, mobile experience report, technical debt audit, WooCommerce health check, SEO + AEO amplifier, internal link builder, image optimizer, 16 builder-to-builder migration recipes, and more.
+- **1 visual reviewer sub-agent** that shows what changed after each edit.
+
+### Troubleshooting
+
+If the MCP server fails to start, Cowork shows "MCP server still connecting" indefinitely with no visible error. Check for a diagnostic file at `~/.respira/last-startup-error.txt`. the server writes the actual failure there on startup crashes (added in `@respira/wordpress-mcp-server` 6.11.5). Common causes:
+
+- `~/.respira/config.json` missing or malformed. Re-download from the respira.press dashboard.
+- API key in the config has been revoked or rotated. Re-download the config to get the current key.
+- The site is unreachable from your machine (firewall, maintenance mode, login wall).
 
 ## Windsurf
 
