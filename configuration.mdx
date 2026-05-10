@@ -144,16 +144,17 @@ In Claude:
 
 ### Connect your sites
 
-Cowork reads the same `~/.respira/config.json` file that the Claude Desktop bundle uses. If Claude Desktop is already set up on this machine, you are done. open a new Cowork chat and every site is immediately editable.
+Cowork reads the same `~/.respira/config.json` file that the Claude Desktop bundle uses. If Claude Desktop is already set up on this machine, you are done. Open a new Cowork chat and every site is immediately editable.
 
-If this is a fresh machine:
+If this is a fresh machine, the fastest path is the one-click flow from your dashboard.
 
-1. Open [your respira.press dashboard](https://respira.press/dashboard/mcp).
-2. Click **Download Cowork config** on the Cowork card.
-3. Save the file to `~/.respira/config.json`.
-4. Open a new Cowork chat. the plugin picks up the file on startup.
+**Option A: Open in Cowork (one click).** Open [respira.press/dashboard/mcp](https://respira.press/dashboard/mcp), find the Cowork card, click **Open in Cowork**. Your browser opens a fresh Cowork chat with a one-time setup token pre-filled in the composer. Hit send. Claude calls `respira_redeem_token`, the MCP server writes `~/.respira/config.json` for you, and reports back how many sites are connected. The token expires in 5 minutes and self-invalidates on use.
 
-Or run `/respira:connect-site` inside Cowork and the skill walks you through it in plain language.
+**Option B: Copy the setup prompt.** On the same card, click **Copy setup prompt**. The pre-filled prompt is copied to your clipboard. Paste into any Cowork chat where the Respira plugin is installed and send. Same outcome as Option A, useful when your browser blocks the `claude://` scheme.
+
+**Option C: Download the config file directly.** On the same card, click **Download config**. Save the resulting `config.json` to `~/.respira/config.json` on your computer. Open a new Cowork chat. The plugin picks up the file on startup.
+
+If you prefer to be walked through it in chat, run `/respira:connect-site` inside Cowork.
 
 ### What is bundled
 
