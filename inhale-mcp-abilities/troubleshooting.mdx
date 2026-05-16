@@ -1,0 +1,81 @@
+---
+title: Troubleshooting
+description: Common issues and how to resolve them.
+---
+
+## An ability I expected doesn't appear in the table
+
+The abilities table lists everything registered with WordPress's Abilities API at the moment the settings page loads. If an ability is missing:
+
+1. Confirm the plugin that should register it is **active** (Plugins screen).
+2. Reload the **Settings → Inhale MCP Abilities** page. Abilities are not cached.
+3. Check the registering plugin's documentation — some plugins register abilities conditionally (only when a feature is enabled or a specific role is in use).
+4. Run `wp ability list` from WP-CLI to see the raw registration set. If your ability isn't there either, the issue is upstream of Inhale.
+
+## The plugin doesn't appear under Settings
+
+Inhale registers itself with `add_options_page()`, which requires the `manage_options` capability. If you're logged in as a role that doesn't have it (Editor, Author), the menu item is hidden.
+
+If you're an administrator and still don't see it:
+
+1. Confirm the plugin is **active** on the Plugins screen.
+2. Confirm the WordPress **MCP Adapter** is installed and active — Inhale refuses to register its settings page if the Adapter is missing, and shows an admin notice explaining why.
+3. Clear your wp-admin page cache if you're behind a caching layer.
+
+## "MCP Adapter not detected" admin notice
+
+Inhale depends on the official WordPress MCP Adapter plugin. If the Adapter is not active, Inhale shows a yellow admin notice on every screen with a direct install link.
+
+To resolve:
+
+```
+Plugins → Add New → search "MCP Adapter" → Install Now → Activate
+```
+
+Or via WP-CLI:
+
+```bash
+wp plugin install mcp-adapter --activate
+```
+
+Once the Adapter is active, the notice disappears and **Settings → Inhale MCP Abilities** becomes available.
+
+## The browser confirmation doesn't fire when I inhale a destructive ability
+
+Inhale calls the native `window.confirm()` dialog. If you don't see it:
+
+1. Confirm the ability is actually annotated **destructive** in the Annotations column. Some abilities you might expect to be destructive (`core/delete-post` for example) may not be annotated if the registering plugin didn't add the metadata.
+2. Check your browser's site settings. Some browsers and most ad blockers can suppress `confirm()` dialogs site-wide if you've previously opted out. Re-enable dialogs for the site.
+3. Check your browser console for JavaScript errors. A console error elsewhere on the page can prevent Inhale's JS from binding the confirmation handler.
+
+## Dark mode doesn't persist across reloads
+
+The dark mode preference is stored in `localStorage` under the key `inhale-theme`. If it's not persisting:
+
+1. Confirm `localStorage` is enabled in your browser. Some private-browsing modes wipe it on tab close.
+2. If you're behind a corporate proxy that strips browser storage, the preference will reset every load.
+3. Without a stored preference, Inhale falls back to your WordPress admin color scheme: dark schemes (Midnight, Ectoplasm, Coffee, Sunrise, Modern) default to dark; the others to light. Change your admin scheme under **Users → Profile** if you want a different default.
+
+## Bulk inhale "doesn't seem to work" on destructive abilities
+
+When you bulk-inhale a selection that includes destructive abilities, Inhale fires one `window.confirm()` per destructive ability. If you click **Cancel** on any of them, that specific ability stays exhaled but the rest of the selection still inhales. There is no batch "skip all destructive" option by design — the safety story of Inhale rests on every destructive inhale being deliberate.
+
+If you don't want to see the prompts at all, narrow the selection before bulk-inhaling.
+
+## My change saved but the MCP client still doesn't see the ability
+
+The MCP Adapter caches its capability list per request. If your client is holding a long-lived connection:
+
+1. Disconnect and reconnect the client to your WordPress server.
+2. If using Claude Desktop, restart the app.
+3. If you're still seeing stale results, confirm the abilities option was actually written: run `wp option get inhale_mcp_abilities_visible` from WP-CLI and check the array.
+
+## Still stuck?
+
+Open an issue on [GitHub](https://github.com/respira/inhale-mcp-abilities/issues) with:
+
+- WordPress version
+- PHP version
+- MCP Adapter version
+- A list of other plugins active on the site
+- The exact behavior you're seeing

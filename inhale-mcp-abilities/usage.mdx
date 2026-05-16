@@ -1,0 +1,85 @@
+---
+title: Usage
+description: How to inhale abilities, the safety model, search and filter behavior, and the dark mode toggle.
+---
+
+## The abilities table
+
+The settings page is a single list-table of every registered ability on your site, with six columns:
+
+| Column | What it shows |
+|---|---|
+| Checkbox | Whether the ability is currently inhaled |
+| Ability | The ability's machine name, in monospace |
+| Source | The plugin or theme that registered the ability |
+| Description | The ability's own description text |
+| Status | `Inhaled`, `Managed`, or `—` |
+| Annotations | `read-only`, `destructive`, `idempotent`, or none |
+
+Abilities marked **Managed** are managed by another plugin — typically the MCP Adapter's discovery ability — and cannot be toggled from Inhale.
+
+## Inhaling an ability
+
+Tick the checkbox in the left column, then click **Save changes** at the bottom of the page. The ability becomes visible to the default MCP server on the next request.
+
+To stop exposing an ability ("exhale" it), untick the checkbox and save.
+
+## The safety model around destructive abilities
+
+When you inhale an ability annotated `destructive`, Inhale shows a single browser confirmation:
+
+> This ability can modify content on your site. Inhale it?
+
+This is the only extra step the plugin adds. There is no separate review queue, no batched approval flow. The confirmation is calm and informational, not alarming — the goal is one clear pause before exposing an ability that can change content.
+
+Inhale never overrides an ability's own permission checks. Every ability still runs its own `permission_callback` before execution. Inhale controls **visibility**, not **authorization**.
+
+## Search
+
+The search input at the top right of the table searches across three columns at once: **Ability name**, **Source**, and **Description**. Matches are case-insensitive and partial; typing `elementor` will surface every ability with "elementor" in any of those three fields.
+
+## Filter views
+
+The view row above the table (the `subsubsub` strip) restricts the table to a slice:
+
+- **All** — every registered ability
+- **Inhaled** — only currently-inhaled abilities
+- **Read-only** — abilities annotated `read-only`
+- **Destructive** — abilities annotated `destructive`
+- **Unannotated** — abilities without annotation metadata
+
+## Source filter
+
+The chevron next to the **Source** column header opens a multi-select dropdown listing every plugin currently registering an ability. Tick the sources you want to see; the table narrows to just those plugins.
+
+## Combining filters
+
+The view (`subsubsub`), the search input, and the source dropdown all combine with **AND** logic. When at least one filter is active, a **Reset filters** link appears next to the view row. Clicking it clears the search input, the source filter, the sort, and resets the view to **All**.
+
+## Sorting
+
+Click a column header to sort by it. Sortable columns:
+
+- **Ability** — alphabetical by machine name
+- **Source** — alphabetical by plugin name
+- **Description** — alphabetical by description text
+- **Status** — Inhaled first, then Managed, then not inhaled
+
+Click again to reverse. Click a third time to clear the sort and return to registration order.
+
+## Bulk actions
+
+Tick multiple rows and pick **Inhale selected** or **Exhale selected** from the bulk actions dropdown, then click **Apply**. The destructive confirmation still fires for each destructive ability in the selection.
+
+## Pagination
+
+Sites with many registered abilities (typically 50+) get paginated. Pagination controls appear in the bottom tablenav. The current view, search, source filter, and sort all carry across pages.
+
+## Light and dark mode
+
+The icon in the page header toggles light and dark mode for the plugin's surface. The plugin defaults to whichever mode matches your WordPress admin color scheme:
+
+- Default, Light, Blue → light
+- Midnight, Ectoplasm, Coffee, Sunrise, Modern → dark
+
+The toggle persists per-user via `localStorage`. WCAG AA contrast holds in both modes; all interactive elements are keyboard-reachable.

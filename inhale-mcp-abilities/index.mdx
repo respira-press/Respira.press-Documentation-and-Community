@@ -1,0 +1,38 @@
+---
+title: Inhale: MCP Abilities
+description: A deliberate, considered way to expose registered WordPress abilities to the default MCP server.
+---
+
+Inhale is a small WordPress plugin that gives site administrators a settings page for choosing which registered abilities are visible to the default MCP server. It is a free utility built by Respira.
+
+## What Inhale does
+
+- Lists every ability registered with WordPress's Abilities API across all active plugins and themes.
+- Lets you choose which abilities are exposed to the default MCP server via simple checkboxes.
+- Surfaces annotation metadata (`read-only`, `destructive`, `idempotent`) on each ability so you can make informed decisions.
+- Asks for a single browser confirmation when you inhale an ability marked destructive.
+- Shows the endpoint your MCP client should connect to, with guides for the common clients.
+
+## What Inhale doesn't do
+
+- Inhale does not run MCP servers, transports, or authentication. Those are handled by the [WordPress MCP Adapter](https://github.com/WordPress/mcp-adapter), which Inhale extends.
+- Inhale does not register any abilities of its own. It only toggles visibility of abilities other plugins have registered.
+- Inhale does not phone home, collect telemetry, or make external network requests.
+
+## How Inhale fits in the Respira ecosystem
+
+Inhale is one of three layers Respira ships for WordPress:
+
+| Layer | What it is | Where it lives |
+|---|---|---|
+| **Inhale** | Free utility — choose which abilities are MCP-visible | Settings → Inhale MCP Abilities |
+| **Respira for WordPress** | Paid plugin — safety layer for AI-driven edits across 12 page builders | Respira menu in wp-admin |
+| **respira.press** | Marketing site and these docs | Public |
+
+You can run Inhale without ever installing Respira for WordPress. The two products are separate; Inhale is a community contribution.
+
+## Next
+
+- [Installation](/inhale-mcp-abilities/installation/)
+- [Usage](/inhale-mcp-abilities/usage/)
+- [Connecting MCP clients](/inhale-mcp-abilities/connecting-mcp-clients/)

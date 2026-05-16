@@ -1,0 +1,53 @@
+---
+title: FAQ
+description: Frequently asked questions about Inhale: MCP Abilities.
+---
+
+## Do I need to write any code to use Inhale?
+
+No. Inhale is a settings-only utility. The whole reason it exists is to replace the PHP-filter pattern that WordPress contributor blogs documented in the months after the MCP Adapter shipped. Anything you used to do with a filter on `wp_register_ability_args` is now a checkbox.
+
+If you have an existing filter in your `functions.php` or an mu-plugin, Inhale will not conflict with it — both control the same visibility surface — but you may end up with two sources of truth. We recommend removing the filter and letting Inhale own the choice.
+
+## Does Inhale work with the WordPress AI plugin?
+
+Yes. They handle different surfaces:
+
+- The **WordPress AI plugin** powers AI features *inside* wp-admin (the AI sidebar in the block editor, AI-suggested image alt text, and so on). It runs in the browser-facing editor.
+- **Inhale** controls which abilities are exposed *outside* wp-admin, to external MCP clients like Claude Desktop and Cursor.
+
+You can use both at once. They don't share state and don't conflict.
+
+## Is Inhale safe to use on production sites?
+
+Inhale is conservative by default. **No abilities are exposed until you explicitly check them.** Destructive abilities require an additional browser confirmation. Inhale doesn't change how WordPress abilities behave; it only controls which ones are visible to the default MCP server. Each ability still runs its own `permission_callback` before execution.
+
+That said, treat the abilities you inhale the same way you'd treat any other API surface: only expose what you're comfortable letting an AI client invoke on your behalf, and audit the list periodically as you install new plugins that register their own abilities.
+
+## What's the relationship between Inhale and Respira?
+
+Inhale is a free utility built and maintained by Respira. Respira's main product is **Respira for WordPress**, a paid safety layer for AI-driven edits across 12 page builders (Elementor, Bricks, Divi, Breakdance, Oxygen, Beaver Builder, etc.).
+
+The two products are completely separate. You can use Inhale forever without ever using Respira for WordPress, and many users will. Inhale is offered to the WordPress community as a small contribution back to the ecosystem.
+
+## Will write operations work through MCP?
+
+Yes, if you inhale abilities that perform writes. Whether a particular ability performs writes is determined by the plugin that registered the ability, not by Inhale. Inhale surfaces annotation metadata (`destructive`, `idempotent`) where the registering plugin has provided it, so you can make informed decisions.
+
+If you're not sure whether an ability writes, the calmest path is: don't inhale it until you've read its description and tested it in a staging environment.
+
+## Why "Inhale"?
+
+The plugin is built by Respira. *Respira* means *breathe* in several Romance languages. The product family has a breath theme. Inhale is the verb for "make this ability part of what the site exposes." It pairs with **exhale**, the verb for un-inhaling, which appears in the bulk actions dropdown.
+
+## Why does the table call it "destructive" instead of something softer?
+
+`destructive` is the standard annotation name used by the WordPress Abilities API and the MCP specification. Renaming it inside Inhale would create a translation layer that confuses developers reading their own ability definitions. We kept the official name and styled it calmly — a thin warning-color border on a neutral background — so it reads as quiet caution rather than alarm.
+
+## Will Inhale add features over time?
+
+The intent is to keep Inhale small. We added everything needed to replace the PHP-filter workaround in 0.1.0; future work focuses on translations, accessibility refinements, and tracking changes in the Abilities API and MCP Adapter as they evolve. If you have a feature request, [open an issue on GitHub](https://github.com/respira/inhale-mcp-abilities).
+
+## Where do I report a bug?
+
+Bug reports and feature requests live on the plugin's [GitHub repository](https://github.com/respira/inhale-mcp-abilities/issues). For security issues, please email security@respira.press instead of filing a public issue.

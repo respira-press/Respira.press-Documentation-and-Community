@@ -1,0 +1,46 @@
+---
+title: About MCP and Anthropic
+description: Clarifying Inhale's relationship to the Model Context Protocol and to Anthropic.
+---
+
+## What MCP is
+
+The **Model Context Protocol** is an open specification for connecting AI clients (like Claude Desktop, Cursor, Claude Code) to external tools and data sources. It is published at [modelcontextprotocol.io](https://modelcontextprotocol.io) and developed in the open on [GitHub](https://github.com/modelcontextprotocol).
+
+In a WordPress context, the protocol is implemented by the official [WordPress MCP Adapter](https://github.com/WordPress/mcp-adapter) plugin. The Adapter exposes a WordPress site's abilities (registered via the Abilities API) to MCP-compatible clients.
+
+Inhale sits on top of the MCP Adapter and provides a settings UI for choosing which abilities the Adapter exposes.
+
+## Inhale's relationship to Anthropic
+
+MCP was **originally developed by Anthropic** as part of their work on Claude. Anthropic has since opened the specification for community contribution, and the protocol is now implemented by multiple AI clients beyond Anthropic's own products.
+
+**Inhale is a third-party plugin.** It is not affiliated with, endorsed by, or sponsored by Anthropic. Respira — the company that maintains Inhale — is an independent company with no business or organizational relationship to Anthropic.
+
+We mention Anthropic in our docs and our plugin description because:
+
+1. They created the specification Inhale depends on, and crediting them is correct.
+2. The most common MCP client our users will connect (Claude Desktop) is an Anthropic product.
+
+Neither of those facts implies any partnership.
+
+## Trademark disclaimer
+
+*Model Context Protocol*, *Claude*, and *Anthropic* are trademarks of Anthropic, PBC. *WordPress* is a trademark of the WordPress Foundation. Inhale's use of these names is purely descriptive and follows nominative-fair-use principles: we name the protocol the plugin implements, and we name the products our users connect, without claiming any endorsement.
+
+If you represent Anthropic, the WordPress Foundation, or any other rights holder mentioned in our documentation and would like us to adjust any specific phrasing, please [email us](mailto:hello@respira.press) and we'll make the change promptly.
+
+## About Respira
+
+Respira is an independent company that ships AI infrastructure for WordPress. Inhale is offered free; Respira's commercial work centers on **Respira for WordPress**, a paid safety layer for AI-driven edits across 12 page builders.
+
+Inhale and Respira for WordPress are technically and commercially separate. Inhale will continue to work whether or not you ever install Respira for WordPress.
+
+## Further reading
+
+- [Model Context Protocol specification](https://modelcontextprotocol.io)
+- [MCP GitHub organization](https://github.com/modelcontextprotocol)
+- [WordPress Abilities API](https://github.com/WordPress/abilities-api)
+- [WordPress MCP Adapter](https://github.com/WordPress/mcp-adapter)
+- [Anthropic](https://www.anthropic.com)
+- [Respira](https://respira.press)

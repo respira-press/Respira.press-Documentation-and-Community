@@ -1,0 +1,105 @@
+---
+title: Connecting MCP clients
+description: Configure Claude Desktop, Cursor, Claude Code, and other MCP-compatible clients to talk to your WordPress site.
+---
+
+## The endpoint
+
+Inhale shows your site's MCP endpoint in the **Connection** section of the settings page. It looks like:
+
+```
+https://your-site.com/wp-json/mcp/mcp-adapter-default-server
+```
+
+This endpoint is served by the WordPress MCP Adapter, not by Inhale. Inhale only controls which abilities are visible through it.
+
+## Authentication
+
+For local development, the HTTP endpoint may be reachable directly. For any production site, use an **Application Password**:
+
+1. In wp-admin, go to **Users → Profile**.
+2. Scroll to **Application Passwords**.
+3. Name the password (e.g. `mcp-client`) and click **Add New Application Password**.
+4. Copy the 24-character token (four groups of six). You will not be able to see it again.
+5. Use your username + this token wherever the client config asks for credentials.
+
+## Claude Desktop
+
+Edit `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claude/`; Windows: `%APPDATA%\Claude\`):
+
+```json
+{
+  "mcpServers": {
+    "wordpress-inhale": {
+      "transport": "http",
+      "url": "https://your-site.com/wp-json/mcp/mcp-adapter-default-server",
+      "auth": {
+        "type": "basic",
+        "username": "admin",
+        "password": "xxxx xxxx xxxx xxxx xxxx xxxx"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop. The configured server appears under the MCP icon in the chat input.
+
+## Cursor
+
+Cursor reads MCP configs from `~/.cursor/mcp.json` (global) or `<workspace>/.cursor/mcp.json` (per-project):
+
+```json
+{
+  "mcpServers": {
+    "wordpress-inhale": {
+      "transport": "http",
+      "url": "https://your-site.com/wp-json/mcp/mcp-adapter-default-server",
+      "headers": {
+        "Authorization": "Basic <base64 of admin:xxxx xxxx xxxx xxxx xxxx xxxx>"
+      }
+    }
+  }
+}
+```
+
+Cursor doesn't currently accept the `auth.basic` shorthand; encode the credentials yourself.
+
+## Claude Code (CLI)
+
+Claude Code reads MCP servers from its standard config. Add via the CLI:
+
+```bash
+claude mcp add wordpress-inhale \
+  --transport http \
+  --url https://your-site.com/wp-json/mcp/mcp-adapter-default-server \
+  --header "Authorization: Basic <base64>"
+```
+
+Or edit the config file directly with the same JSON shape Claude Desktop uses.
+
+## Generic STDIO transport (via WP-CLI)
+
+If your client supports a local stdio process and you have WP-CLI on the same machine as the site, you can skip the HTTP layer:
+
+```json
+{
+  "mcpServers": {
+    "wordpress-inhale": {
+      "command": "wp",
+      "args": [
+        "--path=/var/www/html",
+        "mcp",
+        "stdio",
+        "--server=mcp-adapter-default-server"
+      ]
+    }
+  }
+}
+```
+
+Adjust `--path` to your site's WordPress install directory. STDIO bypasses application passwords because WP-CLI runs as the same OS user as the web server.
+
+## Testing the connection
+
+After configuring the client, ask it to "list available WordPress abilities." If everything is wired up, you'll see only the abilities you inhaled — not every registered ability on the site. That asymmetry is the entire point of Inhale.

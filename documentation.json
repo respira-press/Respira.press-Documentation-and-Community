@@ -112,6 +112,47 @@
             ]
           },
           {
+            "group": "Inhale: MCP Abilities",
+            "icon": "filter",
+            "pages": [
+              {
+                "title": "Overview",
+                "path": "inhale-mcp-abilities/index",
+                "icon": "star"
+              },
+              {
+                "title": "Installation",
+                "path": "inhale-mcp-abilities/installation",
+                "icon": "download"
+              },
+              {
+                "title": "Usage",
+                "path": "inhale-mcp-abilities/usage",
+                "icon": "settings"
+              },
+              {
+                "title": "Connecting MCP clients",
+                "path": "inhale-mcp-abilities/connecting-mcp-clients",
+                "icon": "plug"
+              },
+              {
+                "title": "FAQ",
+                "path": "inhale-mcp-abilities/faq",
+                "icon": "help-circle"
+              },
+              {
+                "title": "Troubleshooting",
+                "path": "inhale-mcp-abilities/troubleshooting",
+                "icon": "alert-triangle"
+              },
+              {
+                "title": "About MCP and Anthropic",
+                "path": "inhale-mcp-abilities/about-mcp-and-anthropic",
+                "icon": "info"
+              }
+            ]
+          },
+          {
             "group": "CLI (Command Line)",
             "icon": "terminal",
             "pages": [
