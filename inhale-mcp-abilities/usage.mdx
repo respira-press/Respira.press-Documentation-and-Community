@@ -13,10 +13,10 @@ The settings page is a single list-table of every registered ability on your sit
 | Ability | The ability's machine name, in monospace |
 | Source | The plugin or theme that registered the ability |
 | Description | The ability's own description text |
-| Status | `Inhaled`, `Managed`, or `—` |
+| Status | `Inhaled`, `Managed`, or `,` |
 | Annotations | `read-only`, `destructive`, `idempotent`, or none |
 
-Abilities marked **Managed** are managed by another plugin — typically the MCP Adapter's discovery ability — and cannot be toggled from Inhale.
+Abilities marked **Managed** are managed by another plugin, typically the MCP Adapter's discovery ability, and cannot be toggled from Inhale: MCP Abilities.
 
 ## Inhaling an ability
 
@@ -26,13 +26,13 @@ To stop exposing an ability ("exhale" it), untick the checkbox and save.
 
 ## The safety model around destructive abilities
 
-When you inhale an ability annotated `destructive`, Inhale shows a single browser confirmation:
+When you inhale an ability annotated `destructive`, Inhale: MCP Abilities shows a single browser confirmation:
 
-> This ability can modify content on your site. Inhale it?
+> This ability can modify content on your site. Inhale: MCP Abilities it?
 
-This is the only extra step the plugin adds. There is no separate review queue, no batched approval flow. The confirmation is calm and informational, not alarming — the goal is one clear pause before exposing an ability that can change content.
+This is the only extra step the plugin adds. There is no separate review queue, no batched approval flow. The confirmation is calm and informational, not alarming, the goal is one clear pause before exposing an ability that can change content.
 
-Inhale never overrides an ability's own permission checks. Every ability still runs its own `permission_callback` before execution. Inhale controls **visibility**, not **authorization**.
+Inhale: MCP Abilities never overrides an ability's own permission checks. Every ability still runs its own `permission_callback` before execution. The Inhale: MCP Abilities plugin controls **visibility**, not **authorization**.
 
 ## Search
 
@@ -42,11 +42,11 @@ The search input at the top right of the table searches across three columns at 
 
 The view row above the table (the `subsubsub` strip) restricts the table to a slice:
 
-- **All** — every registered ability
-- **Inhaled** — only currently-inhaled abilities
-- **Read-only** — abilities annotated `read-only`
-- **Destructive** — abilities annotated `destructive`
-- **Unannotated** — abilities without annotation metadata
+- **All**, every registered ability
+- **Inhaled**, only currently-inhaled abilities
+- **Read-only**, abilities annotated `read-only`
+- **Destructive**, abilities annotated `destructive`
+- **Unannotated**, abilities without annotation metadata
 
 ## Source filter
 
@@ -60,16 +60,16 @@ The view (`subsubsub`), the search input, and the source dropdown all combine wi
 
 Click a column header to sort by it. Sortable columns:
 
-- **Ability** — alphabetical by machine name
-- **Source** — alphabetical by plugin name
-- **Description** — alphabetical by description text
-- **Status** — Inhaled first, then Managed, then not inhaled
+- **Ability**, alphabetical by machine name
+- **Source**, alphabetical by plugin name
+- **Description**, alphabetical by description text
+- **Status**, Inhaled first, then Managed, then not inhaled
 
 Click again to reverse. Click a third time to clear the sort and return to registration order.
 
 ## Bulk actions
 
-Tick multiple rows and pick **Inhale selected** or **Exhale selected** from the bulk actions dropdown, then click **Apply**. The destructive confirmation still fires for each destructive ability in the selection.
+Tick multiple rows and pick **Inhale: MCP Abilities selected** or **Exhale selected** from the bulk actions dropdown, then click **Apply**. The destructive confirmation still fires for each destructive ability in the selection.
 
 ## Pagination
 
