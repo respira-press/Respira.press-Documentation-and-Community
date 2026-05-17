@@ -3,6 +3,14 @@ title: "Connecting MCP clients"
 description: "Configure Claude Desktop, Cursor, Claude Code, and other MCP-compatible clients to talk to your WordPress site."
 ---
 
+## Which MCP server this page is about
+
+This entire page is about the **WordPress MCP Adapter's default server**, the one the official `WordPress/mcp-adapter` plugin exposes at `/wp-json/mcp/mcp-adapter-default-server`. This is the server Inhale: MCP Abilities controls. The plugin's job is exactly one thing: choose which abilities are visible at that endpoint.
+
+If you also have **Respira for WordPress** installed on the same site, it runs its own separate MCP server with its own endpoint, its own authentication, and its own ability surface. Inhale: MCP Abilities does not interact with the Respira MCP server in any way. The two servers are independent: same site, different code paths, different URLs, different visibility settings. If you want abilities exposed to AI clients via Respira's MCP server, configure that inside the Respira plugin. If you want abilities exposed via the WordPress MCP Adapter's default server, use Inhale: MCP Abilities.
+
+The rest of this page talks only about the WordPress MCP Adapter's default server.
+
 ## The endpoint
 
 Inhale: MCP Abilities shows your site's MCP endpoint in the **Connection** section of the settings page. It looks like:
@@ -11,7 +19,7 @@ Inhale: MCP Abilities shows your site's MCP endpoint in the **Connection** secti
 https://your-site.com/wp-json/mcp/mcp-adapter-default-server
 ```
 
-This endpoint is served by the WordPress MCP Adapter, not by Inhale: MCP Abilities. Inhale: MCP Abilities only controls which abilities are visible through it.
+This endpoint is served by the WordPress MCP Adapter (the `WordPress/mcp-adapter` plugin), not by Inhale: MCP Abilities. Inhale: MCP Abilities only controls which abilities are visible through it.
 
 ## Authentication
 
