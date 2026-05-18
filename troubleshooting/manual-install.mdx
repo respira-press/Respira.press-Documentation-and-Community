@@ -1,0 +1,103 @@
+---
+title: Manual table provisioning (locked-down hosting)
+description: Provision Respira's three database tables manually when your hosting environment blocks CREATE TABLE / ALTER TABLE for the WordPress database user.
+---
+
+# Manual table provisioning
+
+## When to use this
+
+Use this page if Respira's activation fails to create its database
+tables because your hosting environment restricts the WordPress
+database user's privileges. Common symptoms:
+
+- "wp_respira_api_keys table is missing" error in the API key step
+  of the setup wizard.
+- Plugin activates without errors but the dashboard shows zero
+  snapshots and no audit log entries.
+- Your hosting provider explicitly states the DB user has no
+  `CREATE` / `ALTER` permissions (common on managed enterprise
+  hosting, some shared hosts, and some compliance-locked installs).
+
+The v6.10.5+ self-healing path won't help in this case because it
+runs the same `CREATE TABLE` your database user can't execute.
+
+## What this does
+
+Respira creates three tables on activation:
+
+| Table | Purpose |
+|---|---|
+| `wp_respira_api_keys` | API keys, encrypted secrets, permissions, license bindings |
+| `wp_respira_audit_log` | Per-request action log shown in Respira → Audit Log |
+| `wp_respira_snapshots` | Before/after content snapshots powering rollback + approvals |
+
+After the tables exist, Respira only performs `INSERT` / `SELECT` /
+`UPDATE` / `DELETE` against them. Every standard WordPress database
+user has those privileges, even on locked-down hosts. So if your
+DBA provisions the schema once via this file, your normal WP user
+never needs elevated privileges, before or after.
+
+## How to use it
+
+1. Download the schema bundle:
+
+   [`manual-install.sql`](./manual-install.sql)
+
+2. If your install uses a custom table prefix (anything other than
+   the default `wp_`, check `$table_prefix` in `wp-config.php`),
+   open the file and replace every occurrence of `wp_` with your
+   actual prefix.
+
+3. Send the file to your database administrator. Ask them to run it
+   against your WordPress database via whatever interface they
+   prefer:
+
+   - **phpMyAdmin** → Import tab → upload the .sql file → Go
+   - **wp-cli** → `wp db query < manual-install.sql`
+   - **mysql client** → `mysql -u <user> -p <database> < manual-install.sql`
+
+4. Activate (or deactivate and reactivate) Respira in WordPress
+   admin. The plugin detects the existing tables, skips its own
+   provisioning step, and proceeds to the API key setup screen.
+
+5. Generate your API key as normal.
+
+## Why this is safe
+
+- All statements use `CREATE TABLE IF NOT EXISTS`. Re-running the
+  file is idempotent and never destroys data.
+- No `DROP TABLE`, no `TRUNCATE`, no `ALTER` on any existing
+  WordPress core table.
+- No privilege change on the WordPress database user. Your DBA
+  retains full control of schema changes.
+
+## Future upgrades
+
+Future Respira minor versions may add columns via the upgrader. The
+in-plugin upgrader uses `ALTER TABLE` for those additions, which
+your DBA-permission setup will also block. Two options when that
+happens:
+
+1. **Stay on a fixed major version.** Patch releases within a major
+   line (for example all 7.0.x) won't change the schema.
+2. **Re-run this file on major upgrades.** When a new major lands,
+   re-fetch the latest version of this file from
+   [the docs repo](https://github.com/respira-press/Respira.press-Documentation-and-Community/blob/main/troubleshooting/manual-install.sql)
+   and have your DBA run it. The `IF NOT EXISTS` semantics make
+   re-runs safe; only new columns get added. If a future version
+   needs an `ALTER TABLE` that this file can't express as a
+   `CREATE TABLE IF NOT EXISTS`, the upgrade notes will say so.
+
+## Still stuck?
+
+If activation still fails after the manual provisioning, send the
+output of these two queries to support:
+
+```sql
+SHOW TABLES LIKE 'wp_respira_%';
+SELECT * FROM information_schema.tables WHERE table_name LIKE 'wp_respira_%';
+```
+
+(Substitute your actual prefix if different.) Knowing which tables
+landed and which didn't pinpoints the next step in one round trip.
