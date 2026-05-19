@@ -1,0 +1,96 @@
+---
+title: Page builder gotchas and how Respira handles them
+description: Known quirks of each major page builder and the patterns Respira uses to handle them. Read this when a tool returns unexpected output for a specific builder.
+---
+
+# Page builder gotchas and how Respira handles them
+
+Every page builder has its own internal data shape, and several of them ship traps that produce broken output if you write naively. Respira knows about these and applies the right workaround automatically, but knowing the underlying issue helps when something looks off.
+
+## Beaver Builder: font fields must be PHP arrays, not objects
+
+Top-level font fields on Beaver Builder modules use the shape `{ family: "...", weight: "..." }`. Beaver expects these as PHP associative arrays. If they land as PHP `stdClass` objects, the module reads them as empty and the font falls back to the theme default.
+
+Respira normalizes font fields to associative arrays on every write since plugin v7.0.25. If you see a font reset after an `update_module` call on a Beaver site, you are likely on a pre-v7.0.25 plugin version. Upgrade.
+
+The same rule applies to any top-level field in a Beaver module that uses a `{ field, sub_field }` shape. If you're writing custom tool logic that touches Beaver modules, always emit associative arrays.
+
+## WPBakery and Uncode: read inline_schemas before injecting shortcodes
+
+WPBakery shortcodes have attribute schemas defined via `vc_map()` at runtime. Different sites have different sets of registered modules with different attribute lists. Hardcoding a shortcode that "works" on one site will silently drop attributes on another.
+
+Always call `respira_get_builder_inline_schemas` before injecting a WPBakery or Uncode shortcode. The response gives you the live attribute schema for the current site:
+
+```text
+Get the inline schemas for the active site, then inject the vc_btn shortcode with the supported attributes only
+```
+
+The plugin caches the schemas for one hour in a transient, so the call is cheap.
+
+Visual Composer (the spiritual fork of WPBakery) uses the same `vc_map()` pattern. Same rule applies.
+
+## Divi 5: target nodes by _nodeId when id is missing
+
+Divi 5 generates internal node IDs at render time that are not always present in the page builder's persisted JSON. `respira_find_builder_targets` returns these as the top-level `id` field when available, but on some sites the `id` is missing and the node only carries a `_nodeId`.
+
+The MCP detects this and routes the update through `_nodeId` automatically since v6.13.0+. If you're driving updates on Divi 5 and the target ID looks like an internal `_nodeId` string, that's expected. The round-trip works.
+
+## Divi 5: presets are stored separately from modules
+
+Divi 5 introduced a preset system where module styles can be defined once and referenced by ID. If you read a Divi 5 module and it looks empty of styling, it might be inheriting from a preset.
+
+Use the v6.4+ preset endpoints:
+
+- `respira_extract_builder_content` returns presets alongside modules
+- `respira_get_preset(preset_id)` returns the raw attributes of a specific preset
+- `respira_update_element` accepts both inline attributes and a `_presetId` reference
+
+When in doubt, extract the page first to see the full structure. The agent should not guess at the preset name.
+
+## Elementor: widget vs section vs column
+
+Elementor's three-tier structure (section > column > widget) is enforced. You cannot put a widget directly in a section. If a tool returns a "parent must be a column" error, restructure your call to wrap the widget in a column first.
+
+`respira_add_section` accepts inline column and widget definitions so you can build the whole stack atomically:
+
+```text
+Add a section with one full-width column containing a heading widget and a button widget
+```
+
+That single call creates section, column, and both widgets in the right hierarchy.
+
+## Gutenberg: serialize blocks back into HTML, not JSON
+
+Gutenberg stores content as HTML with block comments (`<!-- wp:paragraph -->...<!-- /wp:paragraph -->`). The block tree is parsed from those comments. If you write JSON directly, WordPress will render it as plain text.
+
+Respira's Gutenberg tools handle the serialization, but if you're using `respira_update_page` with raw HTML, make sure your HTML includes the block comments. The pattern is:
+
+```html
+<!-- wp:paragraph -->
+<p>Your content</p>
+<!-- /wp:paragraph -->
+```
+
+## Oxygen Classic vs Oxygen 6
+
+Oxygen Classic (4.x) and Oxygen 6 (5.x+, branded "Soflyy Oxygen") have different internal data shapes. `respira_get_builder_info` returns the major version so the right adapter is selected automatically.
+
+If you see "builder not detected" on what is clearly an Oxygen site, run the diagnostic with debug enabled:
+
+```text
+respira_get_builder_info(debug: true)
+```
+
+The response includes per-builder detection signals so you can see which Oxygen-specific markers the detector found or did not find.
+
+## Bricks: classes are not inline styles
+
+Bricks uses a global class system (similar to Tailwind utility classes). Updating a "color" on a Bricks element should target the assigned class, not inject inline CSS. `respira_find_element` with `type: "bricks-class"` returns the class registry; updates go through `respira_update_element` with the class ID.
+
+Setting an inline style on a Bricks element will work but breaks the design-system promise of the builder. Always check whether a class is the right target first.
+
+## Related
+
+- `respira_get_builder_info` — confirm which builder and version is active
+- `respira_get_builder_inline_schemas` — required for WPBakery/Uncode/VC shortcode work
+- `respira_find_builder_targets` — list editable nodes including hidden _nodeId references

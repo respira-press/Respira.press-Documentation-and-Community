@@ -1,0 +1,41 @@
+---
+title: Cloudflare allowlist for Respira routes
+description: Configure Cloudflare so its security rules do not block the Respira plugin's REST routes. The literal rule expression to allowlist is included.
+---
+
+# Cloudflare allowlist for Respira routes
+
+Cloudflare ships several built-in and custom rules that block non-GET HTTP methods (PUT, PATCH, DELETE, OPTIONS) on entire sites. When those rules cover `/wp-json/respira/v1/*`, the Respira plugin can read but cannot write. The symptom is silent: GET works in the browser, the dashboard says the site is connected, but every editing tool returns 405 or 403 with no clear cause.
+
+## How to confirm Cloudflare is the cause
+
+Run the diagnostic from inside the agent:
+
+```text
+Run respira_diagnose_connection on this site
+```
+
+The structured response includes `edge_hints.cloudflare`. If the field is present and `write_method_blocked` is `true`, Cloudflare is intercepting at least one method on the Respira routes.
+
+The diagnostic probes HEAD, GET, and OPTIONS against `/wp-json/respira/v1/ping` and reports which methods return 2xx. When GET returns 200 but OPTIONS returns 4xx or 5xx, the edge layer is blocking writes.
+
+## The allowlist rule
+
+In Cloudflare → Security → WAF → Custom rules, find the existing block rule (typically named "Bad Bot Action Block" or similar). Append the following expression to its "Field is not" carve-out so Respira routes are exempted:
+
+```
+and not (http.request.uri.path contains "/wp-json/respira/")
+```
+
+If your block rule uses an OR-of-AND structure, add the negation to each branch. If you maintain the rule via Terraform or the API, the same expression goes into the `expression` field after the existing predicates.
+
+After saving, wait 30 seconds for Cloudflare to propagate, then re-run `respira_diagnose_connection`. The `write_method_blocked` field should flip to `false` and `edge_hints.cloudflare` will still show the cf-ray header (Cloudflare is still in front of the site, but it now passes Respira traffic through).
+
+## Why this happens
+
+Many Cloudflare rule packs are designed to block bot traffic on the WordPress login and admin paths. The "block all non-GET methods" rule is a broad-strokes anti-spam pattern that catches legitimate REST API traffic alongside it. The Respira plugin operates over the REST API, which means it routinely sends PUT, PATCH, DELETE, and OPTIONS. Allowlisting the plugin's namespace is the supported fix and does not weaken the protection on the rest of the site.
+
+## Related
+
+- `respira_diagnose_connection` — runs the same probes you would run by hand
+- `rest_route` fallback — what happens when WordPress rewrite rules also shadow `/wp-json` (different problem, separate doc)
