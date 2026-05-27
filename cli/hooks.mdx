@@ -1,0 +1,82 @@
+---
+title: The hook framework
+description: Five framework-level hooks fire during every Respira CLI command. Scaffolding ships in v0.1 with a null registry. Callback registration and extension manifests arrive in v0.2. Additive, no breaking changes.
+---
+
+Five framework-level hooks fire during every `respira` command invocation. v0.1 ships the scaffolding. v0.2 ships the callback registration on top.
+
+## Status
+
+**v0.1 (now)**: the hook contracts are live and frozen. The execution cycle fires every framework hook on every command invocation. In v0.1 the hook registry is a null implementation, so no callbacks run. The code path exists, is exercised by tests, and is stable.
+
+**v0.2 (next)**: callback registration. Extension manifests. Priority resolution. If you are building something against Respira today, nothing you write will need to change when v0.2 lands.
+
+## The five framework hooks
+
+### `before_resolve`
+
+Action hook. Fires during PreHooks, before the cycle selects the Tool Chain Function. Use for observation, policy enforcement, or pre-flight validation.
+
+### `filter_plan`
+
+Filter hook. Fires during Resolve. Receives the candidate tool chain function list and returns a possibly-transformed list. Use for routing, substitution, or re-ordering.
+
+### `before_execute`
+
+Action hook. Fires during Execute, as the final gate before the Tool Chain Function runs. Use for last-chance checks, audit logging, or short-circuiting.
+
+### `filter_result`
+
+Filter hook. Fires during PostHooks. Receives the Tool Chain Function's return value and returns a possibly-transformed value. Use for redaction, enrichment, or schema validation.
+
+### `after_execute`
+
+Action hook. Fires during PostHooks, after `filter_result`. Use for record-keeping, notifications, or follow-on work that does not need to influence the return value.
+
+## Hook types
+
+- **Action**: receives payload, returns nothing, side-effects only. Used for logging, notification, policy enforcement.
+- **Filter**: receives payload, returns a transformed payload of the same shape. Used for modifying data flowing through the cycle.
+
+## Interface (stable in v0.1)
+
+```typescript
+interface HookDeclaration {
+  readonly name: string;              // e.g. "filter_page_content"
+  readonly type: "action" | "filter";
+  readonly payloadSchema?: unknown;   // zod schema in v0.2
+  readonly errorPolicy?: "abort" | "skip" | "substitute";
+}
+
+interface Callback {
+  readonly extension: string;
+  readonly priority: number;
+  readonly handler: (payload: unknown, ctx: CycleContext) => Promise<unknown | void>;
+}
+
+interface HookRegistry {
+  callbacks(hookName: string): Callback[];
+  declarations(toolChainFunctionName: string): HookDeclaration[];
+}
+```
+
+In v0.1 the runtime `HookRegistry` is a `NullHookRegistry`. Both methods return empty arrays. The ExecutionCycle iterates those empty arrays on every command, so the code path is hot, covered by tests, and ready for v0.2 to populate. This is exactly what makes v0.2 purely additive: swapping `NullHookRegistry` for `ManifestBackedHookRegistry` is a one-line change inside the cycle; nothing on the caller side needs to move.
+
+## Internal hooks on Tool Chain Functions
+
+Tool Chain Functions can declare their own hook points through the `internalHooks` array on the function metadata. These are function-specific signals, distinct from the five framework hooks. Examples of what might arrive in v0.2:
+
+- `filter_page_content` on `write.edit-page` (transform page body before persist)
+- `action_before_publish` on `write.create-post` (last check before a post goes live)
+- `filter_design_system` on `write.update-design-system` (validate or enrich color/font changes)
+
+In v0.1 the `internalHooks` field is defined and typed on the `ToolChainFunction` interface but unused. v0.2 wires it to the cycle.
+
+## Why v0.1 freezes the contracts now
+
+The goal of the v0.1 sprint is to ship the scaffolding without features so v0.2 is purely additive. Callback registration, priority resolution, extension manifests, and the real Tool Registry are all downstream changes that plug into interfaces already in place. That is the promise: if you publish code against Respira v0.1 today, your code still works with v0.2 tomorrow, unchanged.
+
+## More
+
+- [The full architecture page](/cli/architecture)
+- [Changelog](/cli/changelog)
