@@ -9,20 +9,37 @@ Respira understands 12 WordPress page builders at the module level. AI can updat
 
 ## Supported Builders
 
-| Builder | Modules | Data Format | Module Editing |
-|---------|---------|-------------|----------------|
-| [Divi](/builders/divi) | 200+ | Shortcodes / Blocks | ✓ Full |
-| [Elementor](/builders/elementor) | 140+ | JSON | ✓ Full |
-| [Bricks](/builders/bricks) | 80+ | JSON | ✓ Full |
-| [Oxygen](/builders/oxygen) | 60+ | JSON | ✓ Full |
-| [Gutenberg](/builders/gutenberg) | All blocks | HTML comments | ✓ Full |
-| [WPBakery](/builders/wpbakery) | 70+ | Shortcodes | ✓ Full |
-| [Beaver Builder](/builders/beaver-builder) | 27+ | Serialized | ✓ Full |
-| [Brizy](/builders/brizy) | 40+ | JSON | ✓ Full |
-| [Visual Composer](/builders/visual-composer) | 50+ | JSON | ✓ Full |
-| [Thrive Architect](/builders/thrive-architect) | 40+ | Custom | ✓ Full |
-| [Breakdance](/builders/breakdance) | 130+ | JSON | ✓ Full |
-| [Flatsome UX Builder](/builders/flatsome) | 55+ | Shortcodes | ✓ Full |
+| Builder | Modules | Data Format | Module Editing | Intelligence Level |
+|---------|---------|-------------|----------------|-------------------|
+| [Divi](/builders/divi) | 200+ | Shortcodes / Blocks | ✓ Full | Full Intelligence |
+| [Elementor](/builders/elementor) | 140+ | JSON | ✓ Full | Full Intelligence |
+| [Bricks](/builders/bricks) | 80+ | JSON | ✓ Full | Full Intelligence |
+| [Oxygen](/builders/oxygen) | 49+ | JSON | ✓ Full | Full Intelligence |
+| [Gutenberg](/builders/gutenberg) | All blocks | HTML comments | ✓ Full | Full Intelligence |
+| [Flatsome UX Builder](/builders/flatsome) | 55+ | Shortcodes | ✓ Full | Full Intelligence |
+| [Beaver Builder](/builders/beaver-builder) | 27+ | Serialized | ✓ Full | Smart Defaults |
+| [WPBakery](/builders/wpbakery) | 70+ | Shortcodes | ✓ Full | Smart Defaults |
+| [Brizy](/builders/brizy) | 40+ | JSON | ✓ Full | Smart Defaults |
+| [Visual Composer](/builders/visual-composer) | 50+ | JSON | ✓ Full | Smart Defaults |
+| [Thrive Architect](/builders/thrive-architect) | 40+ | Custom | ✓ Full | Smart Defaults |
+| [Breakdance](/builders/breakdance) | 130+ | JSON | ✓ Full | Basic Support |
+
+### Intelligence Levels
+
+- **Full Intelligence** — Component registries, JSON Schema generation, validators, and layout patterns. AI agents understand the builder's component model at a deep level.
+- **Smart Defaults** — Builder-native format preservation with per-builder type mapping. Element-level operations work correctly.
+- **Basic Support** — Content editing and extraction works. No builder-specific intelligence package.
+
+### New in v6.2: Oxygen Deep Intelligence
+
+Oxygen moves from Smart Defaults to Full Intelligence with:
+
+- 49 dynamically detected components with properties, types, defaults, and nesting rules
+- JSON Schema generation for any component type
+- Tree and settings validators with detailed error messages
+- 6 pre-built layout patterns (hero, features, CTA, testimonial, pricing, image+text)
+
+See the full [Oxygen documentation](/builders/oxygen) for component reference and intelligence details.
 
 ### New in v6.0: Flatsome UX Builder
 
@@ -88,7 +105,7 @@ Then: "Update the module labeled 'Hero CTA Button' to say 'Contact Us'"
 
 ### Which page builder has the best Respira support?
 
-All 12 supported builders have full module-level editing support. Divi and Elementor have the most comprehensive intelligence packages. Bricks has 20 dedicated deep tools. Flatsome has a 55-element intelligence package with nesting rules and page patterns.
+Six builders have Full Intelligence: Elementor, Divi, Gutenberg, Bricks, Flatsome, and Oxygen. Each has component registries, JSON Schema, validators, and layout patterns. Bricks also has 20 dedicated deep tools for design system management.
 
 ### Can Respira edit Global Modules in Divi?
 

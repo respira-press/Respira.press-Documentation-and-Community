@@ -1,6 +1,6 @@
 ---
 title: "Oxygen Builder Reference"
-description: "Technical documentation for using Respira with Oxygen Builder: component trees, targeting strategies, and safe editing workflows."
+description: "Technical documentation for using Respira with Oxygen Builder: 49 components, JSON Schema, tree validation, layout patterns, and Deep Intelligence tools."
 ---
 
 # Oxygen Builder Reference
@@ -9,11 +9,26 @@ Technical documentation for using Respira with [Oxygen Builder](https://oxygenbu
 
 ## About Oxygen
 
-[Oxygen Builder](https://oxygenbuilder.com/) is a professional-grade WordPress site builder that generates clean, bloat-free code. It completely replaces your theme and offers full site building capabilities with over 60 components.
+[Oxygen Builder](https://oxygenbuilder.com/) is a professional-grade WordPress site builder that generates clean, bloat-free code. It completely replaces your theme and offers full site building capabilities with 49+ components. Respira has **Full Intelligence** support for Oxygen — including a dynamic component registry, JSON Schema generation, tree validation, and pre-built layout patterns.
+
+## Support Level
+
+Oxygen has **Full Intelligence** support — the deepest integration level available in Respira:
+
+- Dynamic component registry with 49 detected components
+- JSON Schema generation for every component type
+- Tree validator with hierarchy, ID, and property checks
+- Settings validator with data type and format enforcement
+- 6 pre-built layout patterns ready for injection
+- Element-level read/write with proper tree round-tripping
+- Widget shortcuts for all common Oxygen element types
+- 24-hour component registry caching
+
+---
 
 ## Data Structure
 
-Oxygen stores page layouts as serialized component trees in post meta. Each component has a unique ID and nested children:
+Oxygen stores page layouts as JSON trees in post meta (`ct_builder_shortcodes` or `ct_builder_json`). Each component has a unique ID, a type name, options, and optional children:
 
 ```json
 {
@@ -21,7 +36,10 @@ Oxygen stores page layouts as serialized component trees in post meta. Each comp
   "name": "ct_section",
   "options": {
     "ct_id": 1,
-    "selector": "section-1-123"
+    "selector": "section-1-123",
+    "width": "100%",
+    "background-color": "#ffffff",
+    "padding": "20px"
   },
   "children": [
     {
@@ -29,7 +47,9 @@ Oxygen stores page layouts as serialized component trees in post meta. Each comp
       "name": "ct_headline",
       "options": {
         "ct_content": "Welcome to Our Site",
-        "selector": "headline-2-123"
+        "selector": "headline-2-123",
+        "tag": "h1",
+        "color": "#000000"
       }
     },
     {
@@ -44,7 +64,78 @@ Oxygen stores page layouts as serialized component trees in post meta. Each comp
 }
 ```
 
-## Module Identification
+**Hierarchy:**
+- Section/Div (top-level container)
+  - Components (heading, text, button, etc.)
+    - Nested children (optional, recursive)
+
+**Component Structure:**
+- `id`: Unique identifier (numeric or string like `"section_abc123"`)
+- `name`: Component type (e.g., `"ct_link_button"`, `"ct_headline"`)
+- `options`: Component properties and styling
+- `children`: Array of nested child components (optional)
+
+**Special Properties:**
+- `ct_content`: Main content for text-based components
+- `ct_parent`: Parent component ID (set automatically)
+- `ct_depth`: Nesting depth (set automatically)
+
+---
+
+## Common Components
+
+| Component | Type | Key Options | Category |
+|-----------|------|-------------|----------|
+| Section | `ct_section` | width, padding, background | Structure |
+| Div | `ct_div_block` | layout settings | Structure |
+| Columns | `ct_columns` | column configuration | Structure |
+| Column | `ct_column` | width, padding | Structure |
+| Headline | `ct_headline` | ct_content, tag (h1-h6), color | Basic |
+| Text Block | `ct_text_block` | ct_content | Basic |
+| Button | `ct_link_button` | ct_content, url | Basic |
+| Link | `ct_link` | url, target | Basic |
+| Icon | `ct_icon` | icon_id | Basic |
+| Image | `ct_image` | src, alt | Media |
+| Video | `ct_video` | src, autoplay | Media |
+| Audio | `ct_audio` | src | Media |
+| Gallery | `ct_gallery` | images array | Media |
+| Slider | `ct_slider` | slides | Interactive |
+| Tabs | `ct_tabs` | tab items | Interactive |
+| Accordion | `ct_accordion` | items | Interactive |
+| Toggle | `ct_toggle` | content | Interactive |
+| Modal | `ct_modal` | trigger, content | Interactive |
+| Progress Bar | `ct_progress_bar` | value, max | Advanced |
+| Counter | `ct_counter` | start, end | Advanced |
+| Pricing Box | `ct_pricing_box` | title, price, features | Advanced |
+| Testimonial | `ct_testimonial` | quote, author | Advanced |
+| Icon Box | `ct_icon_box` | icon, title, text | Advanced |
+| Google Map | `ct_map` | address, zoom | Advanced |
+| Code Block | `ct_code_block` | code_php, code_css, code_js | Advanced |
+| Shortcode | `ct_shortcode` | shortcode content | Advanced |
+| Repeater | `ct_repeater` | query settings | WordPress |
+| Post Title | `ct_post_title` | tag | WordPress |
+| Post Content | `ct_post_content` | - | WordPress |
+| Featured Image | `ct_featured_image` | size | WordPress |
+| Menu | `ct_menu` | menu_id | WordPress |
+| Form | `ct_form` | fields | Form |
+
+### Widget Shortcuts
+
+When using `respira_add_*` shortcut tools, Respira maps generic widget names to the correct Oxygen type automatically:
+
+| Generic name | Oxygen type |
+|---|---|
+| `heading` | `ct_headline` |
+| `text-editor` | `ct_text_block` |
+| `button` | `ct_link_button` |
+| `image` | `ct_image` |
+| `google-maps` | `ct_map` |
+| `tabs` | `ct_tabs` |
+| `accordion` | `ct_accordion` |
+
+---
+
+## Element Targeting
 
 ### By Selector (Recommended)
 
@@ -62,91 +153,169 @@ Add a custom class in Oxygen's Advanced tab:
 { "admin_label": "hero-cta-button" }
 ```
 
-### By Path
-
-```json
-{ "path": "components[0].children[1]" }
-```
-
 ### By Type and Content
 
 ```json
 { "type": "ct_link_button", "match_content": "Get Started" }
 ```
 
-## Common Components
+### By Path
 
-| Component | Type | Key Options |
-|-----------|------|-------------|
-| Headline | `ct_headline` | ct_content, tag |
-| Text Block | `ct_text_block` | ct_content |
-| Button | `ct_link_button` | ct_content, url |
-| Image | `ct_image` | src, alt |
-| Icon | `ct_icon` | icon_id |
-| Section | `ct_section` | layout settings |
-| Columns | `ct_columns` | column configuration |
-| Div | `ct_div_block` | generic container |
-| Link | `ct_link` | url, target |
-| Code Block | `ct_code_block` | code_php, code_css, code_js |
+```json
+{ "path": "components[0].children[1]" }
+```
 
-## Example Prompts for Oxygen
+---
 
-**Content Updates:**
+## Oxygen Deep Intelligence (v6.2.0+)
 
+Respira ships a complete intelligence package for Oxygen that gives AI agents deep understanding of the builder's component model.
+
+### Component Registry
+
+The registry dynamically detects all 49 Oxygen components with their properties, types, defaults, nesting rules, and categories. Results are cached for 24 hours.
+
+```
+"What components does Oxygen support?" → Lists all 49 components with categories
+"Show me the properties for ct_link_button" → Returns all options with types and defaults
+```
+
+### JSON Schema Generation
+
+Get the full JSON Schema for any Oxygen component type. AI agents know exactly what settings a section, button, or heading accepts — with types, defaults, and format hints.
+
+```
+"What settings does a ct_section accept?" → Returns JSON Schema with all properties
+"Generate a schema for ct_pricing_box" → Full schema with nested property definitions
+```
+
+### Tree Validator
+
+Validates component hierarchy, unique IDs, property data types, colors, URLs, emails, and nested structures before injection. Detailed error messages prevent silent failures.
+
+**Validation checks:**
+- Unique component IDs within the page
+- Valid component names (type must be recognized)
+- Options must be an object if present
+- Children must be an array if present
+- Color values must be valid hex format
+- URLs must be properly formatted
+- Email addresses must be valid
+- Numeric properties must be numbers
+- Boolean properties must be booleans or boolean-like values
+
+### Settings Validator
+
+Property-level validation with data type enforcement and typo detection. When you pass an invalid property name, Respira suggests the closest match.
+
+### Layout Patterns
+
+6 pre-built patterns ready to inject with unique IDs and translatable strings:
+
+| Pattern | Description |
+|---------|-------------|
+| `hero-section` | Full-width hero with heading, subtext, and CTA button |
+| `three-column-features` | Feature showcase with icons and descriptions |
+| `call-to-action` | Centered CTA section with background |
+| `testimonial` | Quote display with author attribution |
+| `pricing-table` | Pricing comparison layout |
+| `image-with-text` | Two-column content with image |
+
+---
+
+## Element-Level Tools
+
+These tools work with Oxygen (and all other supported builders) for targeted edits without touching the full page structure:
+
+| Tool | What it does |
+|------|-------------|
+| `respira_find_element` | Search for elements by text, CSS class, type, or ID across a page |
+| `respira_update_element` | Update a single element's settings in-place |
+| `respira_batch_update` | Update multiple elements atomically (one extract, one inject) |
+| `respira_move_element` | Move an element to a different parent or position |
+| `respira_duplicate_element` | Clone an element (inserted after the original) |
+| `respira_remove_element` | Delete an element |
+| `respira_reorder_elements` | Reorder sibling elements within a container |
+
+---
+
+## Example Prompts
+
+**Content updates:**
 - "Update the Oxygen component labeled 'Footer Email' to support@example.com"
 - "Change the headline selector 'headline-2-123' to 'New Headline'"
 - "Replace the CTA button link with /pricing"
+- "Find all ct_link_button components with 'Learn More' and change to 'Get Started'"
 
-**Structure Queries:**
-
+**Structure queries:**
 - "Extract Oxygen structure for the homepage"
 - "List all buttons on page 42"
 - "Show me the component tree for this page"
 
-**Bulk Updates:**
+**Page building:**
+- "Build a hero section with a heading, subheading, and CTA button"
+- "Add a pricing table section to the landing page"
+- "Convert this HTML mockup to Oxygen components"
 
-- "Find all ct_link_button components with 'Learn More' and change to 'Get Started'"
-- "Update the copyright year in all text blocks"
-- "Change all H3 headlines to H2"
+**Intelligence:**
+- "What components does Oxygen support on this site?"
+- "Get the JSON Schema for ct_section"
+- "Validate this component tree before injecting it"
+
+---
 
 ## Templates & Reusable Parts
 
-Oxygen templates and reusable parts are editable:
+Oxygen templates (`ct_template` post type) and reusable parts are fully editable:
 
 - "List all Oxygen templates" → Shows template library
 - "Update the header template phone number" → Changes it site-wide
+- "Extract the footer template structure" → Full component tree
+
+Respira detects templates stored in both `ct_builder_shortcodes` and `ct_builder_json` meta keys.
+
+---
 
 ## Inner Content & Gutenberg
 
 Oxygen can include Gutenberg blocks via Inner Content. Respira can edit both the Oxygen structure and embedded Gutenberg content.
 
+---
+
 ## Limitations
 
-- **Conditions**: Oxygen conditions (visibility rules) are preserved but need the builder
-- **Dynamic data**: Dynamic data connections are preserved but not directly editable
-- **Global styles**: Oxygen's global colors and stylesheets need the builder interface
+- **Conditions**: Oxygen conditions (visibility rules) are preserved but require the builder to configure
+- **Dynamic data**: Dynamic data connections are preserved but not directly editable via MCP
+- **Global styles**: Oxygen's global colors and stylesheets require the builder interface
 - **Custom PHP**: Code blocks with PHP are preserved but not editable through Respira
+- **Oxygen 6**: Component detection works with Oxygen 3.x-4.x. Oxygen 6 detection is supported.
 
-## When to Use This Tool
-
-- **Quick content updates** - Change headlines, button text, or links
-- **Batch editing** - Update the same content across multiple templates
-- **SEO workflows** - Fix heading structure or missing content
-- **Client maintenance** - Make content changes without needing Oxygen knowledge
+---
 
 ## See Also
 
-- [wordpress_extract_builder_content](/tools/builders/extract-content) - View page structure
-- [wordpress_update_module](/tools/builders/update-module) - Update specific components
-- [wordpress_inject_builder_content](/tools/builders/inject-content) - Replace entire structure
-- [Page Builder Overview](/builders/overview) - Compare all supported builders
+- [`respira_find_element`](/tools/element-ops/find-element) — Find elements by content, type, or class
+- [`respira_update_element`](/tools/element-ops/update-element) — Update a single element
+- [`respira_extract_builder_content`](/tools/builders/extract-content) — Get full page structure
+- [`respira_inject_builder_content`](/tools/builders/inject-content) — Replace full page structure
+- [`respira_build_page`](/tools/builders/build-page) — Create a complete page from JSON
+- [Page Builder Overview](/builders/overview) — Compare all supported builders
 
-## v5.2.0 Elemental — Fix
+---
 
-### ct_template Detection
+## Version History
 
-Fixed: Oxygen templates using only `ct_builder_json` (without `ct_builder_shortcodes`) were not detected by `is_builder_used()`. Respira now checks both meta keys, matching the logic already used in content extraction.
+### v6.2.0 — Oxygen Deep Intelligence
 
-### Support Level
+Oxygen moves from Smart Defaults to **Full Intelligence** tier:
 
-Oxygen has **Smart Defaults** support — element operations work via the generic tree utility.
+- **Component registry** — 49 components detected dynamically with properties, types, defaults, nesting rules, and categories. Cached for 24 hours.
+- **JSON Schema generation** — Full schema for any component type. AI agents know exactly what settings each component accepts.
+- **Tree validator** — Validates hierarchy, unique IDs, property data types, colors, URLs, emails, and nested structures before injection.
+- **Settings validator** — Property-level validation with data type enforcement and typo suggestions.
+- **6 layout patterns** — Hero, features, CTA, testimonial, pricing, and image+text layouts ready to inject.
+
+### v5.2.0 — Foundation
+
+- **ct_template detection** — Fixed: Oxygen templates using only `ct_builder_json` (without `ct_builder_shortcodes`) were not detected. Respira now checks both meta keys.
+- Element-level operations via the generic tree utility.
