@@ -739,6 +739,21 @@
             "icon": "map",
             "pages": [
               {
+                "title": "Make a Page Responsive",
+                "path": "guides/make-responsive",
+                "icon": "smartphone"
+              },
+              {
+                "title": "Playbooks",
+                "path": "guides/playbooks",
+                "icon": "book-open"
+              },
+              {
+                "title": "Client Reports",
+                "path": "guides/client-reports",
+                "icon": "file-text"
+              },
+              {
                 "title": "SEO Audit Workflow",
                 "path": "guides/seo-audit-workflow",
                 "icon": "search"
@@ -967,6 +982,26 @@
               {
                 "title": "Flatsome",
                 "path": "builders/flatsome",
+                "icon": "layout"
+              },
+              {
+                "title": "Spectra",
+                "path": "builders/spectra",
+                "icon": "layout"
+              },
+              {
+                "title": "Kadence Blocks",
+                "path": "builders/kadence",
+                "icon": "layout"
+              },
+              {
+                "title": "GenerateBlocks",
+                "path": "builders/generateblocks",
+                "icon": "layout"
+              },
+              {
+                "title": "SeedProd",
+                "path": "builders/seedprod",
                 "icon": "layout"
               }
             ]

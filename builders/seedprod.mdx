@@ -1,0 +1,37 @@
+---
+title: 'SeedProd'
+description: 'Read support for SeedProd landing pages in Respira 7.1: detection, content extraction, and layout outline.'
+---
+
+# SeedProd
+
+SeedProd is a popular landing-page builder. Respira 7.1 adds read support: detection, content extraction, and layout outline. Write operations are not available yet.
+
+## Read-only in 7.1
+
+SeedProd is architecturally unlike the Gutenberg-based builders. Landing pages are a custom post type with a proprietary JSON layout document stored in postmeta, closer in shape to Elementor or Divi than to Gutenberg.
+
+SeedProd's serialisation is not documented at attribute granularity, so writing to it blind would risk corrupting paid customers' landing pages. The 7.1 decision is deliberate: ship honest read coverage now, keep the write surface closed until the format is mapped safely. Write calls return a structured error that points you at the SeedProd editor.
+
+### Detection and storage
+
+Respira detects SeedProd by its plugin markers (`SeedProd_Lite`, `SeedProd_Pro`, or `SeedProd`), covering both free and paid installs. The reader works against:
+
+- Custom post type `seedprod_lpage`
+- Layout JSON in postmeta `seedprod_lpage_data`
+- Page settings in postmeta `seedprod_lpage_settings`
+- Structure: sections, rows, columns, blocks, where each block is `{ id, type, settings }`
+
+The parser is defensive: missing keys default to empty, unknown block types pass through with their raw settings preserved, and a diverging shape returns a `seedprod_schema_unknown` marker rather than throwing.
+
+## Supported operations
+
+| Operation | Status |
+|-----------|--------|
+| Detection | Supported |
+| Extract content | Supported |
+| Layout outline | Supported |
+| Inject content | Not available in 7.1 |
+| Element-level editing | Not available in 7.1 |
+
+To edit a SeedProd page, an agent can read its structure for context, then make changes in the SeedProd editor.

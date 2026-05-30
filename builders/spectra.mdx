@@ -1,0 +1,33 @@
+---
+title: 'Spectra'
+description: 'AI-assisted editing for Spectra, the Gutenberg block library by the Astra team. Full read and write support in Respira 7.1.'
+---
+
+# Spectra
+
+Spectra (Ultimate Addons for Gutenberg) is a Gutenberg-native block library from Brainstorm Force, the team behind the Astra theme, with over 1,000,000 active installs. Respira 7.1 adds Spectra as a supported builder.
+
+## How it works
+
+Spectra does not invent a new data model. Its blocks are standard WordPress blocks serialised into `post_content` as block-comment markup. Because of that, Respira treats Spectra as a specialisation of its Gutenberg adapter: detection and display identity change, but the parse, extract, inject, and element-level paths are the same proven Gutenberg code.
+
+### Detection
+
+Respira detects Spectra by the plugin's own markers (`UAGB_Loader`, `UAGB_FILE`, or `UAGB_VER`). A page is only handled as Spectra when it actually contains a `spectra/*` (v3 and later) or `uagb/*` (legacy) block. Both namespaces are valid at the same time on real sites, because Spectra's migration leaves legacy blocks in place rather than rewriting `post_content`.
+
+On a site that merely has Spectra installed, plain-Gutenberg pages still detect as Gutenberg. Detection is per page, so mixed-builder sites resolve each page independently.
+
+## Supported operations
+
+| Operation | Status |
+|-----------|--------|
+| Extract content | Supported |
+| Inject content | Supported |
+| Element-level editing (find, update, move, duplicate, remove) | Supported |
+| build_page | Supported |
+| Snapshots | Supported |
+| Mixed-builder detection | Supported |
+
+## Blocks
+
+The module catalogue is read from the live `WP_Block_Type_Registry`, so whatever the installation registers under `spectra/*` or `uagb/*` is what the adapter reports. Common blocks include the Container, Advanced Heading, Info Box, Buttons, Image, Icon List, and Post Grid.

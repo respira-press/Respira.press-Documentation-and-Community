@@ -1,0 +1,50 @@
+---
+title: 'Make a page responsive in one call'
+description: 'Respira 7.1 infers tablet and mobile breakpoints from a desktop layout and writes them back, across Bricks, Elementor, Divi 4, Beaver Builder, and WPBakery.'
+---
+
+# Make a page responsive in one call
+
+A common gap on builder sites: the desktop layout looks right, but tablet and mobile were never tuned. Respira 7.1 closes it. Ask your agent to make a page responsive and it reads the desktop layout, infers sensible tablet and mobile values, and writes the breakpoints back. No opening the editor, no per-breakpoint fiddling.
+
+## Supported builders
+
+Responsive inference runs on a shared responsive-math core, available on:
+
+- Bricks
+- Elementor
+- Divi 4
+- Beaver Builder
+- WPBakery
+
+## How it works
+
+The agent calls the make-responsive operation with a page or post ID:
+
+```
+POST /wp-json/respira/v1/builder/responsive/{page_id}
+```
+
+The active builder runs a deterministic responsive pass: it scales typography and spacing across breakpoints using thresholds tuned per builder, then writes tablet and mobile overrides into the builder's native data shape.
+
+### Safe by design
+
+- **Idempotent.** Running it again on an already-tuned page is a no-op.
+- **Non-destructive.** Existing responsive overrides are never overwritten. The pass only fills gaps.
+- **Honest about no-ops.** If the page already has breakpoint overrides, or nothing crosses the scaling thresholds, the call returns a clear "no responsive changes needed" message instead of inventing work.
+- **Snapshotted.** Like every write, the change creates a before/after snapshot you can restore from the Changes page.
+
+Use a dry run first to preview what would change without writing.
+
+## Example
+
+```text
+You: "Make the homepage responsive."
+AI: Detects the active builder, reads the desktop layout, infers tablet and mobile
+    breakpoints, and writes them back. Returns a summary of what changed, or
+    "no changes needed" if the page was already responsive.
+```
+
+## Pairs well with section presets
+
+Multi-column Bricks [section presets](/builders/bricks) use flex rows, so a follow-up make-responsive call makes an inserted section fully responsive in one step.

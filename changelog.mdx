@@ -52,6 +52,44 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-06-02" description="Respira for WordPress v7.1.0 — Canopy" tags={["feature", "builders", "responsive", "bricks", "playbooks", "admin"]}>
+
+### What's New in v7.1.0 "Canopy"
+
+The biggest release since launch. Canopy widens the builder coverage, adds responsive inference, gives Bricks a real design-system toolset, introduces repeatable agent workflows, and rebuilds the admin.
+
+**Responsive in one call**
+- Ask the agent to make a page responsive and it reads the desktop layout, infers sensible tablet and mobile values, and writes the breakpoints back. No opening the editor, no per-breakpoint fiddling.
+- Available on Bricks, Elementor, Divi 4, Beaver Builder, and WPBakery, on a shared responsive-math core.
+
+**Four more builders (16 total)**
+- [Spectra](/builders/spectra), [Kadence Blocks](/builders/kadence), and [GenerateBlocks](/builders/generateblocks): Gutenberg-native block libraries with full read and write through the Gutenberg engine, with per-page detection for mixed-builder sites.
+- [SeedProd](/builders/seedprod): read support (detection, extraction, outline). Writes are closed in 7.1 to protect the proprietary layout format.
+
+**Bricks design-system tooling**
+- Import design tokens from Tailwind, Figma, or Style Dictionary into Bricks global classes and variables.
+- Insert curated, production-ready section presets.
+- Scaffold and lint BEM-style global classes.
+- Write-path intelligence: structure autofix, quirk coercion, and signature checks that prevent the silent blank-render class of failure.
+
+**Playbooks**
+- Save a repeatable agent workflow once (a sequence of safe tool calls with inputs and captured outputs), register it, and run it on demand. See the [Playbooks guide](/guides/playbooks).
+- Destructive tools cannot be hidden inside a playbook: they stay in the agent's hand with the existing approval round-trip. Create-time validation catches arg-name and depth mistakes before a playbook ever ships.
+
+**Custom Structures**
+- Create and manage custom post types, taxonomies, and ACF field groups through Respira tools.
+
+**Client reports**
+- Turn an audit into a clean, shareable report you can hand a client. See the [Client reports guide](/guides/client-reports).
+
+**Elementor 4 atomic elements**
+- Full write-path support for Elementor 4 atomic widgets and layout elements (the `$$type`-wrapped storage shape), with a styles writer and CSS regeneration on every write.
+
+**Rebuilt admin**
+- A React-first admin: setup, activity, skills, reports, and settings in one place, with a classic mode for the legacy views. The admin ships as a locally pre-built bundle, so it works offline, behind strict CSP, and on air-gapped installs.
+
+</Update>
+
 <Update label="2026-04-09" description="Respira for WordPress v6.0.0 + WooCommerce Add-on v2.0.0 + MCP Server v6.0.0 — Storefront" tags={["feature", "builders", "woocommerce", "mcp", "commerce"]}>
 
 ### What's New in 6.0.0 "Storefront"

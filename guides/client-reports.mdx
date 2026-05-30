@@ -1,0 +1,47 @@
+---
+title: 'Client reports'
+description: 'Turn your Respira audit log into a structured activity report you can hand a client, scoped to a date range, content type, or single page builder.'
+---
+
+# Client reports
+
+Every Respira write is recorded in a per-site audit log. Respira 7.1 turns that log into a structured activity report: counts, top tools, concrete examples, notable moments, and time-saved estimates. Your own agent shapes the prose, so the same data becomes a client update, a case study, or a personal recap depending on how you ask.
+
+## The ability
+
+Reports come from a read-only ability:
+
+```
+respira/generate-activity-report
+```
+
+It reads the audit log and returns structured data. It never writes, and it is safe to run as often as you like.
+
+## What you can control
+
+- **Window.** `window_days` (default 30, 1 to 365), or an explicit `start_date` and `end_date` in ISO 8601.
+- **Content types.** Restrict to any of: pages, posts, products, variables, snapshots, migrations, audits, skills. Defaults to all.
+- **Scope.** Focus on specific page, post, or product ids, or filter to a single page builder.
+- **Framing.** How the consuming agent should shape the prose:
+  - `personal_recap` — what you got done
+  - `agency_client_report` — an update for the client paying for the work
+  - `agency_case_study` — a reusable before-and-after story
+  - `team_report` — an internal summary
+  - `testimonial_draft` — a starting point for a review
+  - `build_in_public` — a public progress post
+- **Output mode.** `structured` keeps the data-first shape; `client_report` and `ops_report` add client-ready sections.
+
+## Time saved
+
+The report estimates time saved, calibrated to per-tool baselines rather than a flat number, so the figure reflects the actual mix of work done in the window.
+
+## Example
+
+```text
+You: "Give me a client report for acme.com for the last 30 days, agency_client_report framing."
+AI: Invokes respira/generate-activity-report with window_days 30 and
+    framing agency_client_report, then writes a clean client-facing summary
+    from the returned counts, examples, and time-saved estimate.
+```
+
+Because the agent shapes the prose from real audit data, the report is grounded in what actually happened on the site, not a generated guess.

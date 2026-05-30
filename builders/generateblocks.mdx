@@ -1,0 +1,35 @@
+---
+title: 'GenerateBlocks'
+description: 'AI-assisted editing for GenerateBlocks, the minimalist Gutenberg block library by the GeneratePress team. Full read and write support in Respira 7.1.'
+---
+
+# GenerateBlocks
+
+GenerateBlocks is a minimalist Gutenberg-native block library from Tom Usborne, creator of GeneratePress, with over 200,000 active installs. Respira 7.1 adds GenerateBlocks as a supported builder.
+
+## How it works
+
+GenerateBlocks blocks live under the `generateblocks/*` and `generateblocks-pro/*` namespaces and serialise into `post_content` as standard block markup. Respira handles them as a specialisation of its Gutenberg adapter, so parse, extract, inject, and element-level editing reuse the Gutenberg paths.
+
+### Detection
+
+Respira detects GenerateBlocks by the plugin's markers (`GENERATEBLOCKS_VERSION`, the `GenerateBlocks` class, or `GENERATEBLOCKS_DIR`). The `generateblocks-pro/*` namespace is only present when the Pro add-on is also installed. A page is handled as GenerateBlocks only when it contains a real `generateblocks/*` block; otherwise plain-Gutenberg pages detect as Gutenberg.
+
+### v1 and v2 blocks
+
+GenerateBlocks 2.0 introduced the Styles Builder but did not auto-migrate older content, so v1 and v2 block schemas coexist on real sites. The adapter reads the module catalogue from the live block registry, so it reports whatever the installation actually has, and the curated fallback covers both versions.
+
+## Supported operations
+
+| Operation | Status |
+|-----------|--------|
+| Extract content | Supported |
+| Inject content | Supported |
+| Element-level editing (find, update, move, duplicate, remove) | Supported |
+| build_page | Supported |
+| Snapshots | Supported |
+| Mixed-builder detection | Supported |
+
+## Blocks
+
+Common blocks include Container, Grid, Headline, Buttons, Button, and Image. The exact set matches what the installation registers under the GenerateBlocks namespaces.

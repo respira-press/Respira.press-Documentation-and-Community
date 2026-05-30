@@ -1,0 +1,65 @@
+---
+title: 'Playbooks'
+description: 'Save a repeatable agent workflow once and run it on demand. Respira 7.1 playbooks are validated at create time and registered as callable abilities.'
+---
+
+# Playbooks
+
+A playbook is a repeatable agent workflow saved once and run on demand. Instead of re-prompting the same multi-step task every time, you capture it as a named sequence of safe tool calls with typed inputs, register it, and invoke it whenever you need it.
+
+## Shape of a playbook
+
+A playbook has four parts:
+
+- **id** — lowercase, letters, digits, and hyphens, up to 48 characters. Example: `case-study-create`.
+- **label** — a human-readable name.
+- **input_schema** — a JSON-schema object describing the inputs, with `type`, `properties`, and `required`.
+- **steps** — an ordered list. Each step is `{ tool, args, capture? }`. Args can reference inputs (`{{input.client_name}}`) and the captured output of an earlier step (`{{post.id}}`).
+
+### Example
+
+```json
+{
+  "id": "case-study-create",
+  "label": "Create Case Study",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "client_name": { "type": "string" },
+      "industry": { "type": "string" }
+    },
+    "required": ["client_name", "industry"]
+  },
+  "steps": [
+    {
+      "tool": "respira_create_custom_post",
+      "args": { "type": "case_study", "title": "{{input.client_name}}", "status": "draft" },
+      "capture": "post"
+    },
+    {
+      "tool": "respira_update_custom_post",
+      "args": { "type": "case_study", "id": "{{post.id}}", "meta": { "industry": "{{input.industry}}" } }
+    }
+  ]
+}
+```
+
+## Validated at create time
+
+A playbook that looks healthy but fails on first invoke is the failure mode 7.1 designed out. The validator checks, fail-fast, before a playbook is ever stored:
+
+- **Canonical args.** Each step's args must carry the keys the tool actually reads. Near-miss names get a rename hint (for example `post_type` to `type`) instead of a runtime surprise.
+- **Destructive tools refused.** A playbook cannot hide a destructive tool (deletes, restores, element removal, and similar). Those stay in the agent's hand with its existing approval round-trip. The error tells you to split the flow.
+- **Depth and cycles.** A playbook can call another playbook, but composition is capped at depth 5 and self-reference or cycles are rejected.
+
+## Lifecycle
+
+Playbooks are managed through Respira's playbook tools (create, list, get, update, delete) and surface in the Playbooks screen in the admin.
+
+Once created, a playbook is registered as an ability under `respira-playbooks/{id}`, so an agent runs it by invoking that ability with the playbook's inputs.
+
+## When to use a playbook
+
+- A multi-step content operation you repeat (create a case study, spin up a landing page from a brief, publish-and-link a post).
+- A team standard you want every agent run to follow the same way.
+- Anything you have re-prompted more than twice.

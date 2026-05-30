@@ -1,0 +1,31 @@
+---
+title: 'Kadence Blocks'
+description: 'AI-assisted editing for Kadence Blocks, the Gutenberg block library by StellarWP. Full read and write support in Respira 7.1.'
+---
+
+# Kadence Blocks
+
+Kadence Blocks is a Gutenberg-native block library from StellarWP (formerly Kadence WP), with over 400,000 active installs. Respira 7.1 adds Kadence as a supported builder.
+
+## How it works
+
+Kadence blocks live under the `kadence/*` namespace and serialise into `post_content` through standard WordPress block markup. Respira handles Kadence as a specialisation of its Gutenberg adapter: detection and identity change, while parse, extract, inject, and element-level editing reuse the Gutenberg paths.
+
+### Detection
+
+Respira detects Kadence Blocks by the plugin's markers (`KADENCE_BLOCKS_VERSION`, `Kadence_Blocks_Frontend`, `Kadence_Blocks`, or `KADENCE_BLOCKS_PATH`). A page is handled as Kadence only when it contains a real `kadence/*` block. Sites that merely have Kadence installed fall through to the Gutenberg adapter on plain-Gutenberg pages, so detection stays accurate on mixed sites.
+
+## Supported operations
+
+| Operation | Status |
+|-----------|--------|
+| Extract content | Supported |
+| Inject content | Supported |
+| Element-level editing (find, update, move, duplicate, remove) | Supported |
+| build_page | Supported |
+| Snapshots | Supported |
+| Mixed-builder detection | Supported |
+
+## Blocks
+
+The catalogue comes from the live block registry, so the available blocks match what the installation registers under `kadence/*`. Common blocks include Row Layout, Advanced Heading, Advanced Button, Info Box, Icon List, Accordion, Tabs, and Form.
