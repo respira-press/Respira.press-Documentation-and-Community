@@ -13,11 +13,25 @@ This path sits alongside the API key and connect-by-link methods. Those still wo
 - **Cursor, Claude Code, Codex, n8n, and other clients**: see [MCP Setup](/mcp-install).
 - **Link your site to your dashboard**: see [Connecting Your Site](/dashboard/connecting-your-site).
 
+> **This is a settings action, not a chat message.** You add the connector where your app lists its connectors. Pasting the URL into a chat will not connect anything.
+
+## Which apps support this
+
+Browser sign-in works with any MCP client that has shipped remote-server OAuth. Confirmed today:
+
+- **Claude Desktop** and **claude.ai (web)** — Settings → Connectors → Add custom connector (paid plans).
+- **Claude Code** — `claude mcp add --transport http respira <your MCP URL>`.
+- **ChatGPT** — Developer Mode (Plus, Pro, Team, Enterprise, Edu): Settings → Connectors → Add custom connector.
+- **Cursor** — native MCP OAuth since v1.0; add the server URL and authorize in the browser.
+- **Codex CLI** — OAuth login for streamable-HTTP servers (interactive; a headless run uses a key instead).
+
+For clients that support remote MCP but not OAuth yet, or config-file clients (OpenCode, Antigravity, n8n, Windsurf), connect to the **same site URL** with an API key in an `Authorization` header, or use the local install. See [MCP Setup](/mcp-install).
+
 ## What you need
 
 - The Respira for WordPress plugin installed and active on the site, on a version that supports OAuth connections.
 - A Respira account at [respira.press](https://www.respira.press). A free trial works.
-- A recent build of Claude Desktop (the one with **Connectors** in Settings), or claude.ai with custom connectors.
+- An app from the list above, signed in.
 
 ## How it works
 
