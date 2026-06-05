@@ -1,0 +1,74 @@
+---
+title: "Connect Claude Desktop (OAuth)"
+description: "Connect Claude Desktop or claude.ai to your WordPress site by URL with a one-time browser sign-in. No API key to paste, no file to download."
+---
+
+# Connect Claude Desktop with a browser sign-in
+
+This is the simplest way to connect **Claude Desktop** or **claude.ai** to a WordPress site running Respira. You add the site as a custom connector by URL, approve access once in your browser, and the Respira tools appear. There is no API key to paste and no file to download, and you can disconnect the app at any time.
+
+This path sits alongside the API key and connect-by-link methods. Those still work exactly as before. Use whichever fits your client:
+
+- **Claude Desktop / claude.ai** with browser sign-in: this page.
+- **Cursor, Claude Code, Codex, n8n, and other clients**: see [MCP Setup](/mcp-install).
+- **Link your site to your dashboard**: see [Connecting Your Site](/dashboard/connecting-your-site).
+
+## What you need
+
+- The Respira for WordPress plugin installed and active on the site, on a version that supports OAuth connections.
+- A Respira account at [respira.press](https://www.respira.press). A free trial works.
+- A recent build of Claude Desktop (the one with **Connectors** in Settings), or claude.ai with custom connectors.
+
+## How it works
+
+Your WordPress site advertises Respira at respira.press as its authorization server. When a client connects, it discovers that automatically, sends you to respira.press to sign in and approve, and receives a token that only works for that one site. Nothing else needs to be configured by hand.
+
+## Find your site's MCP URL
+
+Your MCP URL is your site address followed by the Respira endpoint:
+
+```
+https://your-site.com/wp-json/respira/v1/mcp
+```
+
+You can also copy the exact URL from two places:
+
+- In WordPress admin, open **Respira → Setup**, go to the **pair an agent** step, and copy the URL shown under **connect by browser sign-in**.
+- In your Respira dashboard, open **MCP Setup**. Each connected site lists its MCP URL under **Connect by browser sign-in**.
+
+## Connect, step by step
+
+### Claude Desktop
+
+1. Open **Settings → Connectors** and choose **Add custom connector**.
+2. Paste your site's MCP URL and confirm.
+3. A browser window opens at respira.press. Sign in to your Respira account.
+4. Review the consent screen. It shows the app, the target site, the permissions, and your account email. Click **Approve**.
+5. Claude Desktop finishes the connection and the Respira tools appear. Try a read action like listing pages to confirm.
+
+### claude.ai
+
+1. Open the connectors settings and choose **Add custom connector**.
+2. Paste your site's MCP URL.
+3. Sign in at respira.press and **Approve** the same consent screen.
+4. The Respira tools appear in your chat.
+
+## What access you are granting
+
+The consent screen shows two permission levels:
+
+- **Read**: read your pages, posts, and site content.
+- **Write**: create and edit pages, posts, and media.
+
+Any per-site limits you set on the connection (a tool allowlist, or approvals required for certain actions) still apply on top of this. The token is bound to the one site you approved. A token issued for site A cannot be used on site B.
+
+## Manage or disconnect a connected app
+
+Open **Connected apps** in your Respira dashboard at [respira.press/dashboard/settings/connected-apps](https://www.respira.press/dashboard/settings/connected-apps). You will see every app you connected by OAuth, the site it can reach, the permissions, and when it was last used. Click **Disconnect** to revoke an app. It loses access right away, and would need to be authorized again to reconnect.
+
+## Troubleshooting
+
+- **The client cannot find the connector.** Make sure the URL is exactly your site address plus `/wp-json/respira/v1/mcp`, with no trailing characters. Open that URL in a browser; you should get a short JSON error asking for authorization, not a 404.
+- **The browser sign-in does not return to the client.** Complete the sign-in and consent in the same browser, then return to your client. If the window was blocked, allow pop-ups for respira.press and try again.
+- **The connection drops after a while.** Tokens refresh automatically. If a connection was disconnected from the dashboard, reconnect it from your client to authorize again.
+- **You want a key-based setup instead.** Use the API key path on the **pair an agent** step in the plugin, or the config download on the dashboard **MCP Setup** page.

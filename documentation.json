@@ -69,6 +69,11 @@
                 "icon": "link"
               },
               {
+                "title": "Connect Claude Desktop (OAuth)",
+                "path": "connect-claude-desktop-oauth",
+                "icon": "shield-check"
+              },
+              {
                 "title": "Quick Start Guide",
                 "path": "quick-start-guide",
                 "icon": "zap"
