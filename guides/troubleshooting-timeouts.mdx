@@ -1,0 +1,77 @@
+---
+title: Troubleshooting tool timeouts
+description: What to do when a Respira tool returns tool_timeout. Covers the per-call watchdog, upload-specific limits, and the diagnose probe timeout.
+---
+
+# Troubleshooting tool timeouts
+
+A `tool_timeout` response from the Respira MCP means a single tool call did not complete inside its allotted window. The MCP returns a structured error instead of letting the call hang and wedge the rest of the stdio session.
+
+```json
+{
+  "error": "tool_timeout",
+  "tool": "respira_extract_builder_content",
+  "timeout_ms": 120000,
+  "site": { "id": "...", "url": "..." },
+  "hint": "..."
+}
+```
+
+The hint always carries the next step. Read it first.
+
+## The three timeout knobs
+
+There are three independent timeout limits, each with its own env var. Pick the right one based on which tool is failing.
+
+### 1. Per-tool watchdog
+
+```bash
+RESPIRA_MAX_TOOL_TIMEOUT_MS  # default 120000 (120s)
+```
+
+Caps every tool handler. Raise it when a tool genuinely needs more time. The lower bound is 5 seconds (so a typo cannot disable the watchdog).
+
+When to raise: large pages with hundreds of widgets, slow shared hosting, or sites with a CDN that adds 15 to 20 seconds of cold-start latency. Set this in the MCP env once and forget:
+
+```bash
+export RESPIRA_MAX_TOOL_TIMEOUT_MS=300000  # 5 minutes
+```
+
+### 2. Upload-specific timeout
+
+```bash
+RESPIRA_UPLOAD_TIMEOUT_MS    # default 60000 (60s)
+RESPIRA_MAX_UPLOAD_MB        # default 50
+```
+
+Apply only to `respira_upload_media`. Uploads have a hard AbortController abort separate from the general watchdog because a stalled HTTP upload can hang on socket-level reads that the watchdog cannot interrupt. The 50 MB preflight prevents accidental upload of a multi-gigabyte file (which would always timeout regardless of the wall-clock setting).
+
+### 3. Diagnose probe timeout
+
+```text
+respira_diagnose_connection(probe_timeout_ms: 30000)
+```
+
+Per-probe timeout for the five connection probes (HEAD root, GET ping, OPTIONS write check, REST root, rest_route fallback). Default 30 seconds in v6.17+ (was 15 seconds in earlier versions). Clamped between 5 seconds and 60 seconds.
+
+Bump this when the site is behind a slow edge layer. Some Cloudflare custom rules add 8 to 12 seconds of latency before forwarding to origin, and the old 15-second default would falsely report the MCP as broken when curl from the same machine returned in under 4 seconds.
+
+## What to try when a tool times out
+
+Follow the same triage rule the MCP server's instructions tell every agent to follow:
+
+1. Read the structured hint in the error response. It usually names the right next step.
+2. Retry the tool once. Transient network blips are real.
+3. Run `respira_search_docs` with the symptom as the query. Most timeout patterns are documented.
+4. Run `respira_diagnose_connection`. It probes the same site with multiple methods and reports which layer is slow (origin, Cloudflare, Wordfence, plugin handler).
+5. If diagnose comes up clean and the tool still times out, ask the user if they want to file a bug. If yes, call `respira_report_issue`. The maintainer gets an email with the full context.
+
+## When to raise the limits vs report it
+
+Raise the limit when the timeout reflects a real characteristic of the site you cannot change (slow host, large pages, mandatory CDN with high latency). Report it when the timeout is unexpected for a site that handles the same operation fast from curl. The diagnose probes will tell you which case you are in.
+
+## Related
+
+- `respira_diagnose_connection` — full self-check battery
+- `respira_search_docs` — check for documented workarounds before retrying
+- `respira_report_issue` — file the bug if everything above came up empty

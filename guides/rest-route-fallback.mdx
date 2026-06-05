@@ -1,0 +1,72 @@
+---
+title: rest_route fallback when /wp-json is shadowed
+description: WordPress rewrite rules sometimes shadow the /wp-json/ path and break REST API access. Respira detects this and auto-falls back to the ?rest_route= query path.
+---
+
+# rest_route fallback when /wp-json is shadowed
+
+Some WordPress installations have rewrite rules (often added by SEO plugins, custom .htaccess, or a theme's permalink hooks) that match `/wp-json/anything` before the REST API gets a chance. The plugin's tool call returns a 301 redirect to the homepage with an `x-redirect-by: WordPress` header instead of the expected JSON.
+
+Respira detects this automatically.
+
+## What the MCP does
+
+Starting in mcp-server v6.11.2, every site is probed once per session. If the first call to `/wp-json/respira/v1/ping` returns a redirect to the homepage, the MCP transparently re-issues the same call against the `?rest_route=` query path:
+
+```
+https://yoursite.com/?rest_route=/respira/v1/ping
+```
+
+This is the canonical WordPress fallback for sites where `/wp-json/` is shadowed. WordPress core ships it as a permanent escape hatch.
+
+The fallback is sticky per session: once activated, every subsequent tool call goes directly to the `rest_route` path without re-probing. One stderr warning is emitted the first time the fallback activates per session, so you know it happened.
+
+## How to make it permanent
+
+If you know your site has a shadowed `/wp-json/`, set the `forceRestRoute` flag in the site's config so the MCP skips the probe entirely:
+
+```json
+{
+  "sites": [
+    {
+      "siteId": "production",
+      "siteUrl": "https://yoursite.com",
+      "apiKey": "respira_...",
+      "forceRestRoute": true
+    }
+  ]
+}
+```
+
+That removes the one-time probe cost on session start and keeps the bypass on across MCP restarts.
+
+## How to confirm the fallback is active
+
+Run the diagnostic:
+
+```text
+Run respira_diagnose_connection on this site
+```
+
+The structured response includes three fields that triangulate the state:
+
+- `rest_route_fallback_worked` — true if the `?rest_route=` path returned 2xx during the probe
+- `rest_route_fallback_active` — true if the current session has already activated the fallback
+- `force_rest_route_configured` — true if `forceRestRoute` is set in the site config
+
+When all three are present in the diagnostic, the rewrite shadowing is confirmed and the fallback is mitigating it.
+
+## How to fix it properly
+
+The fallback works, but the root cause is a rewrite rule in your site that should not match `/wp-json/`. Common culprits:
+
+- SEO plugins that add catch-all rewrites for clean URLs
+- Custom .htaccess rules that redirect any unknown path to the homepage
+- A theme's `template_redirect` hook that runs before WordPress recognizes REST URLs
+
+If you can identify and remove the rule, drop `forceRestRoute` and the MCP will probe `/wp-json/` again on the next session. If you can't, leave the flag on. Either path works.
+
+## Related
+
+- `respira_diagnose_connection` — runs the probe by hand
+- Cloudflare allowlist — separate problem (edge layer vs origin layer), separate doc

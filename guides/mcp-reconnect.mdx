@@ -1,0 +1,88 @@
+---
+title: When the MCP does not reconnect after Claude restart
+description: Why the Respira MCP sometimes does not reappear when Claude restarts and how to recover quickly. Includes the bootstrap log line that confirms which sites loaded.
+---
+
+# When the MCP does not reconnect after Claude restart
+
+Claude Desktop and Claude Code spawn MCP servers as child processes over stdio. After a period of inactivity (typically seven to eight hours), the parent client shuts those processes down. When you restart Claude, the client tries to relaunch every configured MCP. Sometimes the Respira MCP comes back on the first restart. Sometimes it takes two.
+
+This is on the Claude side, not the MCP side. The MCP server only runs when the parent spawns it. There is nothing the server can do to keep itself alive when the parent decides to stop.
+
+What the MCP does help with is making the reconnect visible.
+
+## How to tell whether the MCP came back
+
+Starting in mcp-server v6.17.0, every connection prints one line to stderr on successful handshake:
+
+```
+respira-mcp v6.17.0 ready · 2 sites: yoursite.com, otherclient.com
+```
+
+Look for this line in the Claude activity log or the IDE terminal. If you see it, the MCP is loaded and the listed sites are addressable. If you don't see it after a restart, the MCP did not load.
+
+Pre-v6.17.0 the bootstrap line was the generic "running on stdio" and did not include the site list, so you had to test a tool to find out which sites came back. The new line answers both questions at once.
+
+## What to do when it doesn't reconnect
+
+The two-restart pattern usually unsticks it:
+
+1. Fully quit Claude with Cmd-Q (not the close-window shortcut)
+2. Reopen Claude
+3. Wait for the activity log to show the bootstrap line above
+4. If it is not there, repeat step 1
+
+If two restarts do not bring it back, check that your local config file still has the `respira-wordpress` entry. Local config paths:
+
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json` (Desktop) or `~/.mcp.json` in the project directory (Code)
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- Linux: `~/.config/Claude/claude_desktop_config.json`
+
+The entry should look like:
+
+```json
+{
+  "mcpServers": {
+    "respira-wordpress": {
+      "command": "npx",
+      "args": ["-y", "@respira/wordpress-mcp-server"]
+    }
+  }
+}
+```
+
+If the entry is missing, Claude is not trying to spawn the MCP. If it is present but you still don't see the bootstrap line, you have a path or permissions issue at the npx layer.
+
+## Why the legacy two-entry setup makes this harder
+
+Some customers have two separate MCP entries in their config:
+
+- `respira-wordpress` pointing at one site
+- `respira-ogw` (or any per-site name) hardwired to another site
+
+This is the pre-v6.12 pattern, before site_id-per-call was supported. With two entries, every reconnect cycle has to bring back two MCP processes, and the failure modes multiply. Consolidate to one entry covering all your sites:
+
+```json
+{
+  "mcpServers": {
+    "respira-wordpress": {
+      "command": "npx",
+      "args": ["-y", "@respira/wordpress-mcp-server"]
+    }
+  }
+}
+```
+
+Then drive site selection per call:
+
+```text
+List the pages on otherclient.com
+```
+
+The MCP routes the call to the right site based on the active site context (set via `respira_switch_site` or passed as `site_id` on each tool call). One config entry, multiple sites, fewer moving parts at reconnect time.
+
+## Related
+
+- `respira_switch_site` — flip the active site for the current session
+- `site_id` per-call override — pass a specific site without changing the active site
+- `respira_list_sites` — confirm which sites the MCP loaded

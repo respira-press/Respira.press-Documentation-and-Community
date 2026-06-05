@@ -36,6 +36,10 @@ Make sure you have:
 3. Go to **Plugins** in WordPress Admin
 4. Find **Respira for WordPress** and click **Activate**
 
+<Callout kind="info">
+**Locked-down hosting?** If your WordPress database user does not have `CREATE TABLE` / `ALTER TABLE` privileges (common on managed enterprise hosting and some compliance-locked shared hosts), the activation hook can't provision Respira's three tables and the setup wedges at the API key step. See [Manual table provisioning](/troubleshooting/manual-install) for the workaround: a one-time SQL bundle your DBA can run via phpMyAdmin / wp-cli / mysql client. Your WordPress user never needs elevated privileges, before or after.
+</Callout>
+
 ## Step 2: Connect the site to your Respira account
 
 The fastest way is the auto-connect handshake. One click in WordPress admin, one click in the Respira dashboard, done.

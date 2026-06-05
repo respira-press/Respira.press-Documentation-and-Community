@@ -1,0 +1,49 @@
+---
+title: "Installation"
+description: "Prerequisites and step-by-step setup for Inhale: MCP Abilities."
+---
+
+## Prerequisites
+
+| Requirement | Minimum |
+|---|---|
+| WordPress | 6.8 or later |
+| PHP | 7.4 or later |
+| [WordPress MCP Adapter](https://github.com/WordPress/mcp-adapter) | Latest |
+
+The Abilities API is bundled in WordPress core from 6.9 onward. On 6.8 you'll need to install the [Abilities API plugin](https://github.com/WordPress/abilities-api) alongside the MCP Adapter.
+
+## Install via wp-admin
+
+1. Open your site's wp-admin and go to **Plugins → Add New**.
+2. Search for **Inhale: MCP Abilities**.
+3. Click **Install Now**, then **Activate**.
+4. The plugin appears under **Settings → Inhale: MCP Abilities**.
+
+## Install via Composer
+
+If your site is managed with Composer (Bedrock, WP-CLI workflows, deployment automation):
+
+```bash
+composer require respira/inhale-mcp-abilities
+wp plugin activate inhale-mcp-abilities
+```
+
+Inhale: MCP Abilities follows the [WPackagist](https://wpackagist.org) conventions; if your `composer.json` already includes WPackagist, no additional repository configuration is needed.
+
+## Install via .zip upload
+
+1. Download the latest `inhale-mcp-abilities.zip` from [wp.org](https://wordpress.org/plugins/inhale-mcp-abilities/).
+2. In wp-admin, go to **Plugins → Add New → Upload Plugin**.
+3. Choose the zip and click **Install Now**, then **Activate**.
+
+## First-time setup
+
+1. Confirm the WordPress MCP Adapter is installed and active.
+2. Open **Settings → Inhale: MCP Abilities**.
+3. Review the abilities table. Nothing is exposed by default.
+4. Tick the abilities you want exposed to your default MCP server. Destructive abilities ask for one confirmation.
+5. Click **Save changes**.
+6. Copy the endpoint shown in the **Connection** section and paste it into your MCP client.
+
+See [Connecting MCP clients](/inhale-mcp-abilities/connecting-mcp-clients/) for client-specific instructions.
