@@ -74,6 +74,11 @@
                 "icon": "shield-check"
               },
               {
+                "title": "Connect ChatGPT (OAuth)",
+                "path": "connect-chatgpt-oauth",
+                "icon": "message-square"
+              },
+              {
                 "title": "Quick Start Guide",
                 "path": "quick-start-guide",
                 "icon": "zap"
