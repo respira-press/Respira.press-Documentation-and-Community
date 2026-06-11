@@ -11,6 +11,8 @@ Technical documentation for using Respira with [Visual Composer](https://visualc
 
 [Visual Composer](https://visualcomposer.com/) is a WordPress website builder that provides a frontend editor with 500+ elements and templates. Note: Visual Composer is different from WPBakery (formerly Visual Composer Page Builder). This reference covers the newer Visual Composer Website Builder.
 
+**Write support (Respira 7.4.0 "Clearing"):** Visual Composer is read and write. Respira writes in VC's canonical storage format, the editor loads the page, and the front end renders. VC regenerates its own compiled output the next time you save in its editor. Write coverage is broad but not yet exhaustive across every one of the 500+ elements.
+
 ## Data Structure
 
 Visual Composer stores page content as JSON in post meta. The structure consists of nested elements with unique IDs:

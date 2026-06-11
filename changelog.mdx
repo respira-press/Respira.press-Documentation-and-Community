@@ -52,6 +52,29 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-06-12" description="Respira for WordPress v7.4.0 'Clearing' + MCP Server v7.2.1" tags={["release", "builders", "recovery", "writes"]}>
+
+### What's New in 7.4.0 "Clearing"
+
+What the agent writes is what actually lands on the page. A deep pass through every supported builder, closing the gaps where a write reported success but the page stayed stale or blank.
+
+**Styling now lands**
+- Oxygen, Beaver Builder, Elementor v4 Atomic, Bricks, Divi 4 and Divi 5: style writes that previously saved to the database without changing the rendered page now render, each verified against the real front-end page.
+
+**Two builders moved from read to write**
+- Brizy: writes pages the Brizy editor opens and the front end renders. Front-end compile depends on Brizy's cloud compiler service, so the site needs internet.
+- Visual Composer: writes in VC's canonical storage format. The editor loads the page, the front end renders, and VC recompiles on the next editor save.
+
+**Recovery goes deeper**
+- Custom CSS and page settings are now captured, and global objects are versioned: deleting a Bricks global class, a Divi preset, or an Elementor kit color leaves a recovery point.
+
+**Writes fail loudly, not silently**
+- When a value cannot be persisted in a shape the builder reads, Respira names exactly what did not land instead of reporting success, which cuts the retry loops that waste tokens.
+
+12 builder legs verified end-to-end on real installs. Full notes: [respira.press/releases/7.4.0](https://www.respira.press/releases/7.4.0).
+
+</Update>
+
 <Update label="2026-04-09" description="Respira for WordPress v6.0.0 + WooCommerce Add-on v2.0.0 + MCP Server v6.0.0 — Storefront" tags={["feature", "builders", "woocommerce", "mcp", "commerce"]}>
 
 ### What's New in 6.0.0 "Storefront"
