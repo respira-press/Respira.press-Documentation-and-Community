@@ -75,6 +75,91 @@ What the agent writes is what actually lands on the page. A deep pass through ev
 
 </Update>
 
+<Update label="2026-06-07" description="Respira for WordPress v7.3.0 + MCP Server v7.2.0 — Cascade rollback" tags={["release", "recovery", "acf"]}>
+
+### What's New in 7.3.0
+
+Reversibility extends past page edits to destructive structure operations and whole-session cascades.
+
+- **Cascade rollback (session-level recovery).** Deleting an ACF field group, custom post type, or taxonomy, or changing an option, now captures a recovery snapshot first. A whole-session restore rolls back a multi-step destructive mess in one call, returning every object the session touched to its pre-session state. New MCP tools `wordpress_begin_session` / `wordpress_end_session` / `wordpress_restore_session`.
+- The ACF structures the agent builds are editable and correctly typed.
+- Images sideload into the media library by default.
+
+Verified end to end on a local Bricks + Elementor + ACF environment.
+
+</Update>
+
+<Update label="2026-06-06" description="Respira for WordPress v7.2.0 — Connect by browser sign-in (OAuth)" tags={["release", "oauth", "setup"]}>
+
+### What's New in 7.2.0
+
+Connect AI apps to your site with a one-time browser sign-in, no API key and no file.
+
+- **Connect by browser sign-in (OAuth 2.0).** Claude Desktop, claude.ai, Claude Code, ChatGPT (Developer Mode), Cursor, and Codex add your site as a custom connector by URL. The app discovers respira.press as the authorization server, you approve access once in the browser, and a site-scoped token is minted.
+- Backward compatible: the existing API-key, connect-by-link, and `.mcpb` paths keep working exactly as before.
+
+</Update>
+
+<Update label="2026-06-02" description="Respira for WordPress v7.1.0 'Roots' — the plugin redesign" tags={["release", "builders", "playbooks", "admin", "sdk"]}>
+
+### What's New in 7.1.0 "Roots"
+
+The biggest release since launch: a rebuilt React admin around live telemetry, and the plugin ability ecosystem made safe to use.
+
+- **Four new builders, 16 total:** Spectra, Kadence Blocks, GenerateBlocks, and SeedProd (audit-only).
+- **Playbooks:** teach an agent a multi-step workflow once, then rerun it as one callable WordPress ability.
+- **Custom Structures:** agents create custom post types, taxonomies, and ACF field groups.
+- **Redesigned admin:** a React-first wp-admin with a bridge view of agent ↔ Respira ↔ site, driven by eleven new REST endpoints.
+- **Public add-on SDK** so third-party plugin authors can register their own MCP abilities.
+- **generate_activity_report:** turns your audit log into a client-ready report your own agent shapes into prose.
+
+</Update>
+
+<Update label="2026-05-08" description="Respira for WordPress v7.0.0 'Bloom' + MCP Server v7.0.0" tags={["release", "builders", "intelligence", "tests"]}>
+
+### What's New in 7.0.0 "Bloom"
+
+Every page-builder adapter promoted to deeper-intelligence parity, in lockstep.
+
+- Five cross-cutting invariants every adapter now inherits: render-validation gate, universal write-trace, Variables CRUD shape, source-driven catalog auto-scan, and per-property typed validators.
+- Per-builder slices close the family-bug arcs surfaced across the 6.10.x line.
+- 1076 standalone test assertions across 27 alpha cycles, zero failures.
+
+</Update>
+
+<Update label="2026-05-07" description="Respira for WordPress v6.11.0 'Self-Heal'" tags={["release", "bugfix", "diagnostics"]}>
+
+### What's New in 6.11.0 "Self-Heal"
+
+A bug-bash release. Closes 14 customer-reported bugs across 5 named trial threads and all 7 open public GitHub issues, plus 5 cross-cutting audits.
+
+- New `respira_diagnose_connection` tool surfaces edge-layer interception, so REST returning homepage HTML instead of JSON stops being opaque.
+- JSON post-meta unicode safety across every adapter, MCP tool-schema audit, duplicator kses bypass fix, and render-trace fields on every write.
+
+</Update>
+
+<Update label="2026-04-20" description="Respira for WordPress v6.6.0 — ACF Intelligence" tags={["release", "acf", "tools"]}>
+
+### What's New in 6.6.0 "ACF Intelligence"
+
+54 Advanced Custom Fields tools covering field reads and writes, field-group management, ACF Pro repeaters, flexible content, galleries, options pages, relationships, and bulk updates.
+
+- Every write snapshot-backed and dry-run previewable.
+- Works on the roughly 2 million WordPress sites that use ACF today.
+
+</Update>
+
+<Update label="2026-04-14" description="Respira for WordPress v6.2.0 + v6.3.0 — Deep Intelligence: Oxygen + Breakdance" tags={["release", "builders", "intelligence"]}>
+
+### What's New in 6.2.0 + 6.3.0 "Deep Intelligence"
+
+The deepest Oxygen and Breakdance MCP integrations available.
+
+- **Oxygen (6.2.0):** 49 components, 140+ schema properties, a fuzzy-matching settings validator, a data-repair pipeline, Oxygen 6 detection, and 10 layout patterns.
+- **Breakdance (6.3.0):** 84 elements across 7 categories, 120+ schema properties, nesting validation, fuzzy matching, content/design preservation, and 8 layout patterns.
+
+</Update>
+
 <Update label="2026-04-09" description="Respira for WordPress v6.0.0 + WooCommerce Add-on v2.0.0 + MCP Server v6.0.0 — Storefront" tags={["feature", "builders", "woocommerce", "mcp", "commerce"]}>
 
 ### What's New in 6.0.0 "Storefront"
