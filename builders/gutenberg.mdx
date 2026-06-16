@@ -11,6 +11,17 @@ Technical documentation for using Respira with the [WordPress Block Editor](http
 
 The [WordPress Block Editor](https://wordpress.org/gutenberg/), commonly known as Gutenberg, is WordPress's default content editor since version 5.0. It powers over 40% of all websites on the internet through WordPress core.
 
+## Prompting for great results on Gutenberg
+
+For the full prompting guide, see [Get Great Results: How to Prompt](/prompts). The one thing to know on Gutenberg:
+
+- **"Native" means blocks, not raw HTML.** The same do-not-write-raw-HTML rule applies as on any builder. Blocks (`core/heading`, `core/paragraph`, `core/columns`, `core/group`, `core/cover`, `core/button`) are the native structure. Ask for blocks and the page stays editable in the block editor. Ask for "the HTML" and you get a single classic/HTML block the editor cannot break apart.
+- **Prime once at the start.** *"This is a Gutenberg site. Build with core blocks, not raw HTML, and duplicate any live page before editing."*
+
+```text
+Add an FAQ section to [page] using native Gutenberg blocks (a heading plus details/accordion blocks if available). Keep it editable in the block editor. Duplicate the page first and show me a preview.
+```
+
 ## Data Structure
 
 Gutenberg stores content as HTML with block comment delimiters in `post_content`:

@@ -11,6 +11,20 @@ Technical documentation for using Respira with [Oxygen Builder](https://oxygenbu
 
 [Oxygen Builder](https://oxygenbuilder.com/) is a professional-grade WordPress site builder that generates clean, bloat-free code. It completely replaces your theme and offers full site building capabilities with over 60 components.
 
+## Prompting for great results on Oxygen
+
+For the full prompting guide, see [Get Great Results: How to Prompt](/prompts). Oxygen has one failure mode worth naming:
+
+- **Ask for native Oxygen components, not a single HTML/code block.** The most common bad result on Oxygen is the agent retreating to one big HTML or code block instead of building real Oxygen components. The page then is not editable in Oxygen.
+- **Prime once at the start.** *"This is an Oxygen site. Build with native Oxygen components, not a code block. Read my site first, then give me a draft I can review."*
+
+<details>
+<summary>Oxygen 6 caveat</summary>
+
+On **Oxygen 6** specifically, the single-code-block fallback is the most-reported issue today. If you get "one block of code", that is the wrong path: re-prime the agent (*"use native Oxygen components, not a code block"*) and ask it to rebuild. A deeper Oxygen 6 fix is in progress; until it ships, priming plus the native-only instruction is the reliable workaround.
+
+</details>
+
 ## Data Structure
 
 Oxygen stores page layouts as serialized component trees in post meta. Each component has a unique ID and nested children:

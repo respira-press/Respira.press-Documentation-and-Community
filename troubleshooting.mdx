@@ -75,6 +75,29 @@ npx @respira/wordpress-mcp-server --setup
 - Confirm your system firewall or host environment is not blocking local connections
 - Restart your AI assistant (Cursor, Claude Code, etc.) after configuration changes
 
+### Browser connector: sign-in opens a "Page not found" on `/authorize`
+
+This is the most common browser-connection failure (Claude Desktop, claude.ai, ChatGPT, Cursor). If the sign-in tab opens something like `https://your-site.com/authorize?...&client_id=respira_site_...` and shows a 404 / "Page not found", the cause is almost always a **Client ID filled into the connector**.
+
+A browser connector connects **by URL only**. When you also give it a Client ID, the assistant stops doing automatic discovery and builds the sign-in URL on **your own WordPress address** — which has no `/authorize` page by design, so it 404s.
+
+The `respira_site_...` value people paste there is the **site token** from the dashboard's Connected Sites panel. It is **not** an OAuth Client ID — it is only for the command-line / npm setup (header auth) and must never go in a browser connector.
+
+**Fix:**
+
+1. Remove the connector.
+2. Re-add it with only the MCP URL in the URL field: `https://your-site.com/wp-json/respira/v1/mcp`
+3. Leave **Client ID** and **Client Secret** blank. Do not paste the `respira_site_...` token anywhere in the connector.
+4. Approve the sign-in tab that opens on **respira.press** — sign-in always happens there, never on your own site.
+
+<details>
+<summary>Two things that are *not* the problem</summary>
+
+- **There is no `/authorize` route on your WordPress site, and the plugin does not need one.** The plugin is only the destination the AI edits; the OAuth sign-in lives on respira.press. Do not try to "register an authorize route" or reinstall to fix this.
+- **"License: Not synced", "Plan unavailable", or "0 API keys" in the plugin panel does not block a browser connection.** That panel is the plugin's local view; the browser flow issues its own token from respira.press and needs no plugin API key. "0 keys" is normal for a browser-only connection.
+
+</details>
+
 ### MCP update hints appear in tool responses (`respira_mcp_update`)
 
 This is informational, not a runtime failure.

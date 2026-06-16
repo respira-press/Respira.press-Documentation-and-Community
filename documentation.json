@@ -84,6 +84,11 @@
                 "icon": "zap"
               },
               {
+                "title": "Get Great Results (How to Prompt)",
+                "path": "prompts",
+                "icon": "sparkles"
+              },
+              {
                 "title": "Usage Guide",
                 "path": "usage",
                 "icon": "file-text"
@@ -826,11 +831,6 @@
             "group": "Reference",
             "icon": "book",
             "pages": [
-              {
-                "title": "Prompts & Examples",
-                "path": "prompts",
-                "icon": "book-open"
-              },
               {
                 "title": "Error Codes",
                 "path": "reference/error-codes",

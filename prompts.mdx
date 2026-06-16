@@ -1,15 +1,105 @@
 ---
-title: "Prompts & Examples"
-description: "WordPress AI prompts and practical examples for Respira for WordPress, including guidance for AI coding assistants like Cursor and Claude."
+title: "Get Great Results: How to Prompt"
+description: "How to prompt Respira for great results: the mental model, the great-results checklist, copy-paste starter prompts, per-builder notes, and fixes for common bad results."
 ---
 
 ## Overview
 
-This guide provides practical WordPress AI prompts and examples for using Respira for WordPress with AI coding assistants such as Cursor or Claude. It helps you write clear, effective prompts that guide the AI when analyzing, editing, or optimizing your WordPress site.
+This guide shows you how to prompt Respira for great results, plus a library of ready-made prompts. Most frustrating results ("it only made a basic layout", "it built one block of code", "the styles didn't apply") are not bugs. They are prompting and workflow gaps, and one extra sentence usually closes them.
 
 These prompts work best when Respira is fully installed and configured. If you have not set things up yet, see the [Installation](/installation) and [Configuration](/configuration) guides.
 
 For more background, also visit the [Introduction](/introduction), [Usage Guide](/usage), and [Troubleshooting](/troubleshooting).
+
+---
+
+## The mental model
+
+Read this once. Everything else follows from it.
+
+Respira lets an AI agent edit your live WordPress site **through the page builder's own native tools**. When you ask Claude or ChatGPT to change your homepage, it is not editing files or touching the database. It is calling Respira tools that speak your builder's language: Elementor widgets, Divi modules, Bricks elements, Gutenberg blocks.
+
+- **The builder is the language, and the agent has to speak it.** A Divi page is a tree of Divi modules; an Elementor page is a tree of Elementor widgets. If the agent drops raw HTML into a builder page, the builder cannot read it and the page opens to a blank or broken canvas. This single mistake causes most bad results.
+- **One account per site.** Name the site you mean when you have more than one connected.
+- **Snapshots protect you.** Every edit creates a rollback point automatically, so it is safe to let an agent work on a real site.
+- **You describe outcomes, not markup.** Say what you want ("make the hero headline punchier and the button green"). Let the agent pick the modules. You should rarely paste HTML, and you should rarely be asked to.
+
+A useful way to picture it: Respira is a translator standing between your AI and your site. The AI speaks plain English to you and the builder's native language to the site. Bad results usually mean the translator was handed the wrong kind of input (raw code) or was not told which language the site speaks (which builder is active).
+
+---
+
+## The great-results checklist
+
+These habits separate a great result from a frustrating one. Most take one extra sentence.
+
+1. **Prime the agent first.** Before any real work: *"Before we start, detect my builder, read my site, and use native builder modules only. Duplicate any live page before editing it."* This is the single highest-leverage thing you can do.
+2. **One site per request, and name it.** "Edit the about page on clientco.com", not "edit the about page".
+3. **Describe the outcome, not the HTML.** "Add a three-card benefits section under the hero" beats pasting a block of `<div>`s.
+4. **Let it duplicate or snapshot before touching a live page.** For any published page, ask the agent to duplicate it first, edit the copy, and show you the preview before going live. This is SafeEdit.
+5. **Never ask for raw HTML or code blocks when the builder has native modules.** Ask for "a pricing table using the builder's native modules", not "the HTML for a pricing table".
+6. **If a style "doesn't apply", it is unsupported on that builder, not a bug to retry.** Pick a supported attribute or a different module. Retrying the same dropped write is the number-one source of wasted tokens.
+7. **Read, then write.** If you sense the agent is guessing, tell it to read the page first.
+
+<details>
+<summary>Tip</summary>
+
+The plugin ships a one-click **primer** and a library of 20 ready-made prompts on the **Prompts** screen. The primer is the checklist above in one paste.
+
+</details>
+
+---
+
+## Copy-paste starter prompts
+
+Tuned to produce the safe, native-first workflow. Copy, fill in the brackets, send.
+
+### First session (the primer)
+
+Run this once at the top of any new conversation about a site.
+
+```text
+Before we start, prime yourself for this site with Respira. Detect the active page builder and its version, read my site context, and list a few of my pages so you know the lay of the land. From here on, follow Respira's safe workflow: every page edit goes through the builder's native modules, never raw HTML; duplicate any live page before editing it; read the exact element before you change it. When you are ready, give me a one-line briefing of what you found.
+```
+
+### Edit a page
+
+```text
+On [page name or URL], change [what you want] using builder-native Respira tools only. Find the exact element first by its current text or by its type. If the target is ambiguous, ask me rather than guessing. Show me a preview before anything goes live.
+```
+
+### Build a new page
+
+```text
+Create a draft page called [title] using the active page builder. Use this structure: hero, trust proof, three benefit cards, process steps, FAQ, final CTA. Use native builder modules, not raw HTML. Mark placeholder copy clearly as draft. When done, give me the draft URL, the builder used, and anything that needs my review.
+```
+
+### Redesign or improve an existing page
+
+```text
+Improve [page] without redesigning it from scratch. Keep the brand colors, fonts, and layout intent. Strengthen the headings, spacing, and CTA placement using the builder's native settings. Make the smallest changes that improve readability and keep mobile working. Duplicate the page first and show me the preview.
+```
+
+### Audit before you touch anything
+
+```text
+Audit [page or my whole site] with Respira. Run site and builder context checks first, then inspect the homepage and my highest-value pages. Return a prioritized plan: quick wins under 30 minutes, medium tasks, deep tasks, and risks. Do not make any changes yet.
+```
+
+---
+
+## When the result is wrong
+
+Plain-language fixes for the things people actually report.
+
+| What you see | What happened | What to say next |
+| --- | --- | --- |
+| "It only makes basic layouts" | The agent did not read the builder's full capabilities. | "Detect my builder, load its module schemas, then rebuild using richer modules (columns, cards, accordions), not just headings and text." Name the structure you want. |
+| "It built one big HTML block" | The agent bypassed the builder with raw HTML. | "That is a code block, not a native page. Rebuild it using [builder]'s native modules only." Then re-prime. Common on Oxygen 6. |
+| "The styles didn't apply" | The builder did not recognize that setting and dropped it. | "Use a supported attribute or a different module to get the same look." Do not retry the same write. |
+| "Handshake loop / plan unavailable" | A connection or context step is failing. | "Run a connection diagnosis and tell me which layer is failing." Most are documented known issues with a quick fix. |
+| "It burns tokens every time" | The agent is not carrying context between turns. | Prime once at the top of the session. The Prime-the-Agent skill also stores a per-site brief on the site itself for the next session. |
+
+---
 
 <details>
 <summary>Tip</summary>

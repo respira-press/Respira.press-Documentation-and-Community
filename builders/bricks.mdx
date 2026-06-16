@@ -27,6 +27,20 @@ Bricks has **Full Native Support** — the deepest integration level available i
 
 ---
 
+## Prompting for great results on Bricks
+
+For the full prompting guide, see [Get Great Results: How to Prompt](/prompts). A few things matter most on Bricks:
+
+- **Ask the agent to read your design system first.** Bricks has real global classes, theme styles, a color palette, and typography. For anything beyond a one-off edit, tell the agent to read the design system and build with your existing global classes, not new inline styles. This keeps the site consistent and maintainable.
+- **Ask for native Bricks elements, never raw HTML.** A Bricks page is a tree of elements (`section`, `container`, `heading`, `text-basic`, `image`, `button`). Raw HTML dropped into the page bypasses Bricks and breaks the editor.
+- **Prime once at the start.** *"Detect my builder, read my Bricks design system and global classes, then build using those. Native elements only, and duplicate any live page before editing."*
+
+```text
+Build a pricing section on [page] using native Bricks elements. First read my Bricks global classes and color palette and reuse them instead of inline styles. Duplicate the page first and show me a preview.
+```
+
+---
+
 ## Data Structure
 
 Bricks stores page structure as JSON in post meta (`_bricks_page_content_2`). Elements are organized in a **flat array** — each element carries both a `parent` reference (pointing up) and a `children` array (pointing down by ID string). Respira handles this round-trip automatically.
