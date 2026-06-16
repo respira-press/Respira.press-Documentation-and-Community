@@ -37,6 +37,25 @@ Supported generated client formats:
 - Codex
 - Claude Code
 
+### Connect Claude Desktop, claude.ai, ChatGPT or Cursor (browser sign-in)
+
+These apps connect **by URL, with no API key**. In the app, add a **custom connector** and paste your site's MCP URL:
+
+```
+https://YOUR-SITE.com/wp-json/respira/v1/mcp
+```
+
+Then:
+
+- Paste the URL in the **URL** field only.
+- Leave **Client ID** and **Client Secret** blank. You do not need them — Respira registers the connector and signs you in automatically.
+- Do **not** paste your site API key into the connector. The key is only for tools that explicitly ask for one (Claude Code, n8n, custom scripts), never for a browser connector.
+- A tab opens on **respira.press** to sign in and approve. Approve it, and the tools appear.
+
+<Warning>
+If the sign-in tab opens a **"page not found"** on your own site's address (for example `https://your-site.com/authorize`), a **Client ID** was filled in by mistake. Clear the Client ID and Client Secret fields, remove the site key if you pasted it there, and reconnect. Sign-in always happens on respira.press, never on your own WordPress site — there is no `/authorize` page there by design.
+</Warning>
+
 ### Method 2: Interactive Setup Wizard
 
 The fastest and easiest way to get started:
