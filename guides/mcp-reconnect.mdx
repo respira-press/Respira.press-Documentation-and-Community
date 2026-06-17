@@ -53,6 +53,8 @@ The entry should look like:
 
 If the entry is missing, Claude is not trying to spawn the MCP. If it is present but you still don't see the bootstrap line, you have a path or permissions issue at the npx layer.
 
+> **macOS gotcha:** make sure the entry is in `claude_desktop_config.json`, not `config.json`. On some Claude Desktop versions the "Edit Config" button opens `config.json`, a separate preferences file in the same folder that is **not** read for MCP servers. If `claude_desktop_config.json` looks empty or is missing the entry, that is usually why. Edit the right file directly: `open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json`
+
 ## Why the legacy two-entry setup makes this harder
 
 Some customers have two separate MCP entries in their config:

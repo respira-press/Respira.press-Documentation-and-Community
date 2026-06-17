@@ -120,6 +120,8 @@ Find your configuration file:
 
 Add the same configuration shown above.
 
+> **macOS:** paste this into `claude_desktop_config.json`, not `config.json`. On some Claude Desktop versions the "Edit Config" button opens `config.json`, a separate preferences file in the same folder that is **not** read for MCP servers, so the paste silently does nothing and the server never appears after a restart. If that happens, edit the right file directly: `open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json`
+
 Then create your site configuration:
 
 ```bash
