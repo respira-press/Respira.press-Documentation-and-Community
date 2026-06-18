@@ -187,6 +187,16 @@
                 "icon": "key"
               },
               {
+                "title": "Architecture",
+                "path": "cli/architecture",
+                "icon": "layers-2"
+              },
+              {
+                "title": "Hooks",
+                "path": "cli/hooks",
+                "icon": "plug"
+              },
+              {
                 "title": "respira auth",
                 "path": "cli/commands/auth",
                 "icon": "lock"
@@ -245,6 +255,11 @@
                 "title": "CLI FAQ",
                 "path": "cli/faq",
                 "icon": "help-circle"
+              },
+              {
+                "title": "CLI Changelog",
+                "path": "cli/changelog",
+                "icon": "history"
               }
             ]
           },

@@ -1,0 +1,110 @@
+---
+title: CLI Architecture
+description: The Respira CLI runs every command through a deterministic six-phase execution cycle with framework-level hooks, typed tool chain functions, and structured tracing. Frozen in v0.1, extended additively in v0.2.
+---
+
+Every `respira` command runs through the same deterministic runtime: a six-phase execution cycle with framework-level hook points, typed tool chain functions, and structured JSON tracing. The cycle, the hook contracts, and the function shape are all frozen in v0.1 so v0.2 can add callback registration and extension manifests without breaking anything.
+
+## The six-phase execution cycle
+
+```
+LoadContext -> PreHooks -> Resolve -> Execute -> PostHooks -> Return
+```
+
+- **LoadContext**: gather auth, target site, switches, and task input.
+- **PreHooks**: fire the `before_resolve` framework hook.
+- **Resolve**: select and validate the Tool Chain Function that will run. Record `prerequisite_check` per declared prerequisite.
+- **Execute**: call `fn.execute(input, ctx)`. This is where the SDK call lives.
+- **PostHooks**: fire `filter_result` (payload pipeline), then `after_execute` (observation).
+- **Return**: write trace to disk if `--verbose`, assemble the result envelope, return.
+
+Phases are deterministic. Same input + same context produces the same output (modulo timing). Errors inside any phase are caught and wrapped in a `CycleError` with the original cause preserved: the cycle never re-throws at its boundary.
+
+## Framework hooks
+
+Five named hooks fire at fixed points in the cycle:
+
+- `before_resolve`: action. Fires during PreHooks.
+- `filter_plan`: filter. Fires during Resolve.
+- `before_execute`: action. Fires during Execute.
+- `filter_result`: filter. Fires during PostHooks.
+- `after_execute`: action. Record, notify, trigger follow-on work.
+
+In v0.1 no callbacks register against these hooks. The contracts are frozen. v0.2 adds **callback registration** and **extension manifests** on top, without changing anything you see in v0.1. If you are building against Respira today, nothing you write will need to change when v0.2 arrives.
+
+See [the hook framework in detail](/cli/hooks).
+
+## Tool Chain Functions
+
+Every command is a typed function with metadata:
+
+```typescript
+interface ToolChainFunction<T> {
+  name: string;                    // "read.structure"
+  description: string;
+  domainTags: readonly string[];   // ["pages", "read", "public", "anonymous"]
+  capability: "read" | "write" | "destructive";
+  prerequisites: readonly Prerequisite[];
+  internalHooks?: readonly HookDeclaration[];
+  execute(input: unknown, ctx: CycleContext): Promise<T>;
+}
+```
+
+Domain tags document what a function does across four dimensions: builder (elementor, divi, bricks, gutenberg, etc.), domain (pages, posts, media, design-system), capability (read, write, destructive), and access (public, anonymous, connected, licensed). In v0.1 these are metadata. In v0.2 they become SQL filters against the Tool Registry.
+
+## File-organization convention
+
+There are 34 public commands, and exactly 34 files under `packages/cli/src/commands/`. One `BaseCommand` subclass per file, one `ToolChainFunction` per file, always co-located. No topic-level grouping, no shared files. This is frozen.
+
+- The `ToolChainFunction` is a **named export** alongside the oclif `Command` class (which stays the default export). Name pattern: `<camelCasePath>Function`.
+- Examples: `auth/login.ts` exports `authLoginFunction`. `read/design-system.ts` exports `readDesignSystemFunction`. `write/create-page.ts` exports `writeCreatePageFunction`.
+- The function's `name` field uses dot-notation mirroring the route (`auth.login`, `read.design-system`, `write.create-page`). Traces, logs, and (v0.2) the extension manifest reader key on this.
+- v0.2 discovers every function by globbing `src/commands/**/*.ts` and picking up named exports ending in `Function`. No user file changes when the registry swaps in.
+
+## Structured tracing
+
+Pass `--verbose` on any command and the cycle writes a JSON trace to `~/.respira/traces/{invocationId}.json`. Each entry carries a phase, event type, timestamp, duration, and status. The trace is for coding agents that need to understand why something did or did not do what was expected.
+
+```bash
+$ respira read structure https://example.com --verbose
+[respira] trace: ~/.respira/traces/2adcfb73-8a97-4b94-be23-1448f2db1cce.json
+```
+
+Without `--verbose`, traces accumulate in memory and are discarded at end of command. No stderr noise.
+
+## Error handling
+
+The cycle catches phase errors and wraps them in a `CycleError` with codes like `PREREQUISITE_NOT_MET`, `VALIDATION_FAILED`, `TOOL_CHAIN_ERROR`, `PHASE_ERROR`. The original error is preserved as `cause`, so command handlers unwrap it for user display. What you see on the terminal is the familiar `RespiraError` message and hint. The `CycleError` context is logged only when `--verbose` is set.
+
+## What ships in v0.1, what ships in v0.2
+
+**In v0.1:**
+
+- The execution cycle. Six phases. Deterministic. Traceable.
+- The hook framework contracts. Five named hooks. Frozen shape.
+- Tool Chain Function abstraction for all 34 commands, co-located with each `BaseCommand` subclass.
+- Null hook registry. The hook-firing code path runs, callbacks are always empty. This is the scaffolding that makes v0.2 purely additive: `NullHookRegistry` swaps for `ManifestBackedHookRegistry`, callbacks start registering, no existing caller changes.
+- Structured tracing with `--verbose`.
+
+**In v0.2:**
+
+- Callback registration against framework-level hooks.
+- Extension manifests for third-party contributors.
+- SQLite-backed tool registry with full-text search.
+- Tool chain functions declaring internal hook points.
+- Baseline site inventory for per-site prerequisite validation.
+- Priority resolution when callbacks run in order.
+
+Every v0.2 addition is additive. No breaking changes. No "we renamed this" in the changelog. That is the whole point of landing this scaffolding now.
+
+## Why this architecture, why now
+
+The CLI works today. 34 commands, 45-tool catalog, typed SDK, green CI. Publishing as-is would be reasonable. But once extensions and third-party integrations exist, they will register callbacks against phase boundaries that do not currently exist. Retrofitting those boundaries later is breaking work. Landing them now, while nothing has subscribed to them, is cheap and costs nothing downstream.
+
+The part most users care about: none of this changes how you use the CLI. Same commands. Same flags. Same output. The architecture is there because v0.2 is going to need it, and retrofitting it later would break everyone who adopted v0.1.
+
+## Next
+
+- [The hook framework in detail](/cli/hooks)
+- [Browse commands](/cli/commands/auth)
+- [Changelog](/cli/changelog)

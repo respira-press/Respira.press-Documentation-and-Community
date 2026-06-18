@@ -1,0 +1,44 @@
+---
+title: CLI Changelog
+description: Release notes for Respira CLI for WordPress. Foundation release v0.1.0 shipped 2026-04-19.
+---
+
+Release notes for `@respira/cli`, `@respira/sdk`, and `@respira/cli-core`.
+
+## 0.1.0 · Foundation release · 2026-04-19
+
+First public release. The CLI ships alongside the Respira plugin and MCP server.
+
+### Architecture
+
+- Explicit six-phase execution cycle (load context, pre-hooks, resolve, execute, post-hooks, return).
+- Framework-level hook contracts in place: `before_resolve`, `filter_plan`, `before_execute`, `filter_result`, `after_execute`. Callback registration and extension manifests arrive in v0.2. The contracts are frozen and v0.1 to v0.2 is additive.
+- Every command runs through the cycle. Structured JSON trace emission available with `--verbose`, written to `~/.respira/traces/`.
+- Tool Chain Function abstraction for all 34 commands, each with capability class, domain tags, and prerequisite declarations. One command per file; the `ToolChainFunction` lives in the same file as the `BaseCommand` subclass, exported as `<camelCasePath>Function`.
+
+### Commands
+
+- 34 commands across 9 topics (auth 4, sites 5, read 8, write 7, snapshots 3, tools 3, find-element 1, exec 1, docs 1, init-claude-code 1).
+- 45-tool catalog accessible via `respira tools list/describe/search`.
+- `respira init-claude-code` generates a Claude Code skill that teaches the agent when and how to call the CLI.
+
+### Free on any public WordPress URL
+
+- `respira read structure <url>` detects 11 page builders and fetches the sitemap.
+- `respira read design-system <url>` extracts colors and fonts.
+
+### Packages
+
+- `@respira/cli` 0.1.0
+- `@respira/sdk` 0.1.0: typed TypeScript client with zod validation.
+- `@respira/cli-core` 0.1.0: execution cycle, hook contracts, tool chain function interface, trace emitter, error taxonomy, auth/sites/output utilities.
+
+### Install
+
+```bash
+npm install -g @respira/cli
+```
+
+MIT licensed. Node.js 18 or later. Works on macOS, Linux, and Windows.
+
+For commit-level history, see the [CHANGELOG.md](https://github.com/respira-press/respira-wordpress-cli/blob/main/CHANGELOG.md) in the repository.
