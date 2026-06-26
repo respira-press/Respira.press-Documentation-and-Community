@@ -138,11 +138,15 @@ Configure Respira to work with [Claude Cowork](https://respira.press/cowork), th
 
 In Claude:
 
-1. Open **Customize > Plugins > Add Custom Plugin**.
-2. Paste `https://github.com/respira-press/cowork-plugin-wordpress`.
-3. Click **Install**.
+1. Open **Customize > Plugins**.
+2. Click the **Personal** tab (next to Anthropic / Partners), then the **+** button.
+3. Choose **Add marketplace > Add from a repository** and enter `respira-press/cowork-plugin-wordpress`.
+4. Click **Sync**, then on the Respira plugin page click **Install**.
+5. When the "This plugin includes local MCP servers" notice appears, that is expected (the `respira-wordpress` connector runs locally). Click **Continue**.
 
-(Marketplace approval pending with Anthropic. Until it lands, install directly from the GitHub repo.)
+(On **Claude Code** instead, run `/plugin marketplace add respira-press/cowork-plugin-wordpress`, then `/plugin install respira`.)
+
+(Marketplace approval is pending with Anthropic. Until the Anthropic / Partners tabs list it, the Personal route above is the live path.)
 
 ### Connect your sites
 
@@ -154,7 +158,7 @@ If this is a fresh machine, the fastest path is the one-click flow from your das
 
 **Option B: Copy the setup prompt.** On the same card, click **Copy setup prompt**. The pre-filled prompt is copied to your clipboard. Paste into any Cowork chat where the Respira plugin is installed and send. Same outcome as Option A, useful when your browser blocks the `claude://` scheme.
 
-**Option C: Download the config file directly.** On the same card, click **Download config**. Save the resulting `config.json` to `~/.respira/config.json` on your computer. Open a new Cowork chat. The plugin picks up the file on startup.
+**Option C: Download the config file directly.** On the same card, click **Download config**, then move it into place so Cowork can read it. On Mac or Linux: `mkdir -p ~/.respira && mv ~/Downloads/config.json ~/.respira/config.json`. No Terminal? Create a `.respira` folder in your home directory and put `config.json` inside it. Open a new Cowork chat and the plugin picks it up on startup.
 
 If you prefer to be walked through it in chat, run `/respira:connect-site` inside Cowork.
 
