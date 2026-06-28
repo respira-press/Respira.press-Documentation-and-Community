@@ -373,3 +373,79 @@ If you run into issues with WooCommerce tools or need help designing workflows, 
 />
 
 </Columns>
+
+## Complete tool list
+
+The add-on registers 53 WooCommerce abilities (namespace `respira-woocommerce/`), plus the REST/MCP storefront-design, catalog, pricing and AI-readiness tools described in the [overview](/woocommerce/overview). Every write is snapshot-backed, runs behind the `manage_woocommerce` capability, and supports `dry_run` where it changes data.
+
+### Products, categories, tags & brands
+
+- `respira-woocommerce/get-products` — List WooCommerce products
+- `respira-woocommerce/get-product` — Get a WooCommerce product by ID
+- `respira-woocommerce/create-product` — Create a WooCommerce product
+- `respira-woocommerce/update-product` — Update a WooCommerce product
+- `respira-woocommerce/duplicate-product` — Duplicate a WooCommerce product
+- `respira-woocommerce/get-categories` — List product categories
+- `respira-woocommerce/get-category` — Get a product category by ID
+- `respira-woocommerce/create-category` — Create a product category
+- `respira-woocommerce/update-category` — Update a product category
+- `respira-woocommerce/delete-category` — Delete a product category
+- `respira-woocommerce/get-tags` — List product tags
+- `respira-woocommerce/get-tag` — Get a product tag by ID
+- `respira-woocommerce/create-tag` — Create a product tag
+- `respira-woocommerce/update-tag` — Update a product tag
+- `respira-woocommerce/delete-tag` — Delete a product tag
+- `respira-woocommerce/get-brands` — List product brands
+- `respira-woocommerce/get-brand` — Get a product brand by ID
+- `respira-woocommerce/create-brand` — Create a product brand
+- `respira-woocommerce/update-brand` — Update a product brand
+- `respira-woocommerce/delete-brand` — Delete a product brand
+- `respira-woocommerce/get-orders` — List WooCommerce orders
+- `respira-woocommerce/get-order` — Get a WooCommerce order by ID
+- `respira-woocommerce/update-order-status` — Update order status
+- `respira-woocommerce/get-stock-status` — Inventory stock overview
+- `respira-woocommerce/update-stock` — Update product stock
+- `respira-woocommerce/get-sales-report` — Sales report
+
+### Variations, attributes & swatches
+
+- `respira-woocommerce/get-variations` — List product variations
+- `respira-woocommerce/create-variation` — Create a product variation
+- `respira-woocommerce/update-variation` — Update a product variation
+- `respira-woocommerce/delete-variation` — Delete a product variation
+- `respira-woocommerce/generate-variations` — Generate the variation matrix
+- `respira-woocommerce/get-global-attributes` — List global attributes
+- `respira-woocommerce/create-global-attribute` — Create a global attribute (incl. swatches)
+
+### Product configurator (Staggs)
+
+- `respira-woocommerce/configurator-status` — Configurator status
+- `respira-woocommerce/list-configurator-attributes` — List configurator attributes
+- `respira-woocommerce/get-configurator-attribute-items` — Get configurator attribute items
+- `respira-woocommerce/set-configurator-attribute-items` — Set configurator attribute items
+- `respira-woocommerce/get-plugin-state` — Get allow-listed plugin state
+- `respira-woocommerce/set-plugin-state` — Set allow-listed plugin state
+
+### Coupons
+
+- `respira-woocommerce/get-coupons` — List coupons
+- `respira-woocommerce/get-coupon` — Get a coupon
+- `respira-woocommerce/create-coupon` — Create a coupon
+- `respira-woocommerce/update-coupon` — Update a coupon
+- `respira-woocommerce/delete-coupon` — Delete a coupon
+
+### Customers
+
+- `respira-woocommerce/get-customers` — List customers
+- `respira-woocommerce/get-customer` — Get a customer
+- `respira-woocommerce/create-customer` — Create a customer
+- `respira-woocommerce/update-customer` — Update a customer
+- `respira-woocommerce/delete-customer` — Delete a customer
+
+### Orders, notes & refunds
+
+- `respira-woocommerce/get-order-notes` — List order notes
+- `respira-woocommerce/add-order-note` — Add an order note
+- `respira-woocommerce/get-order-refunds` — List order refunds
+- `respira-woocommerce/create-order-refund` — Refund an order
+
