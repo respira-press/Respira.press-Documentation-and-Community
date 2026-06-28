@@ -1,11 +1,11 @@
 ---
-title: WooCommerce Commerce Add-on
-description: 36 AI tools for WooCommerce including storefront design intelligence, bulk pricing with snapshots, and catalog health audits. €95/year for Maker and Builder. Included free with Studio and Founder.
+title: WooCommerce Add-on
+description: 54 AI tools for WooCommerce including storefront design intelligence, bulk pricing with snapshots, and catalog health audits. €95/year for Maker and Builder. Included free with Studio and Founder.
 ---
 
 ## Overview
 
-Respira Commerce extends Respira's safety-first workflow to your WooCommerce store. 36 tools that connect commerce data to page builder visuals with snapshots on every write.
+The Respira for WordPress WooCommerce Add-on extends Respira's safety-first workflow to your WooCommerce store. 54 tools that connect commerce data to page builder visuals, with a snapshot, a dry-run preview, and an approval step on every change.
 
 **Pricing:**
 - **Studio and Founder plans:** included free, no separate purchase
@@ -26,46 +26,37 @@ If you are not set up with Respira yet, start with the base [Installation](/inst
 
 </Callout>
 
-## What the add-on includes
+## What's included (54 tools)
 
-### Original tools (21)
+The add-on grew from commerce CRUD into the full storefront layer. The areas:
 
-The foundation: products, orders, categories, tags, inventory, and reports.
+**Products, categories, and brands**
+- Create, read, update, and duplicate simple and variable products
+- Full CRUD for product categories, tags, and brands
 
-- **Products:** create, read, update, duplicate simple and variable products
-- **Categories and tags:** full CRUD for product taxonomy
-- **Orders:** list, filter, update status (triggers WooCommerce emails)
-- **Inventory:** stock levels, stock status, low-stock detection
-- **Reports:** sales by period, top products, revenue tracking
+**Variations, attributes, and swatches**
+- Variation CRUD and one-call variation-matrix generation with a dry-run preview
+- Global attributes, plus the WooCommerce 10.9 colour and image swatches (wc-visual)
 
-### New in v6.0: Commerce tools (15)
+**Product configurator (Staggs)**
+- Drive the Staggs product configurator by prompt: enable it per product, read its setup, and toggle options per dealer. Allow-listed and snapshotted. The piece no other WooCommerce MCP has.
 
-The layer above CRUD. Tools that bridge commerce data and page builder visuals.
+**Orders, refunds, and notes**
+- Order listing, status updates (which trigger WooCommerce emails), and order notes
+- Refunds are dry-run by default: money only moves when you explicitly confirm, and a refund is capped to the order's remaining refundable total
 
-**Storefront design intelligence (6 tools):**
-- `analyze_shop_page` — read your shop page in the active builder format, return hierarchy assessment and actionable issues
-- `analyze_product_page` — image, description, price, and category quality scoring
-- `update_product_card_layout` — modify product grid columns, rows, ordering via builder abstraction
-- `add_low_stock_badge` — identify products needing low-stock badges with configurable threshold
-- `add_sale_badge` — calculate discount percentages for sale badges
-- `update_checkout_layout` — modify checkout page via builder abstraction
+**Coupons and customers**
+- Full coupon CRUD, and customer CRUD. Customer writes are PII-aware: confirm-to-delete, and IDs only in the audit log
 
-Storefront intelligence is supported for Elementor, Divi, Flatsome, Gutenberg, and Bricks in v6.0. Other builders return a clear unsupported message.
+**Inventory and AI-readiness**
+- Stock levels, stock status, and low-stock detection
+- An AI-readiness score (0-100) per product and across the catalog (`product_ai_readiness`, `catalog_ai_readiness`) so an agent knows what to fix before it sells
 
-**Catalog operations (4 tools):**
-- `list_products_advanced` — filter by category, tag, stock status, sale, featured, price range
-- `bulk_update_products` — batch product updates with 100-product cap and snapshots
-- `analyze_catalog_health` — audit for missing images, short descriptions, no category, zero-stock
-- `find_product_by_natural_language` — "the blue cotton t-shirt on sale" returns scored matches
+**Storefront design intelligence**
+- Read your shop and product pages in the active builder, score them, and edit product cards and checkout layout through the builder abstraction. Supported on Elementor, Divi, Bricks, Flatsome, and Gutenberg; other builders return a clear unsupported message
 
-**Pricing (3 tools):**
-- `bulk_update_prices` — percentage, absolute, or set-value changes with dry_run and snapshots
-- `schedule_sale` — set sale price plus start/end dates with validation
-- `revert_pricing` — roll back to a Respira snapshot
-
-**Inventory (2 tools):**
-- `bulk_update_stock` — set, increase, or decrease stock with 100-product cap and snapshots
-- `find_low_stock` — products below configurable threshold
+**Catalog operations and pricing**
+- Advanced product filtering, bulk product and price updates (percentage, absolute, or set-value) with a 100-product cap and snapshots, catalog-health audits, natural-language product search, and snapshot-backed pricing rollback
 
 ## Safety
 
@@ -73,6 +64,7 @@ Every WooCommerce write operation creates a before/after snapshot. Every bulk op
 
 - **Snapshots:** every product write (create, update, stock change) captures before and after states
 - **Dry-run:** bulk_update_prices, bulk_update_products, bulk_update_stock, schedule_sale all support `dry_run: true`
+- **Refunds dry-run by default:** a refund is previewed and capped to the order's remaining refundable total; money moves only on explicit confirmation
 - **Hard cap:** maximum 100 products per bulk call
 - **Audit trail:** all commerce writes logged to the Respira audit log
 - **PII redaction:** customer email, phone, and address redacted by default on order endpoints
