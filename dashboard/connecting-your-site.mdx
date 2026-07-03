@@ -11,11 +11,11 @@ Respira's auto-connect handshake is the fastest path from "plugin installed" to 
 
 ## Prerequisites
 
-- Respira for WordPress plugin **v6.10.1 or later** installed and activated on the site
+- Respira for WordPress plugin **v7.0 or later** installed and activated on the site (keeping it on the latest release is best)
 - A Respira account at [respira.press](https://www.respira.press) (free trial works)
 - Logged in to that account in the same browser you'll use for the handshake
 
-If your plugin is older than v6.10.1, update first via **Plugins → Updates** in WordPress, or download the latest from [respira.press/releases](https://www.respira.press/releases).
+If your plugin is older than v7.0, update first via **Plugins → Updates** in WordPress, or download the latest from [respira.press/releases](https://www.respira.press/releases).
 
 ## The handshake, step by step
 
@@ -60,7 +60,7 @@ The handshake can fail for a handful of reasons. The plugin and dashboard both l
 | Browser redirect lands on `respira.press/login?redirect=...` | You're not logged in to your Respira account | Log in, then click *Connect to Respira* again |
 | Plugin shows *handshake expired* after returning to wp-admin | The 10-minute single-use state token timed out before you completed the dashboard step | Click *Connect to Respira* again — generates a fresh token |
 | Dashboard shows the site as *Pending* even after success | A caching plugin or CDN is serving a stale wp-admin response | Purge the site's cache, then refresh the Respira dashboard |
-| Plugin redirects to wp-admin root instead of the Respira admin page | Older plugin version (pre-v6.10.1) had this bug | Update the plugin to v6.10.1 or later |
+| Plugin redirects to wp-admin root instead of the Respira admin page | An older plugin version had this bug | Update the plugin to the latest version |
 
 If none of those apply, the manual fallback below always works.
 

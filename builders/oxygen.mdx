@@ -19,9 +19,9 @@ For the full prompting guide, see [Get Great Results: How to Prompt](/prompts). 
 - **Prime once at the start.** *"This is an Oxygen site. Build with native Oxygen components, not a code block. Read my site first, then give me a draft I can review."*
 
 <details>
-<summary>Oxygen 6 caveat</summary>
+<summary>Oxygen 6: native components (fixed in the 7.4.x line)</summary>
 
-On **Oxygen 6** specifically, the single-code-block fallback is the most-reported issue today. If you get "one block of code", that is the wrong path: re-prime the agent (*"use native Oxygen components, not a code block"*) and ask it to rebuild. A deeper Oxygen 6 fix is in progress; until it ships, priming plus the native-only instruction is the reliable workaround.
+Older Respira builds on **Oxygen 6** sometimes fell back to a single HTML or code block instead of native Oxygen elements. That is fixed as of the 7.4.x releases. Respira now hands the agent the native Oxygen 6 element catalog on connect and builds real, editable `OxygenElements` (sections, headings, text, buttons, images), including the rich `EssentialElements` when the "Breakdance Elements for Oxygen" add-on is active. If you are on an older plugin and still get one big code block, update to the latest release and re-prime the agent to use native Oxygen components.
 
 </details>
 

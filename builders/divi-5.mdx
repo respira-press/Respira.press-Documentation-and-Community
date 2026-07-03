@@ -27,9 +27,9 @@ For the full prompting guide, see [Get Great Results: How to Prompt](/prompts). 
 - **Reuse existing presets and color tokens.** For brand consistency, tell the agent to read your existing Divi 5 presets and reuse them rather than inventing new colors.
 
 <details>
-<summary>Divi 5.7.4 caveat</summary>
+<summary>Divi 5 "Unknown Module" (fixed in the 7.4.x line)</summary>
 
-Some installs on **Divi 5.7.4** have reported an "Unknown Module" error on certain modules. If you hit it, do not retry the same write. Ask the agent to fall back to the core modules (heading, text, image, button, blurb) and to report the failing module name so it can be fixed. A schema fix for this is tracked separately.
+Older builds could produce an "Unknown Module" error when the agent invented layout names (`hero_section`, `feature_grid`, `cta_section`) instead of real Divi types. As of the 7.4.x releases Respira coerces any unrecognized type to the nearest native Divi block and warns the agent to use real `divi/` types, so an invented name no longer breaks the page. Best practice is still to ask for native Divi modules. If a specific module still fails on your Divi version, ask the agent to fall back to the core modules (heading, text, image, button, blurb) and report the failing module name.
 
 </details>
 
