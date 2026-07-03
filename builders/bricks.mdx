@@ -11,6 +11,8 @@ Technical documentation for using Respira with [Bricks Builder](https://bricksbu
 
 [Bricks Builder](https://bricksbuilder.io/) is a modern, performance-focused WordPress page builder that stores content as lightweight JSON. It's known for clean code output, developer-friendly features, and over 80 elements. Respira has **full native support** for Bricks — including 20 dedicated Deep Intelligence tools that go beyond content editing into design system inspection, ACSS integration, query loops, and component management.
 
+Respira reads Bricks' real per-element control schemas (around 75 elements, the complete control set) so the agent knows what each element actually accepts. Ask for them with `get_builder_inline_schemas`. Every create path mints native 6-character element IDs that match Bricks' own `#brxe-` selectors, the `bricks_components` library is reachable, and CSS is regenerated on every write.
+
 ## Support Level
 
 Bricks has **Full Native Support** — the deepest integration level available in Respira:
@@ -270,6 +272,14 @@ Bricks global elements and templates are accessible through Respira:
 - [Page Builder Overview](/builders/overview) — Compare all supported builders
 
 ---
+
+## Recent capabilities (plugin v7.5.x)
+
+- **Real per-element control schemas.** A scanner captured every Bricks element's full runtime control schema (around 75 elements, the complete control set). The element registry and `get_builder_inline_schemas` now surface those real controls, so the agent builds against what each element accepts instead of guessing from names. Off-contract controls are flagged in the write notes (warn only, never rejected).
+- **Native 6-character element IDs everywhere.** Every create path — `build_page`, HTML convert, section presets, in-place inserts, and the pattern library — mints native 6-character IDs, so the editor's duplicate, copy, paste, and save work and front-end `#brxe-` selectors match.
+- **Component library reachable.** Respira reads the `bricks_components` option, so find/replace and the analyzers resolve component instances and a guarded patch path can edit a component definition with an automatic snapshot and rollback.
+- **CSS regenerated on writes**, so the front end reflects a change immediately without a manual rebuild.
+- **SEO, schema, and readability analyzers read Bricks content.** Bricks stores the page in postmeta rather than `post_content`; the analyzers now build analyzable HTML from the element tree, so they no longer report 0 words on a page that renders fine.
 
 ## v5.4.0 Elemental — Bricks Goes Deep
 

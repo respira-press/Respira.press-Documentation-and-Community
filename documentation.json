@@ -266,6 +266,16 @@
                 "title": "MCP Tools Overview",
                 "path": "tools/overview",
                 "icon": "book-open"
+              },
+              {
+                "title": "Playbooks",
+                "path": "playbooks",
+                "icon": "repeat"
+              },
+              {
+                "title": "Team Accounts",
+                "path": "team-accounts",
+                "icon": "users"
               }
             ]
           },
@@ -370,6 +380,11 @@
                 "title": "wordpress_update_module",
                 "path": "tools/builders/update-module",
                 "icon": "sliders"
+              },
+              {
+                "title": "wordpress_get_page_outline",
+                "path": "tools/builders/get-page-outline",
+                "icon": "list-tree"
               }
             ]
           },
@@ -777,6 +792,11 @@
                 "title": "Divi 4 to Divi 5 Migration Guide",
                 "path": "guides/divi-4-to-divi-5",
                 "icon": "list-checks"
+              },
+              {
+                "title": "Host Blocks the Browser Connector",
+                "path": "guides/host-user-agent-block",
+                "icon": "shield-off"
               }
             ]
           },
@@ -977,6 +997,26 @@
               {
                 "title": "Flatsome",
                 "path": "builders/flatsome",
+                "icon": "layout"
+              },
+              {
+                "title": "Spectra",
+                "path": "builders/spectra",
+                "icon": "layout"
+              },
+              {
+                "title": "Kadence Blocks",
+                "path": "builders/kadence-blocks",
+                "icon": "layout"
+              },
+              {
+                "title": "GenerateBlocks",
+                "path": "builders/generateblocks",
+                "icon": "layout"
+              },
+              {
+                "title": "SeedProd",
+                "path": "builders/seedprod",
                 "icon": "layout"
               }
             ]

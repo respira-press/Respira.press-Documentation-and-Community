@@ -1,0 +1,56 @@
+---
+title: "Spectra (Ultimate Addons for Gutenberg)"
+description: "How Respira reads and writes Spectra blocks natively. Spectra is one of Respira's 16 supported page builders, edited as native WordPress blocks."
+---
+
+# Spectra (Ultimate Addons for Gutenberg)
+
+Technical documentation for using Respira with [Spectra](https://wpspectra.com/), also known as Ultimate Addons for Gutenberg (UAG).
+
+Spectra is a block library that extends the WordPress block editor with advanced sections, containers, and design blocks. It is one of Respira's 16 supported page builders, with full read and write.
+
+## Data Structure
+
+Spectra does not use a separate storage format. Its blocks are stored as native WordPress blocks in `post_content`, the same as any Gutenberg page. Spectra blocks carry the `spectra/*` or `uagb/*` namespace:
+
+```html
+<!-- wp:uagb/container {"block_id":"a1b2c3"} -->
+  <!-- wp:uagb/advanced-heading {"headingTitle":"Welcome"} /-->
+  <!-- wp:uagb/buttons -->
+    <!-- wp:uagb/buttons-child {"label":"Get Started"} /-->
+  <!-- /wp:uagb/buttons -->
+<!-- /wp:uagb/container -->
+```
+
+Because Spectra is block-based, Respira edits Spectra blocks natively through the same path it uses for core Gutenberg blocks. There is no shortcode parsing or custom serialization in the middle.
+
+## Priming
+
+Prime once at the start of a session so the agent builds and edits in blocks, not raw HTML:
+
+> *"This is a Spectra (UAG) site. Build and edit with Spectra and core blocks, not raw HTML, and duplicate any live page before editing."*
+
+## What Respira can do
+
+- Read the full block structure of any Spectra page and report on it
+- Update text, headings, and buttons inside Spectra blocks (`uagb/advanced-heading`, `uagb/buttons`, `uagb/info-box`, and the rest of the Spectra block set)
+- Find blocks by type, content match, or block anchor
+- Add or remove sections while keeping the page editable in the block editor
+- Preserve all existing block attributes and styling on every write
+
+The workflow is the same as core Gutenberg because Spectra blocks are just namespaced WordPress blocks. For the shared block workflow, block identification, and prompt patterns, see [Gutenberg (Block Editor)](/builders/gutenberg).
+
+## FAQ
+
+### Does Respira edit Spectra blocks natively or convert them?
+
+Natively. Respira reads and writes Spectra blocks in place through the WordPress block registry. Nothing is flattened to HTML and nothing is converted to a different builder.
+
+### What if a page has both Spectra and plain Gutenberg blocks?
+
+That is normal and fully supported. A page only registers as a Spectra page when it contains at least one `spectra/*` or `uagb/*` block. Either way, every block on the page stays editable.
+
+## See also
+
+- [Gutenberg (Block Editor)](/builders/gutenberg) - the shared block workflow
+- [Page Builder Overview](/builders/overview) - compare all 16 supported builders

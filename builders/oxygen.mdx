@@ -11,6 +11,8 @@ Technical documentation for using Respira with [Oxygen Builder](https://oxygenbu
 
 [Oxygen Builder](https://oxygenbuilder.com/) is a professional-grade WordPress site builder that generates clean, bloat-free code. It completely replaces your theme and offers full site building capabilities with over 60 components.
 
+Respira builds native, editable elements on both Oxygen Classic and Oxygen 6. On Oxygen 6 it emits real `OxygenElements` (and the rich `EssentialElements` when the "Breakdance Elements for Oxygen" add-on is active), not a single HTML block. Oxygen stores its tree in post meta, so writes are verified by reading the database rather than the object cache.
+
 ## Prompting for great results on Oxygen
 
 For the full prompting guide, see [Get Great Results: How to Prompt](/prompts). Oxygen has one failure mode worth naming:
@@ -164,3 +166,9 @@ Fixed: Oxygen templates using only `ct_builder_json` (without `ct_builder_shortc
 ### Support Level
 
 Oxygen has **Smart Defaults** support — element operations work via the generic tree utility.
+
+## Recent capabilities (7.4.x)
+
+- **Oxygen 6 builds native elements, not one HTML block.** Respira hands the agent the native Oxygen 6 element catalog on connect and builds real, editable `OxygenElements` (sections, headings, text, buttons, images), including the rich `EssentialElements` when the "Breakdance Elements for Oxygen" add-on is active. Sites without the add-on keep the safe core-only mapping.
+- **`build_page` accepts Oxygen 6's real elements.** Multi-element types the builder advertises (Columns, Column, Div, Grid, Accordion, Tabs, TextLink and more) validate against the same catalog `get_builder_info` reports, so a structured build is no longer refused with a 422 and forced into a code block.
+- **Writes are verified against the database, not the object cache**, so a persistent object cache cannot confirm a write that never reached the database.

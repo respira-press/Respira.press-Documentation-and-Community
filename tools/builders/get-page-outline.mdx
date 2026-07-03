@@ -1,0 +1,61 @@
+---
+title: "wordpress_get_page_outline"
+description: "Lightweight row-level summary of a builder page's structure. Cheaper than extracting the full builder JSON."
+---
+
+# wordpress_get_page_outline
+
+Return a row-level outline of a builder page. This is a lighter read than `extract_builder_content`: instead of the full nested tree, you get one entry per top-level row so you can answer "what is the structure of this page" without walking the whole layout client-side.
+
+Works on every supported builder. Adapters with a dedicated outline implementation (WPBakery and Uncode today) return a richer per-row child-type histogram.
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| pageId | number | Yes | Page or post ID |
+| builder | string | No | Builder name. Auto-detected from the active site builder when omitted. |
+
+## Response
+
+One entry per top-level row, each shaped like this:
+
+```json
+{
+  "success": true,
+  "outline": [
+    {
+      "index": 0,
+      "type": "et_pb_section",
+      "kind": "section",
+      "primary_heading": "Welcome",
+      "child_count": 3,
+      "child_types": ["et_pb_text", "et_pb_button", "et_pb_image"]
+    }
+  ]
+}
+```
+
+## Example Prompts
+
+- "What is the structure of the homepage?"
+- "Give me an outline of page 42 before we edit it"
+- "How many rows does the About page have and what is in each?"
+
+## When to use this vs extract_builder_content
+
+- Use **get_page_outline** first when you want the shape of a page: how many rows, what each one is, what it contains. It is the cheapest way to orient before an edit.
+- Use [wordpress_extract_builder_content](/tools/builders/extract-content) when you need the full builder-native JSON to modify and pass back into `inject_builder_content`.
+- For a targeted search by text or class, use `find_element` instead.
+
+If `extract_builder_content` runs into the response-size cap on a large page, the truncation hint points you back here: get the outline first, then extract just the subtree you care about.
+
+## Related Tools
+
+- [wordpress_extract_builder_content](/tools/builders/extract-content) - Full structured builder JSON
+- [wordpress_inject_builder_content](/tools/builders/inject-content) - Replace or append to the builder structure
+- [wordpress_update_module](/tools/builders/update-module) - Update a specific module
+
+## Notes
+
+- Read-only tool - doesn't modify content

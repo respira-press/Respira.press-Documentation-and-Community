@@ -11,7 +11,7 @@ Technical documentation for using Respira with [Visual Composer](https://visualc
 
 [Visual Composer](https://visualcomposer.com/) is a WordPress website builder that provides a frontend editor with 500+ elements and templates. Note: Visual Composer is different from WPBakery (formerly Visual Composer Page Builder). This reference covers the newer Visual Composer Website Builder.
 
-**Write support (Respira 7.4.0 "Clearing"):** Visual Composer is read and write. Respira writes in VC's canonical storage format, the editor loads the page, and the front end renders. VC regenerates its own compiled output the next time you save in its editor. Write coverage is broad but not yet exhaustive across every one of the 500+ elements.
+**Write support (Respira 7.4.0 "Clearing"):** Visual Composer moved from read-only to read and write in Respira 7.4.0. Respira writes in VC's canonical storage format, the editor loads the page, and the front end renders. VC regenerates its own compiled output the next time you save in its editor. Write coverage is broad but not yet exhaustive across every one of the 500+ elements.
 
 ## Data Structure
 
@@ -131,6 +131,11 @@ Visual Composer's global areas are editable:
 - **Animations**: Element animations are preserved but need the builder to modify
 - **Hub elements**: Third-party Hub elements have varying support
 - **Dynamic content**: Dynamic field connections are preserved but not directly editable
+
+## Recent capabilities (7.x)
+
+- **`update_element` applies edits as a deep settings patch.** The base-class write path (shared with Visual Composer) now normalizes an `updates` payload into a settings patch and deep-merges it, instead of a shallow merge at the element root that used to overwrite the whole `settings` dict and lose other styling keys.
+- **Successful meta writes are not misreported as no-ops.** Visual Composer stores its canonical tree in post meta, not `post_content`, so the write-noop check reads a storage-specific signature and no longer flags every successful write as a silent failure.
 
 ## When to Use This Tool
 

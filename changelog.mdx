@@ -52,6 +52,52 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-07" description="Respira for WordPress v7.5.x — ChatGPT connector + server-truth connectivity (latest v7.5.18)" tags={["release", "oauth", "chatgpt", "connectivity"]}>
+
+### What's New in the 7.5.x line
+
+The 7.5.x line is about connecting more AI apps with less friction, and about the plugin telling the truth about itself so a connected app never offers something this install cannot do. The current latest build is v7.5.18.
+
+**ChatGPT connector, no key to paste**
+- Unauthenticated MCP discovery so ChatGPT (and other apps that probe before signing in) can find your site's connector, then complete a one-time browser sign-in. You add the site by URL, approve access once, and a site-scoped token is minted. This matches the browser sign-in path Claude and the other apps already used.
+
+**Server truth, so connected apps stop guessing**
+- The plugin now declares which capabilities this exact install actually exposes, computed from the REST routes registered on it. A connected app can read that and hide tools whose route is not present, which removes the "no route" failures that happen when the AI app is newer than the installed plugin.
+- Connectivity and diagnostics improvements across the connect flow so a site that is reachable connects, and a site that is not says why.
+
+i haven't written a per-patch breakdown of every 7.5.x build here yet. If you want the exact notes for a specific version, ask and i will point you at it.
+
+</Update>
+
+<Update label="2026-06-21" description="Respira for WordPress v7.4.1 through v7.4.20 — builder-fix line" tags={["release", "builders", "writes", "fixes"]}>
+
+### What's New across 7.4.1 to 7.4.20
+
+A long run of builder fixes after "Clearing", each one verified on the matching builder on a real install. The theme is the same as 7.4.0: what the agent writes is what lands, and when it cannot land, Respira says so instead of reporting a false success.
+
+**Elementor**
+- Elementor v4 atomic style writes now wire to the element, so an explicit styles block, digit-leading style ids, and global system colours (primary, secondary, text, accent) all render instead of being generated and then worn by nothing.
+
+**Bricks**
+- Full control-schema deconstruction: a scanner captures every Bricks element's real runtime control set into a committed snapshot, so the agent knows what each element actually accepts, and off-contract controls are flagged with a "did you mean" instead of being dropped silently.
+- Bricks elements now mint the native 6-character ids the editor and front-end `#brxe-` selectors expect, Bricks Components survive a write with their `cid` and per-instance `properties` intact, and the SEO, schema, and readability checks now read Bricks content out of postmeta.
+
+**Oxygen 6**
+- Oxygen 6 now builds with its real native elements (`OxygenElements\*`), and picks up the rich `EssentialElements\*` Section, Heading, and Button blocks when the "Breakdance Elements for Oxygen" add-on is active, instead of collapsing a whole page into one HTML block. A legacy `null` that bricked the Oxygen 6 editor site-wide is coerced back to its empty shape on every save.
+
+**Divi 5**
+- Made-up layout names like `hero_section` no longer land as "Unknown Module" blocks: an unrecognised type is coerced to the nearest native `divi/` block, nested correctly, with a loud warning to use real Divi types. Loose content shapes agents actually send now normalise into native, editable, rendering modules, and the Visual Builder opens with the correct content after a Respira write.
+
+**Beaver Builder**
+- Compound settings (border, typography, dimension, and friends) are coerced to the array shape Beaver reads, so a render, duplicate, or batch update no longer fatals with "Cannot use object of type stdClass as array".
+
+**Self-correcting errors, less token waste**
+- When a locate, update, or patch operation cannot find its target, the response now hands the agent the page's actual elements to pick from (each with its path, id, type, admin_label, and a short content excerpt), so the agent picks the right one on its next call instead of guessing.
+
+This line also carried a critical site-down fix for Bedrock-style managed hosts (Kinsta and similar) on WordPress 6.9 and 7.0, where a bundled Abilities API polyfill could collide with the same class now shipping in core.
+
+</Update>
+
 <Update label="2026-06-12" description="Respira for WordPress v7.4.0 'Clearing' + MCP Server v7.2.1" tags={["release", "builders", "recovery", "writes"]}>
 
 ### What's New in 7.4.0 "Clearing"

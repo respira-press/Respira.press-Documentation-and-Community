@@ -11,6 +11,8 @@ Technical documentation for using Respira with [Elementor](https://elementor.com
 
 [Elementor](https://elementor.com/) is the leading WordPress page builder with over 16 million active installations. It provides a drag-and-drop interface for building pages using widgets, sections, and containers.
 
+Respira supports classic Elementor and Elementor v4 (Atomic). On v4, Respira writes around 20 element types (9 widgets plus 11 layout containers) with per-breakpoint and per-state styling. Types it does not yet support return a clear 422 error naming the unsupported type instead of dropping the element silently.
+
 ## Data Structure
 
 Elementor stores page layouts as structured JSON in WordPress post meta (`_elementor_data`). Each page contains a hierarchical tree of elements:
@@ -190,3 +192,11 @@ CSS custom properties (design tokens) can be converted to Elementor Global Color
 ### Support Level
 
 Elementor has **Full Intelligence** support — the highest tier, with dynamic schemas, element operations, HTML conversion, and settings validation.
+
+## Recent capabilities (plugin v7.5.x)
+
+- **Elementor v4 (Atomic) writes.** Respira writes around 20 v4 element types (9 widgets plus 11 layout containers) with per-breakpoint and per-state styling. Applied styles are wired to the element so they actually render.
+- **Clear errors on unsupported types.** A v4 element type Respira does not support yet returns a 422 error that names the type, instead of dropping it silently.
+- **Digit-leading style ids render.** A style id that starts with a digit (for example `1probedigit`) is sanitized to a valid letter-leading class, so Elementor generates a rule the browser matches and the element carries its style.
+- **Repeaters can shrink.** `update_element` can now remove entries from a repeater, not only add or change them.
+- **`_elementor_data` decode fixed** and `build_page` no longer drops v4 children, so a full-page build keeps every element. Per-page v4 auto-detect was also corrected so v4 pages are recognized as v4.

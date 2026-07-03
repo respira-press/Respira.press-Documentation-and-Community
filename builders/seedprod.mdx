@@ -1,0 +1,49 @@
+---
+title: "SeedProd"
+description: "How Respira reads and audits SeedProd landing pages. SeedProd is one of Respira's 16 supported page builders, read and audit only today."
+---
+
+# SeedProd
+
+Technical documentation for using Respira with [SeedProd](https://www.seedprod.com/).
+
+SeedProd is a landing-page and theme builder. It is one of Respira's 16 supported page builders. Today it is read and audit only: agents read SeedProd landing pages and report on them, and i haven't shipped write support for SeedProd yet.
+
+## Data Structure
+
+SeedProd is architecturally different from the block builders. A SeedProd landing page is stored as a `seedprod_lpage` custom post type, with the layout document held in the `seedprod_lpage_data` postmeta as proprietary JSON (a sections, rows, columns, blocks shape).
+
+Respira reads that structure. It walks the sections, rows, columns, and blocks so an agent can see what a landing page contains and describe it back to you. It does not write to that JSON, because SeedProd's serialization is not documented at attribute granularity and writing blind would risk corrupting a live landing page.
+
+## Priming
+
+Because SeedProd is read only today, prime the agent to audit rather than edit:
+
+> *"My landing pages are built with SeedProd. Read them and report on structure, copy, and SEO. Do not try to edit SeedProd pages directly."*
+
+## What Respira can do
+
+- Detect SeedProd landing pages on a site
+- Read the full section, row, column, and block structure of a landing page
+- Return the top-level layout outline so an agent can summarize a page
+- Report on copy, headings, and structure for review and SEO audits
+
+What Respira cannot do yet:
+
+- Write, update, or add blocks on a SeedProd landing page. Write operations return a clear "not supported" response with an agent-readable hint, so an agent knows to audit and report instead of editing blind.
+
+Native write support for SeedProd is on the roadmap for a follow-up release.
+
+## FAQ
+
+### Can Respira edit my SeedProd landing pages?
+
+Not yet. Respira reads and audits SeedProd pages today. i haven't shipped write support for SeedProd yet, so an agent can tell you what is on a page and flag issues, but it will not change the page. Write support is queued for a later release.
+
+### Can i still use Respira for the rest of my SeedProd site?
+
+Yes. The rest of your site, pages, posts, and any other supported builder, works normally with full read and write. Only SeedProd's own landing pages are read and audit only for now.
+
+## See also
+
+- [Page Builder Overview](/builders/overview) - compare all 16 supported builders

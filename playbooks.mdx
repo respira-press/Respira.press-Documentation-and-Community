@@ -1,0 +1,101 @@
+---
+title: "Playbooks"
+description: "Teach an agent a multi-step WordPress workflow once, then rerun it as a single callable Ability under the respira-playbooks/ namespace."
+---
+
+# Playbooks
+
+A Playbook is a typed JSON workflow that registers itself as a WordPress Ability and becomes a callable MCP tool. You author a repeatable workflow once, and every future run is a single tool call instead of an instruction-by-instruction agent session.
+
+Under the hood, the steps run server-side against Respira's own REST handlers. That means each step gets the same auth, audit trail, and snapshot protection as a direct agent call, and the whole run is one restorable snapshot session. The agent that invokes the Playbook sees a single typed result.
+
+## Why a Playbook
+
+A normal AI edit is the agent reasoning step by step: read the page, find the module, write the change, verify. That is flexible but slow and non-deterministic. Once you have a workflow you run often, "create a case study post", "publish a weekly digest", "mail-merge a service page", you want it to be:
+
+- one tool call, not a dozen
+- deterministic, so it does the same thing every time
+- typed, so the agent passes exactly the inputs it needs
+
+A Playbook crystallizes that workflow so the agent can just call it.
+
+## The tools
+
+| Tool | What it does |
+| --- | --- |
+| `respira_create_playbook` | Author a Playbook from an id, label, input schema, and an ordered list of steps. It registers as an Ability at `respira-playbooks/<id>`. |
+| `respira_list_playbooks` | List every Playbook stored on the site, with id, ability id, label, description, step count, invocation count, and last-invoked time. |
+| `respira_get_playbook` | Get one Playbook's full definition (input schema, steps, returns template, audit metadata). Read this before updating or invoking. |
+| `respira_update_playbook` | Modify an existing Playbook. The id is immutable; to change it, delete and recreate. Validation re-runs on the merged payload. |
+| `respira_delete_playbook` | Delete a Playbook. Its Ability drops out of the MCP catalog on the next handshake. Data created by past runs is left untouched. |
+
+## What a Playbook can and cannot do
+
+Steps reference MCP tools by name. Each step is `{ tool, args, capture? }`:
+
+- **tool** is an MCP tool name from the executor allowlist.
+- **args** are literal values plus templates. Use `{{input.x}}` to reference the Playbook's own inputs and `{{capture_name.field}}` to reference an earlier step's captured result.
+- **capture** is an optional name you bind a step's result under so later steps can read it.
+
+Destructive tools are refused at create time. `delete_*`, `restore_snapshot`, and `apply_builder_patch` cannot appear in a Playbook. If your flow needs one of those, split it out and have the agent call the destructive op directly.
+
+## Worked example: create a case study
+
+Author a Playbook that takes a client name and industry and produces a case study post.
+
+```json
+{
+  "id": "case-study-create",
+  "label": "Create Case Study",
+  "description": "Creates a case study post with client name and industry.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "client_name": { "type": "string" },
+      "industry": { "type": "string" }
+    },
+    "required": ["client_name"]
+  },
+  "steps": [
+    {
+      "tool": "respira_create_custom_post",
+      "args": {
+        "type": "post",
+        "title": "{{input.client_name}} case study",
+        "status": "draft",
+        "content": "How {{input.client_name}} works in {{input.industry}}."
+      },
+      "capture": "post"
+    }
+  ],
+  "returns": {
+    "post_id": "{{post.id}}",
+    "url": "{{post.link}}"
+  }
+}
+```
+
+The `capture: "post"` on the create step binds that step's result under the name `post`, so the `returns` template can pull `{{post.id}}` and `{{post.link}}` out of it.
+
+## Invoking a Playbook
+
+Once created, a Playbook is callable through `respira_invoke_ability` at the ability id `respira-playbooks/<id>`:
+
+```text
+respira_invoke_ability({
+  ability: "respira-playbooks/case-study-create",
+  args: { client_name: "AcmeBank", industry: "fintech" }
+})
+```
+
+Two things to keep in mind about invocation:
+
+- The wire field is `args`, never `input`. Respira binds the incoming `args` object under the name `input` inside the Playbook executor, which is why the step templates reference `{{input.client_name}}`.
+- Playbooks under the `respira-playbooks/` namespace skip the Inhale opt-in gate that other Abilities go through, because your own agent authored them on-site through `respira_create_playbook` (which already ran the destructive-tool refusal validator). Any other Ability still has to be inhaled from the Respira MCP Abilities screen before it can be invoked.
+
+Playbooks also appear in the streamable MCP `tools/list`, so a client sees them alongside the built-in tools.
+
+## Related
+
+- [respira_invoke_ability](/inhale-mcp-abilities/overview) — how Abilities are invoked
+- [Inhale MCP Abilities overview](/inhale-mcp-abilities/overview) — the opt-in gate Playbooks bypass

@@ -11,7 +11,13 @@ Technical documentation for using Respira with the Breakdance WordPress page bui
 
 [Breakdance](https://breakdance.com/) is a visual WordPress site builder that stores layouts as structured JSON rather than shortcodes or raw HTML.
 
-Respira interacts with Breakdance pages at the JSON layer, updating content while preserving the existing layout and design.
+Respira interacts with Breakdance pages at the JSON layer, updating content while preserving the existing layout and design. Breakdance is full read and write: `build_page`, `inject_builder_content` (append and replace), and `update_element` all write native elements, with content landing at the native `properties.content.content.*` path the renderer reads and CSS regenerated after every write.
+
+## Recent capabilities (7.4.x)
+
+- **Content-path nesting and append-unwrap.** `inject_builder_content` with `mode:"append"` unwraps every wrapper shape Respira accepts (`children`, `elements`, `nodes`, `content`, `sections`, `modules`) before merging, and the validator walks with a running counter so a non-list array can never crash it. Content is nested one `content` level deeper for the element types whose content section is `content`, so text, headings and button labels render instead of falling back to defaults.
+- **Never-null structural fields are coerced (shared with Oxygen 6).** Oxygen 6.0.0 added a strict io-ts decoder that rejects `null` where it expects an object or array. Imported header, footer and template JSON often carries `"properties":null` or `"design":null`, which used to brick the editor site-wide. Respira's Oxygen 6 / Breakdance write path now coerces these to their empty shape (`properties` → `{}`, `design`/`content` → `[]`) on every persist, so imported templates do not brick the editor, and re-saving an affected template through any Respira edit repairs the null in place.
+- **Writes are verified against the database, not the object cache**, so a host with a persistent object cache cannot report a write that never reached the database.
 
 ## Data structure
 

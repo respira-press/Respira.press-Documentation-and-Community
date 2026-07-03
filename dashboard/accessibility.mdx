@@ -82,6 +82,49 @@ respira scan accessibility https://example.com
 
 Same scanner, same report format, callable from any terminal where the CLI is installed.
 
+## Scanning from an AI agent
+
+The same WCAG scanner is available as MCP tools, so an agent connected to a site can scan, review, and fix accessibility issues in one conversation. Four tools cover the flow.
+
+### respira_scan_page_accessibility
+
+Run a WCAG scan on a page. The scanner runs an axe sweep against the page's public URL: `page_id` is resolved to the permalink server-side before the scan. The result groups violations by severity (critical, serious, moderate, minor) with auto-fix suggestions.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| page_id | number | Yes | Page ID to scan. Resolved to the page's public permalink before scanning. |
+| standard | string | No | WCAG standard to test against (default `wcag2aa`). Supported: `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`, `section508`. |
+| url | string | No | Explicit URL override. When set, skips the page_id lookup. Use it for staging or preview URLs that do not map to a Respira page_id. |
+
+### respira_list_accessibility_scans
+
+List previous scans with scores and violation counts. It defaults to `summary_only=true`, which strips the per-node detail and the AI fix prompts from each entry. Those add up to roughly 30KB per scan and blow past the MCP response cap once you have five or more scans, so keep `summary_only` on for browsing and only set it to `false` when you genuinely need the full payload.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| limit | number | No | Max scans to return (default 20). |
+| offset | number | No | Pagination offset (default 0). |
+| summary_only | boolean | No | When true (default), omits `violations[].nodes` and `prompts[]`. |
+
+### respira_get_accessibility_scan
+
+Get the full detail of one scan: every violation, the scores, and the AI fix prompts. Pass the `scan_id`, which is the UUID string from a `list_accessibility_scans` entry's `id` field. This is where you get the full payload that `list_accessibility_scans` leaves out in summary mode.
+
+### respira_apply_accessibility_fixes
+
+Auto-apply fixes for a scan. Pass the `scan_id`, and optionally a list of `rule_ids` to fix a subset; omit `rule_ids` to fix everything that is auto-fixable. The fixes it can apply are: `image-alt`, `color-contrast`, `label`, `heading-order`, `document-title`, and `html-lang-valid`.
+
+### A typical agent flow
+
+```text
+1. respira_scan_page_accessibility on page 42
+2. respira_get_accessibility_scan for the full violation detail
+3. respira_apply_accessibility_fixes for the auto-fixable rules
+4. respira_scan_page_accessibility again to confirm the score improved
+```
+
+Anything the auto-fixer cannot handle stays in the report for manual work, the same way the dashboard scanner leaves keyboard and screen-reader issues to human testing.
+
 ## Privacy
 
 Scans against public URLs are stored in our database with the URL, the report, and (if logged in) your account ID. We do not retain page content beyond the snapshot needed to render the report. Anonymous scans are rate-limited per IP and not associated with any account.

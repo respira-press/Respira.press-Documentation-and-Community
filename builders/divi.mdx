@@ -38,6 +38,8 @@ Use these resources for Divi 5 specific workflows:
 
 Divi 4 stores its builder layouts as `et_pb_*` shortcodes in `post_content`. Divi 5 uses block-based layouts where Divi modules appear as `divi/*` blocks in `post_content`. Respira works against both formats but does not perform the migration or conversion between them.
 
+On Divi 4, Respira parses the shortcode tree with a quote-aware attribute parser and folds alias children (rows and columns) into the right nesting, so a rebuild keeps the section, row, and column structure intact.
+
 Divi stores content as shortcodes in `post_content`:
 
 ```text
@@ -122,6 +124,14 @@ Respira detects Divi Global Modules. Updates to global modules appear everywhere
 - Visual-only settings (hover states) may need Divi builder
 - Per-module custom CSS is supported but complex styling may need builder
 - Dynamic content tokens are preserved but not directly editable
+
+## Recent capabilities (plugin v7.5.x)
+
+Divi 4 stays shortcode-based, and recent work hardened that path:
+
+- **Alias children fold correctly.** Row and column aliases now fold into the right nesting, so a full-page rebuild no longer drops rows or columns.
+- **Quote-aware attribute parser.** Shortcode attribute values that contain quotes or brackets (for example a `button_text` with punctuation) parse cleanly instead of truncating the shortcode.
+- **kses and `column_structure` corruption fixes.** Content-filtering and column-width edge cases that could corrupt a saved page are fixed, so an edited Divi 4 page renders as written.
 
 ## See also
 

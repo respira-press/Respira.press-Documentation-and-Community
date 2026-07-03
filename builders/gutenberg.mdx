@@ -131,6 +131,10 @@ Example: "Update the site header tagline to 'Your Success Partner'"
 - **SEO and readability workflows** - Batch-fix heading hierarchy or missing alt text
 - **Programmatic content** - Update dates, years, or repeated content across pages
 
+## Recent capabilities (7.4.x)
+
+- **`build_page` no longer emits a non-existent `core/section` block.** A `section` type used to fall through to `core/section`, which WordPress renders as "This block is not supported" and the front end drops; `row` had the same gap. `section`/`container`/`wrapper` now map to `core/group` and `row` to `core/columns`, so a full-page build is valid, nested and renders. Native block support is otherwise full: Respira reads every registered block from the block registry, core and third-party alike.
+
 ## Limitations
 
 - **Block patterns**: Pattern structure is preserved, but pattern-specific styling may need the editor
