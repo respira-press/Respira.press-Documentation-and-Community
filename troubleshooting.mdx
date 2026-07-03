@@ -38,13 +38,13 @@ npx @respira/wordpress-mcp-server --list
 npx @respira/wordpress-mcp-server --setup
 ```
 
-### Recommended version baseline (March 2026)
+### Recommended version baseline
 
-- Respira for WordPress: `5.2.0+`
-- MCP server: `5.2.0+`
-- WooCommerce tooling: plugin `5.2.0+`, MCP `5.2.0+`, Woo add-on `1.0.2+`
+- Respira for WordPress: `7.5+`
+- MCP server: `7.2+`
+- WooCommerce tooling: keep the WooCommerce add-on current alongside the plugin
 
-If you are on older versions, upgrade first before deep debugging.
+Respira ships fixes almost every week, so the reliable baseline is simply the latest release of each. If you are on older versions, update first before deep debugging.
 
 ### Gathering information for support
 
@@ -127,8 +127,7 @@ This is informational, not a runtime failure.
 
 If Elementor writes fail intermittently or return 500-level errors:
 
-- Upgrade Respira plugin to `4.2.0+`
-- Upgrade MCP server to `4.0.0+`
+- Update the Respira plugin and MCP server to the latest release
 - Re-run setup: `npx @respira/wordpress-mcp-server --setup`
 - Re-test: `npx @respira/wordpress-mcp-server --test`
 - Retry the same operation once after upgrade

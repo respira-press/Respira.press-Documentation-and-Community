@@ -11,6 +11,8 @@ Technical documentation for using Respira with [WPBakery Page Builder](https://w
 
 [WPBakery Page Builder](https://wpbakery.com/) (formerly Visual Composer) is one of the most widely used WordPress page builders with over 4 million active installations. It uses a shortcode-based architecture to store content.
 
+WPBakery is full read and write (read moved to write in Respira 7.4.0 "Clearing"). Respira builds, edits and round-trips shortcode layouts, and the same class handles the popular WPBakery forks: Uncode and TagDiv/Newspaper are recognized and their `uncode_*` / `tdb_*` shortcodes surface as first-class elements.
+
 ## Data Structure
 
 WPBakery stores layouts as nested shortcodes in `post_content`:
@@ -117,6 +119,13 @@ Respira works with content regardless of which editor was used. Both Backend Edi
 - **Custom CSS**: Per-element custom CSS is preserved but complex styling changes may require the builder
 - **Third-party add-ons**: Support varies; core WPBakery elements have full support
 - **Row/column structure**: Layout-level changes (column widths, row settings) are best done in the builder
+
+## Recent capabilities (7.x)
+
+- **Attribute round-trip is byte-faithful.** A pre-7.0.33 bug silently dropped every shortcode attribute on save (widths, media IDs, font tokens, `uncode_shortcode_id`) while reporting success. The write path now reads the attribute bag from any of `attrs` / `attributes` / `settings`, so extract-then-inject preserves every attribute.
+- **Per-shortcode attribute schemas at runtime.** `get_builder_inline_schemas` returns real per-shortcode schemas (`param_name`, type, heading, description, value, dependency, group) by reading WPBakery's `vc_map()` registry at runtime, cached for 1 hour, covering WPBakery, Uncode and TagDiv.
+- **`find_builder_targets` paginates.** Results carry `total_matches`, `offset`, `has_more` and `next_offset` so large pages page through cleanly.
+- **`_wpb_shortcodes_custom_css` is regenerated on every inject**, so Respira's REST writes (which run without an editor cap check) no longer leave stale per-post shortcode CSS that could break the front-end render on Uncode.
 
 ## When to Use This Tool
 

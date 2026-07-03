@@ -1,0 +1,54 @@
+---
+title: "GenerateBlocks"
+description: "How Respira reads and writes GenerateBlocks natively. GenerateBlocks is one of Respira's 16 supported page builders, edited as native WordPress blocks."
+---
+
+# GenerateBlocks
+
+Technical documentation for using Respira with [GenerateBlocks](https://generateblocks.com/).
+
+GenerateBlocks is a lightweight block library built around a small set of flexible blocks (container, grid, headline, button, text). It is one of Respira's 16 supported page builders, with full read and write.
+
+## Data Structure
+
+GenerateBlocks stores content as native WordPress blocks in `post_content`, the same as any Gutenberg page. GenerateBlocks carry the `generateblocks/*` (and `generateblocks-pro/*`) namespace:
+
+```html
+<!-- wp:generateblocks/container {"uniqueId":"a1b2c3"} -->
+  <!-- wp:generateblocks/headline {"uniqueId":"h1"} -->Welcome<!-- /wp:generateblocks/headline -->
+  <!-- wp:generateblocks/button {"uniqueId":"btn1"} -->Get Started<!-- /wp:generateblocks/button -->
+<!-- /wp:generateblocks/container -->
+```
+
+Because GenerateBlocks is block-based, Respira edits GenerateBlocks natively through the same path it uses for core Gutenberg blocks. There is no separate storage format to parse.
+
+## Priming
+
+Prime once at the start of a session so the agent builds and edits in blocks, not raw HTML:
+
+> *"This is a GenerateBlocks site. Build and edit with GenerateBlocks and core blocks, not raw HTML, and duplicate any live page before editing."*
+
+## What Respira can do
+
+- Read the full block structure of any GenerateBlocks page and report on it
+- Update text, headlines, and buttons inside GenerateBlocks (`generateblocks/headline`, `generateblocks/button`, `generateblocks/container`, `generateblocks/grid`, and the rest of the set)
+- Find blocks by type, content match, or block anchor
+- Add or remove sections while keeping the page editable in the block editor
+- Preserve all existing block attributes and styling on every write
+
+The workflow is the same as core Gutenberg because GenerateBlocks are namespaced WordPress blocks. For the shared block workflow, block identification, and prompt patterns, see [Gutenberg (Block Editor)](/builders/gutenberg).
+
+## FAQ
+
+### Does Respira edit GenerateBlocks natively or convert them?
+
+Natively. Respira reads and writes GenerateBlocks in place through the WordPress block registry. Nothing is flattened to HTML and nothing is converted to a different builder.
+
+### Are GenerateBlocks Pro blocks supported?
+
+Yes. Both the free `generateblocks/*` and the `generateblocks-pro/*` blocks are read and written as native blocks.
+
+## See also
+
+- [Gutenberg (Block Editor)](/builders/gutenberg) - the shared block workflow
+- [Page Builder Overview](/builders/overview) - compare all 16 supported builders

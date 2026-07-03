@@ -1,0 +1,59 @@
+---
+title: Host blocks the browser connector (nginx 403 on an automated user agent)
+description: When the browser or ChatGPT connector fails at sign-in but the local connectors work, your host may be blocking Claude's automated user agent at the origin. How to confirm it, and the one fix.
+---
+
+# Host blocks the browser connector (nginx 403 on an automated user agent)
+
+Some managed hosts (WP Engine is the common one) block automated HTTP clients at the origin server, before the request ever reaches WordPress or the Respira plugin. Claude's servers fetch your site's sign-in files identifying as `python-httpx`, and a host that blocks that user agent returns a plain `403 Forbidden` from nginx. The browser connector then fails at the very first step, so it never reaches the sign-in screen.
+
+This is a different problem from a [Cloudflare block](/guides/cloudflare-allowlist). Cloudflare bot settings are not involved, and turning Cloudflare rules on or off will not fix it.
+
+## When this is your problem
+
+- The remote **browser connector** (claude.ai, or the Claude Desktop *custom connector by URL*, or the ChatGPT connector) fails with `mcp_registration_failed` or a start error before you ever see a sign-in page.
+- The site loads normally in a web browser.
+- The **local** connectors work fine: Claude Desktop (the one-click `.mcpb`), Claude Code, and Cursor all connect and edit your site. They run on your own computer with a user agent your host allows, so they are never blocked.
+
+If the local path already works for you, you are not stuck. You only need the fix below if you specifically want the browser/URL connector.
+
+## How to confirm it is your host, not Cloudflare
+
+Run this from any terminal, replacing the domain with your site:
+
+```bash
+curl -A "python-httpx/0.28.1" https://yoursite.com/.well-known/oauth-protected-resource
+```
+
+- If it returns the sign-in JSON (a short block starting with `{"resource":`), your host is not blocking and the problem is elsewhere.
+- If it returns a `403 Forbidden` whose body is a plain nginx page (`<center>nginx</center>`), your host is blocking the user agent at the origin. That is this problem.
+
+To be certain it is user-agent based, compare a browser-like agent, which should return `200`:
+
+```bash
+curl -A "Mozilla/5.0" https://yoursite.com/.well-known/oauth-protected-resource
+```
+
+A `200` for the browser agent and a `403` for `python-httpx` confirms the block is on the user agent, at your host, not on the path.
+
+## The fix
+
+The fix is a message to your host's support (for WP Engine, open a support ticket):
+
+> Please allow the paths `/.well-known/` and `/wp-json/respira/` through your platform user-agent blocking. An automated client (user agent `python-httpx`) is getting a 403 from nginx on those paths, and I need it allowed.
+
+The finish line is the same one-line test. Once it returns `200` instead of `403`, the connector completes on the next try:
+
+```bash
+curl -A "python-httpx/0.28.1" https://yoursite.com/.well-known/oauth-protected-resource
+```
+
+## While you wait
+
+You do not need the browser connector to start using Respira. On the [MCP Setup page](https://www.respira.press/dashboard/mcp), pick **Claude Desktop** (one-click) or **Claude Code** (one command). Both connect from your own computer with your key and are not affected by the host block.
+
+## Related
+
+- [Cloudflare allowlist for Respira routes](/guides/cloudflare-allowlist) — a separate edge block, on the HTTP method rather than the user agent
+- [Connect Claude Desktop (OAuth)](/connect-claude-desktop-oauth)
+- [Connect ChatGPT (OAuth)](/connect-chatgpt-oauth)

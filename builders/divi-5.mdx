@@ -27,9 +27,9 @@ For the full prompting guide, see [Get Great Results: How to Prompt](/prompts). 
 - **Reuse existing presets and color tokens.** For brand consistency, tell the agent to read your existing Divi 5 presets and reuse them rather than inventing new colors.
 
 <details>
-<summary>Divi 5.7.4 caveat</summary>
+<summary>Divi 5 "Unknown Module" (fixed in the 7.4.x line)</summary>
 
-Some installs on **Divi 5.7.4** have reported an "Unknown Module" error on certain modules. If you hit it, do not retry the same write. Ask the agent to fall back to the core modules (heading, text, image, button, blurb) and to report the failing module name so it can be fixed. A schema fix for this is tracked separately.
+Older builds could produce an "Unknown Module" error when the agent invented layout names (`hero_section`, `feature_grid`, `cta_section`) instead of real Divi types. As of the 7.4.x releases Respira coerces any unrecognized type to the nearest native Divi block and warns the agent to use real `divi/` types, so an invented name no longer breaks the page. Best practice is still to ask for native Divi modules. If a specific module still fails on your Divi version, ask the agent to fall back to the core modules (heading, text, image, button, blurb) and report the failing module name.
 
 </details>
 
@@ -54,6 +54,7 @@ Divi 5 support in Respira focuses on safe reading and editing of both layout for
 **Respira behavior**
 
 - Respira can read, edit, and save Divi 5 pages as blocks safely.
+- Respira builds real, editable modules from a 108-module catalog. Ask for the catalog with `get_builder_inline_schemas`.
 - Respira continues supporting Divi 4 pages by reading and writing the existing `et_pb_*` shortcodes.
 - Respira does not perform automatic conversion between these formats.
 
@@ -406,6 +407,15 @@ All `divi/*` modules accept a `settings` object with shorthand keys. Respira map
 > You can mix simplified `settings` with raw `attributes` in the same node. Settings are applied first, then any explicit `attributes` override them. Use `attributes` for Divi 5-specific features not covered by the simplified keys.
 
 ---
+
+## Recent capabilities (plugin v7.5.x)
+
+- **Native, editable module builds across a 108-module catalog.** `build_page` writes real `divi/*` modules from the catalog, discoverable through `get_builder_inline_schemas`, instead of falling back to a raw code block.
+- **Invented type names are coerced, not written verbatim.** An unmapped or made-up type name (for example `hero_section`) is coerced to the nearest native `divi/` block with a warning, so it no longer renders as a phantom "Unknown Module".
+- **Content lands in the bucket the renderer reads.** Loose content shapes are normalized into the `settings` bucket, so a module renders instead of coming back as an empty container.
+- **Custom CSS group recognized.** The universal `css` group is accepted on `update_module` instead of being flagged as an unknown group.
+- **Heading level fix.** A Heading only ever carries a valid `h1`–`h6` level, so Divi 5.7+ no longer refuses to render it.
+- **Background-overlay key fix**, so overlay settings apply as written.
 
 ## v5.2.0 Elemental — New Capabilities
 

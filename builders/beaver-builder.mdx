@@ -11,6 +11,8 @@ Technical documentation for using Respira with [Beaver Builder](https://www.wpbe
 
 [Beaver Builder](https://www.wpbeaverbuilder.com/) is a reliable, user-friendly WordPress page builder trusted by agencies and developers. It stores layouts as serialized data and features over 30 content modules with a focus on stability and clean code.
 
+Beaver Builder is full read and write. Respira builds, duplicates, batch-updates and renders native Beaver layouts, and mirrors every write to both the draft (`_fl_builder_data`) and published (`_fl_builder_data_published`) meta so the editor and the front end stay in lockstep.
+
 ## Data Structure
 
 Beaver Builder stores layouts as serialized PHP arrays in post meta (`_fl_builder_data`). The structure consists of rows, columns, and modules:
@@ -167,3 +169,9 @@ The `convert_html_to_builder` tool now fully supports Beaver Builder with:
 ### Support Level
 
 Beaver Builder has **Smart Defaults** support — element operations work via the generic tree utility with builder-specific content merging.
+
+## Recent capabilities (7.4.x)
+
+- **Compound settings no longer fatal on write.** Beaver reads compound settings (`border`, `place_content`, `typography`, `dimension` and friends) with array syntax, so Respira now coerces every compound setting value to a PHP array on the write path. That fixes duplicate, batch-update and page render in one place, where they previously could fatal with "Cannot use object of type stdClass as array."
+- **HTML-to-builder preserves section order on nested layouts.** Sections wrapping nested `<div>`s used to reorder because the converter produced invalid row-in-row structures. The Beaver hierarchy pass now emits valid `row > column-group > column > module` in source order, keeping multi-column grids intact.
+- **inject-builder-content accepts raw HTML** (a string, or `{ html: "..." }`), running it through the same converter `convert_html_to_builder` uses, so the two tools take the same input.

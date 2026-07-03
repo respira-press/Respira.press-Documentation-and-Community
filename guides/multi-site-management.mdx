@@ -15,6 +15,10 @@ You might have:
 - Staging site
 - A client site
 
+## Listing sites
+
+Use `wordpress_list_sites` to see every site in the current configuration and which one is active. It takes no arguments and is read-only, so it is the safe first call when you are not sure what is connected.
+
 ## Switching Sites
 
 Use [wordpress_switch_site](/tools/other/switch-site) to change the active site:
@@ -23,7 +27,19 @@ Use [wordpress_switch_site](/tools/other/switch-site) to change the active site:
 Switch to siteId "staging"
 ```
 
-Then run the rest of your tools normally (they’ll apply to the selected site).
+Then run the rest of your tools normally (they'll apply to the selected site). Switching flips the global current site for the configuration, so every later call in the session lands on the new site until you switch again.
+
+## Overriding the site for a single call
+
+Most tools also accept an optional `site_id` argument. Passing it overrides the active site for that one call without changing the global current site. This is the safest way to touch a different site once: you do not have to switch and remember to switch back.
+
+```text
+List the pages on siteId "staging" for this call only
+```
+
+This matters when one MCP server process runs several chats in parallel (for example multiple Cowork chats against different sites). A `switch_site` there would move the current site for every chat at once, so each chat should pin its own target with a per-call `site_id` instead of switching.
+
+A few tools do not take `site_id`, because a per-call override would not mean anything for them: `wordpress_list_sites`, `wordpress_get_active_site`, `wordpress_switch_site` (which already takes `site_id` to flip the global site), and `wordpress_redeem_token` (which runs before any site exists).
 
 ## Best Practices
 

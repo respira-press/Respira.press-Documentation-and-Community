@@ -1,0 +1,33 @@
+---
+title: "Team Accounts"
+description: "Put more than one person on a single Respira account, with a per-member access level enforced at token introspection."
+---
+
+# Team Accounts
+
+A team account lets more than one person work under a single Respira account. The team owns the licenses, and therefore the sites and packs. Members connect their own agents to those sites without needing their own separate subscription.
+
+Every existing account is already a team of one. Team features only surface once a second member is invited, and a single-user account behaves exactly as it did before.
+
+## How access works
+
+Each member has an access level. From the dashboard dropdown you pick one of three:
+
+- **read-only** — the member's agent is capped to read. It can inspect sites but not write.
+- **editor** — full read and write on the sites the member is granted.
+- **admin** — account-grade capabilities, with editor-level access to sites.
+
+The access level is enforced at token introspection. When a member's agent connects, Respira checks the member's live access level for the team that owns the site and hands the plugin the matching scope. The plugin only honors the scope introspection returns, so lowering someone to read-only takes effect on their next connection without any change to the plugin or the site keys. Changes land within the plugin's roughly one-minute introspection cache.
+
+## Per-member tokens
+
+A member's token keeps that member's own user id for revocation and audit, while pointing at the team's existing site and license. Two consequences follow from that:
+
+- Removing a member revokes only that member's tokens. The team's site-connection keys never rotate, so other members and the connected sites are unaffected.
+- Each member's MCP setup codes carry the team's sites through that member's own token. A member gets working setup codes for the team sites without the owner having to reshare a site key.
+
+## Related
+
+- [Multi-Site Management](/guides/multi-site-management) — working across the team's sites
+- [Team Workflows](/guides/team-workflows) — safe review patterns for teams
+- [API key management](/security/api-key-management) — how tokens and revocation work
