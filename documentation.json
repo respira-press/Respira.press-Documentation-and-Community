@@ -843,6 +843,10 @@
                 "icon": "book-open"
               },
               {
+                "title": "Agent-Ready Commerce",
+                "path": "woocommerce/agent-ready-commerce"
+              },
+              {
                 "title": "Installation",
                 "path": "woocommerce/installation",
                 "icon": "download"
