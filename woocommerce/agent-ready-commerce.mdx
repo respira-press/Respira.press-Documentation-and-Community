@@ -1,0 +1,116 @@
+---
+title: Agent-Ready Commerce
+description: Make your WooCommerce store discoverable and shoppable for AI assistants - product feeds in six formats, a store llms.txt, an AI-readiness score with autofix, and attributed cart links. New in add-on v3.1.
+---
+
+## Why this exists
+
+AI assistants like ChatGPT, Claude, Copilot and Google AI Mode already recommend products to shoppers, and they can only sell what they can read. Shopify made its stores readable to them with one platform switch. The agent-ready commerce layer (add-on v3.1) does the same for a WooCommerce store: product feeds in the formats the platforms ingest, a machine-readable store summary, a catalog quality score with the tools to fix what it flags, and cart links whose orders are attributed back to the AI assistant that sent them.
+
+Everything runs on your own server. Feeds are static files in your uploads directory, checkout stays on your store, and no product data passes through Respira.
+
+<Callout kind="info">
+
+The readable half of this layer (feeds, llms.txt, readiness score, cart links) is also available as **Respira ARC**, a free plugin. The add-on includes all of ARC plus the agent tools that act on your store. If both are installed, ARC steps aside automatically and settings carry over.
+
+</Callout>
+
+## Product feeds in six formats
+
+One catalog walk builds every enabled format:
+
+| Format | File | Register with |
+| --- | --- | --- |
+| Google Shopping XML | `google.xml` | Google Merchant Center (scheduled fetch). Bing accepts the same file. |
+| OpenAI / ChatGPT JSONL | `openai.jsonl` | OpenAI merchant onboarding (product discovery) |
+| Meta CSV | `meta.csv` | Meta Commerce Manager (Facebook + Instagram) |
+| Pinterest CSV | `pinterest.csv` | Pinterest catalogs |
+| TikTok CSV | `tiktok.csv` | TikTok Seller Center |
+| Generic CSV | `products.csv` | Anything else |
+
+Feeds rebuild on your schedule (hourly, twice daily, or daily) and again a few minutes after products change. Variations export as proper variant rows grouped by `item_group_id` with per-variation prices and images, sale prices carry their date windows, and identifiers follow each platform's rules, including Google's `identifier_exists` logic.
+
+Feed URLs contain an unguessable token. They are served at a pretty URL (`/respira-feed/{token}/{file}`) with a `/wp-json` fallback for hosts that intercept unknown paths.
+
+**Tools:** `woocommerce_configure_feed`, `woocommerce_generate_feed`, `woocommerce_get_feed_status`, `woocommerce_validate_feed`, `woocommerce_set_feed_category_mapping`.
+
+**Admin screen:** WooCommerce &rarr; Respira ARC shows every feed URL with copy buttons, product counts, and last-build times.
+
+## The store llms.txt
+
+With the option enabled, a machine-readable store summary is served at `yoursite.com/llms.txt`: what you sell, your policy pages, your top categories with counts, and where the feeds live. It is the file AI assistants look for first when they try to understand a site.
+
+## AI-readiness score and autofix
+
+`woocommerce_validate_feed` scores your catalog against the Google Shopping spec and lists the exact failing products per check (missing images, empty or thin descriptions, missing brands and GTINs, unmapped categories, over-length titles).
+
+`woocommerce_readiness_fixlist` turns that into an ordered work queue: weakest products first, each failing check paired with the tool that fixes it. An agent can walk the queue end to end:
+
+- GTINs via `woocommerce_update_product` (`global_unique_id`, WooCommerce 9.2+)
+- Galleries via `woocommerce_update_product` (`gallery_image_ids`)
+- Image alt text via `woocommerce_set_image_alt`
+- Brands via the brand tools, categories via `woocommerce_set_feed_category_mapping`
+
+The catalog readiness report also checks your robots.txt for lines that block AI crawlers (GPTBot, OAI-SearchBot, Google-Extended, PerplexityBot) and flags exactly which assistant each line blocks.
+
+## Cart links with attribution
+
+`woocommerce_create_cart_link` builds a signed URL an agent can hand to a shopper. Opening it fills the cart server-side and lands on your own checkout, so payments and customer data never leave your store. The signature is HMAC-based; tampered links are rejected.
+
+Orders arriving through cart links are attributed twice: through WooCommerce's native order attribution (`utm_source` per agent, `utm_medium=agentic`, visible in WooCommerce Analytics) and through a server-side order meta safety net that works even with JavaScript blocked.
+
+`woocommerce_agent_orders_report` returns the orders and revenue attributed to agents over any period, broken down by source. The same numbers appear on your respira.press dashboard as the "Agent-origin orders" card.
+
+## Two skills that use this layer
+
+- **woo-agent-storefront** walks the whole setup: configure feeds, validate against each spec, register with each platform (including the gated OpenAI program), check AI crawler access, and demonstrate the cart-link loop.
+- **woo-catalog-perfection** runs the fixlist loop in reviewable batches until your catalog scores 90+, with a snapshot before every change.
+
+Both are in the [skills directory](https://www.respira.press/skills).
+
+## Prompts to try
+
+```
+Set up product feeds for Google and ChatGPT and give me the URLs to register.
+```
+
+```
+Score my catalog against the Google Shopping spec and fix everything that's fixable without new photos.
+```
+
+```
+Create a cart link for the ceramic mug and the pour-over kit, attributed to my newsletter.
+```
+
+```
+How many orders did AI assistants send me this month?
+```
+
+## Support and next steps
+
+Questions or feed formats you need that aren't here yet: `word@respira.press`.
+
+<Columns cols={3}>
+
+<Card
+  title="WooCommerce overview"
+  href="/woocommerce/overview"
+  icon="book-open"
+  cta="All capabilities"
+/>
+
+<Card
+  title="Tools reference"
+  href="/woocommerce/tools"
+  icon="wrench"
+  cta="Tool by tool"
+/>
+
+<Card
+  title="Safety notes"
+  href="/woocommerce/safety"
+  icon="shield"
+  cta="Snapshots and rollback"
+/>
+
+</Columns>
