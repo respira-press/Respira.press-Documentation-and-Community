@@ -1,6 +1,6 @@
 ---
 title: WooCommerce Tools Reference
-description: Reference for WooCommerce MCP tools provided by the Respira for WordPress WooCommerce Add-on (54 tools), grouped by products, orders, inventory, and reports.
+description: Reference for WooCommerce MCP tools provided by the Respira for WordPress WooCommerce Add-on (87 tools), grouped by products, orders, inventory, feeds, extensions, configurators, and reports.
 ---
 
 ## How WooCommerce tools work with your AI assistant
@@ -13,7 +13,7 @@ Your AI assistant typically decides which tool to call based on natural language
 - Set guardrails for what the assistant is allowed to change
 - Review logs and audit which tools were used
 
-When the WooCommerce add-on is installed, the assistant has access to 54 WooCommerce tools spanning products, variations and swatches, the Staggs configurator, orders and refunds, coupons, customers, inventory, AI-readiness, and storefront design intelligence. This page documents the primary product, order, inventory, and report tools; see the [overview](/woocommerce/overview) for the full list of areas.
+When the WooCommerce add-on is installed, the assistant has access to 87 WooCommerce tools (as of add-on v3.2) spanning products, variations and swatches, orders and refunds, coupons, customers, inventory, AI-readiness, storefront design intelligence, product feeds and llms.txt, cart links with agent-order attribution, Subscriptions, Bookings and Memberships, and the STAGGS product configurator. This page documents the primary product, order, inventory, and report tools, then lists the v3.1 and v3.2 groups; see the [overview](/woocommerce/overview) for the full list of areas.
 
 <Callout kind="info">
 
@@ -376,7 +376,7 @@ If you run into issues with WooCommerce tools or need help designing workflows, 
 
 ## Complete tool list
 
-The add-on registers 54 WooCommerce tools: the `respira-woocommerce/` abilities plus the REST/MCP storefront-design, catalog, pricing and AI-readiness tools described in the [overview](/woocommerce/overview). Every write is snapshot-backed, runs behind the `manage_woocommerce` capability, and supports `dry_run` where it changes data.
+The add-on registers 87 WooCommerce MCP tools (as of v3.2): the `respira-woocommerce/` abilities plus the REST/MCP storefront-design, catalog, pricing, AI-readiness, feeds, cart-link, extension and configurator tools described in the [overview](/woocommerce/overview) and in the section below. Every write is snapshot-backed, runs behind the `manage_woocommerce` capability, and supports `dry_run` where it changes data.
 
 ### Products, categories, tags & brands
 
@@ -449,3 +449,43 @@ The add-on registers 54 WooCommerce tools: the `respira-woocommerce/` abilities 
 - `respira-woocommerce/get-order-refunds` — List order refunds
 - `respira-woocommerce/create-order-refund` — Refund an order
 
+
+## Agent-ready commerce and extension tools (v3.1 and v3.2)
+
+The v3.1 and v3.2 releases added six groups. MCP tool names below; each also registers as a WordPress Ability for browser AI.
+
+### Product feeds and llms.txt
+
+- `woocommerce_configure_feed` — enable formats, schedule, options; returns the public feed URLs
+- `woocommerce_generate_feed` — kick a rebuild (idempotent; first batch runs synchronously so it works even when wp-cron is dead)
+- `woocommerce_get_feed_status` — manifest, per-format freshness, wp-cron health warning
+- `woocommerce_validate_feed` — check rows against each platform's actual spec before registering
+- `woocommerce_set_feed_category_mapping` — map your categories to the Google product taxonomy
+
+### Readiness score and autofix
+
+- `woocommerce_product_ai_readiness` / `woocommerce_catalog_ai_readiness` — the 0-100 score, per product and store-wide
+- `woocommerce_readiness_fixlist` — the scan as an ordered work queue, weakest products first, each failing check paired with the tool that fixes it
+- `woocommerce_set_image_alt` — write image alt text (the check that fails most often); GTIN and gallery writes live on `woocommerce_update_product`
+
+### Cart links and attribution
+
+- `woocommerce_create_cart_link` — a signed URL that fills the cart server-side and lands on your own checkout; tampered signatures get a 403
+- `woocommerce_agent_orders_report` — orders and revenue attributed to AI-assistant sources
+
+### Subscriptions (WooCommerce Subscriptions)
+
+- `woocommerce_list_subscriptions`, `woocommerce_get_subscription`, `woocommerce_update_subscription_status` (every transition validated against what Subscriptions itself allows), `woocommerce_update_subscription_dates`, `woocommerce_add_subscription_note`
+
+### Bookings and Memberships (WooCommerce Bookings, Memberships)
+
+- `woocommerce_list_bookings`, `woocommerce_get_booking`, `woocommerce_update_booking_status`, `woocommerce_reschedule_booking` (conflict scan before anything moves)
+- `woocommerce_list_membership_plans`, `woocommerce_list_memberships`, `woocommerce_get_membership`, `woocommerce_update_membership_status`, `woocommerce_set_membership_end_date`
+
+All extension writes are dry-run by default and require the real extension plugin to be active.
+
+### Product configurator (STAGGS, v3.2)
+
+- `woocommerce_configurator_status`, `woocommerce_get_product_configurator`, `woocommerce_set_product_configurator` — detect STAGGS, read and enable/disable the configurator per product
+- `woocommerce_list_configurator_attributes`, `woocommerce_get_configurator_attribute_items`, `woocommerce_set_configurator_attribute_items` — read attribute groups and rewrite option items (labels, prices, defaults) through the STAGGS/Carbon Fields helpers
+- `woocommerce_get_plugin_state`, `woocommerce_set_plugin_state` — allow-listed plugin settings; any key outside the known-safe set refuses the whole request

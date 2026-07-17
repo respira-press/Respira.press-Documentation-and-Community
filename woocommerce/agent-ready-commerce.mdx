@@ -1,6 +1,6 @@
 ---
 title: Agent-Ready Commerce
-description: Make your WooCommerce store discoverable and shoppable for AI assistants - product feeds in six formats, a store llms.txt, an AI-readiness score with autofix, and attributed cart links. New in add-on v3.1.
+description: Make your WooCommerce store discoverable and shoppable for AI assistants - product feeds in six formats, a store llms.txt, an AI-readiness score with autofix, attributed cart links, and STAGGS configurator editing. Add-on v3.1 and v3.2.
 ---
 
 ## Why this exists
@@ -60,6 +60,14 @@ The catalog readiness report also checks your robots.txt for lines that block AI
 Orders arriving through cart links are attributed twice: through WooCommerce's native order attribution (`utm_source` per agent, `utm_medium=agentic`, visible in WooCommerce Analytics) and through a server-side order meta safety net that works even with JavaScript blocked.
 
 `woocommerce_agent_orders_report` returns the orders and revenue attributed to agents over any period, broken down by source. The same numbers appear on your respira.press dashboard as the "Agent-origin orders" card.
+
+## Product configurators (v3.2)
+
+Stores that sell configurable products (engraving, materials, add-on options) usually run them through the STAGGS plugin. v3.2 adds eight configurator tools: detect STAGGS, enable or disable the configurator per product, list its attribute groups, and rewrite option items (labels, prices, defaults). Writes go through the same STAGGS and Carbon Fields helpers the plugin itself uses, so storage stays exactly as STAGGS expects, and every write is allow-listed: any key outside the known-safe set refuses the whole request rather than half-applying it.
+
+## The Respira ARC screen in wp-admin
+
+The add-on ships an admin screen under WooCommerce called Respira ARC. It is the home for this layer: feed formats and schedule, the feed URLs with submit links for each platform, the catalog quality score with Fix with AI buttons, a cart link generator with a product picker, agent-origin orders for the last 30 days, and a "What an agent could do here" card with copyable prompts.
 
 ## Two skills that use this layer
 

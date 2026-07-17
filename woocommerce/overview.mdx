@@ -1,11 +1,11 @@
 ---
 title: WooCommerce Add-on
-description: 54 AI tools for WooCommerce including storefront design intelligence, bulk pricing with snapshots, and catalog health audits. €95/year for Maker and Builder. Included free with Studio and Founder.
+description: 87 AI tools for WooCommerce including agent-ready commerce (product feeds + llms.txt), storefront design intelligence, Subscriptions, Bookings and Memberships writes, STAGGS configurator editing, bulk pricing with snapshots, and catalog health audits. €95/year for Maker and Builder. Included free with Studio and Founder.
 ---
 
 ## Overview
 
-The Respira for WordPress WooCommerce Add-on extends Respira's safety-first workflow to your WooCommerce store. 54 tools that connect commerce data to page builder visuals, with a snapshot, a dry-run preview, and an approval step on every change.
+The Respira for WordPress WooCommerce Add-on extends Respira's safety-first workflow to your WooCommerce store. 87 tools (as of add-on v3.2) that connect commerce data to page builder visuals and make the store readable to AI shopping assistants, with a snapshot, a dry-run preview, and an approval step on every change.
 
 **Pricing:**
 - **Studio and Founder plans:** included free, no separate purchase
@@ -26,7 +26,7 @@ If you are not set up with Respira yet, start with the base [Installation](/inst
 
 </Callout>
 
-## What's included (54 tools)
+## What's included (87 tools)
 
 The add-on grew from commerce CRUD into the full storefront layer. The areas:
 
@@ -38,8 +38,17 @@ The add-on grew from commerce CRUD into the full storefront layer. The areas:
 - Variation CRUD and one-call variation-matrix generation with a dry-run preview
 - Global attributes, plus the WooCommerce 10.9 colour and image swatches (wc-visual)
 
-**Product configurator (Staggs)**
-- Drive the Staggs product configurator by prompt: enable it per product, read its setup, and toggle options per dealer. Allow-listed and snapshotted. The piece no other WooCommerce MCP has.
+**Agent-ready commerce (v3.1)**
+- Product feeds in six formats (Google Shopping XML, OpenAI/ChatGPT JSONL, Meta, Pinterest, TikTok, generic CSV) plus a store llms.txt at the site root, rebuilt on schedule and minutes after products change
+- Signed cart links that fill a shopper's cart and land on your own checkout, with agent-origin order attribution and a revenue report
+- The readiness score becomes a fix loop: an ordered fixlist, GTIN and gallery writes, and image alt-text tools
+- Full detail on the [Agent-Ready Commerce](/woocommerce/agent-ready-commerce) page
+
+**Subscriptions, Bookings, and Memberships (v3.1)**
+- 14 write tools tested against the real Woo extensions: list, inspect and transition subscriptions, reschedule bookings with a conflict scan, pause and resume memberships, set end dates. Dry-run by default
+
+**Product configurator (STAGGS, v3.2)**
+- Read and edit STAGGS product configurators by prompt: enable per product, list attribute groups, and rewrite option items (labels, prices, defaults) through the STAGGS/Carbon Fields helpers so storage stays consistent. Writes are allow-listed: any key outside the known-safe set refuses the whole request. The piece no other WooCommerce MCP has
 
 **Orders, refunds, and notes**
 - Order listing, status updates (which trigger WooCommerce emails), and order notes
