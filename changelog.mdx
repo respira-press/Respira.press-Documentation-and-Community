@@ -489,6 +489,49 @@ Download: [respira-for-wordpress-1.9.1.zip](https://respira.press/releases)
 
 </Update>
 
+## WooCommerce Add-on Releases
+
+<Update label="2026-07-17" description="WooCommerce Add-on v3.2.0: STAGGS configurator suite" tags={["feature", "woocommerce", "configurators"]}>
+
+### WooCommerce Add-on v3.2.0
+
+Product configurator editing for stores running STAGGS. 87 tools total.
+
+- Eight configurator tools: detect STAGGS, enable or disable the configurator per product, list attribute groups, and rewrite option items (labels, prices, defaults) through the STAGGS/Carbon Fields helpers
+- Allow-listed writes: any key outside the known-safe set refuses the whole request rather than half-applying it
+- Verified live against the real STAGGS plugin, round-trip included
+
+</Update>
+
+<Update label="2026-07-16" description="WooCommerce Add-on v3.1.0: Agent-Ready Commerce" tags={["feature", "woocommerce", "agentic-commerce"]}>
+
+### WooCommerce Add-on v3.1.0
+
+Your store becomes discoverable and shoppable by AI assistants. 79 tools, up from 56.
+
+- Product feeds in six formats (Google Shopping XML, OpenAI/ChatGPT JSONL, Meta, Pinterest, TikTok, generic CSV), rebuilt in the background on schedule and minutes after products change, plus a store llms.txt at the site root
+- The AI-readiness score becomes a fix loop: an ordered fixlist, GTIN and gallery writes on update_product, image alt-text writes, robots.txt AI-crawler checks
+- Signed cart links that fill a shopper's cart and land on your own checkout, with agent-origin order attribution and a revenue report
+- 14 write tools for WooCommerce Subscriptions, Bookings and Memberships, tested against the real extensions, dry-run by default
+- A new wp-admin screen under WooCommerce, Respira ARC, as the home for feeds, the quality score, cart links and agent-origin orders
+- The readable half also ships standalone as Respira ARC, a free plugin submitted to WordPress.org
+
+See [Agent-Ready Commerce](/woocommerce/agent-ready-commerce) for the full documentation.
+
+</Update>
+
+<Update label="2026-07-16" description="WooCommerce Add-on v3.0: complete WooCommerce agent coverage" tags={["feature", "woocommerce"]}>
+
+### WooCommerce Add-on v3.0
+
+Complete WooCommerce agent coverage: 56 tools.
+
+- Variations, attributes, and the WooCommerce 10.9 colour and image swatches
+- Brands, coupons, customers (PII-aware), order notes, and refunds with dry-run by default
+- AI-readiness scoring per product and across the catalog
+
+</Update>
+
 ## MCP Server Releases
 
 <Update label="2026-03-07" description="MCP Server v3.3.5" tags={["improvement", "telemetry"]}>

@@ -899,6 +899,17 @@
             ]
           },
           {
+            "group": "Respira ARC (free)",
+            "icon": "store",
+            "pages": [
+              {
+                "title": "Respira ARC",
+                "path": "arc",
+                "icon": "gift"
+              }
+            ]
+          },
+          {
             "group": "Support",
             "icon": "help-circle",
             "pages": [

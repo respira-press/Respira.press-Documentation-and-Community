@@ -1,0 +1,51 @@
+---
+title: Respira ARC (free plugin)
+description: Respira ARC is a free WordPress plugin that makes any WooCommerce store readable to AI assistants - product feeds in six formats, a store llms.txt, an AI-readiness score, and attributed cart links. No caps, no accounts, no telemetry.
+---
+
+## What ARC is
+
+Respira ARC (Agent-Ready Commerce) is a free plugin for WooCommerce stores. AI assistants like ChatGPT, Claude, Copilot and Google AI Mode already recommend products to shoppers, and they can only sell what they can read. ARC makes your catalog readable to them:
+
+- **Product feeds in six formats**: Google Shopping XML, OpenAI/ChatGPT JSONL, Meta CSV, Pinterest CSV, TikTok CSV, and a generic CSV. Rebuilt on a schedule and a few minutes after products change, served as static files from your own domain.
+- **A store llms.txt** at your site root: what you sell, policy pages, top categories, and where the feeds live. The file AI assistants look for first.
+- **An AI-readiness score**: your catalog checked against the Google Shopping spec (images, descriptions, brands, identifiers, category mapping), with each failing check explained.
+- **Cart links with attribution**: signed URLs that fill a shopper's cart and land on your own checkout, with the order attributed to the source that sent it.
+
+Everything runs on your own server. No caps on products, no account required, no telemetry, and no product data passes through Respira.
+
+## Installing
+
+ARC has been submitted to the WordPress.org plugin directory and is in their review queue. Until the listing is live, download the zip from [respira.press/arc](https://www.respira.press/arc) and install it via Plugins, Add New, Upload Plugin.
+
+Requirements: WordPress 6.0 or newer, PHP 7.4 or newer, WooCommerce active.
+
+## The ARC screen
+
+After activation you get a screen under WooCommerce called Respira ARC:
+
+- **Product feeds**: pick formats, set the rebuild schedule, include or exclude out-of-stock products, serve the llms.txt.
+- **Feed URLs**: one row per format with a copy button and a submit link for the right destination (Google Merchant Center, OpenAI merchant onboarding, Meta Commerce Manager, Pinterest ads, TikTok ads).
+- **Catalog quality**: the readiness score with each failing check explained.
+- **Cart link generator**: pick products from a dropdown (variations included), set quantities and a source label, get a signed link.
+- **Agent-origin orders**: orders and revenue that arrived through cart links, last 30 days.
+
+## ARC and the WooCommerce Add-on
+
+ARC is the readable half. The paid [WooCommerce Add-on](/woocommerce/overview) contains all of ARC plus the agent that acts on what ARC finds: 87 tools that can fix every product failing the feed checks, write descriptions and alt text, assign brands and GTINs, manage orders and refunds, and edit STAGGS configurators, each write behind a snapshot with 90-day rollback.
+
+You never need both installed. If the add-on is present, ARC steps aside automatically and your settings carry over. Full detail on the paid layer: [Agent-Ready Commerce](/woocommerce/agent-ready-commerce).
+
+## FAQ
+
+**Does it slow the store down?** No. Feeds generate in the background in small batches and are served as static files. A shopper never waits on feed generation.
+
+**Does checkout leave my site?** No. Cart links land on your own WooCommerce checkout. Nothing about payment changes.
+
+**What if wp-cron is unreliable on my host?** The ARC screen warns when the scheduled rebuild is overdue and recommends a real cron hitting wp-cron.php. Manual rebuilds always work from the screen.
+
+**Where do the feeds live?** Static files in your uploads directory, served from your own domain at stable URLs. Your feed does not live on anyone else's CDN.
+
+## Support
+
+Questions: [word@respira.press](mailto:word@respira.press) or the [GitHub community](https://github.com/respira-press/Respira.press-Documentation-and-Community).

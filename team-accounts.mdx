@@ -26,6 +26,25 @@ A member's token keeps that member's own user id for revocation and audit, while
 - Removing a member revokes only that member's tokens. The team's site-connection keys never rotate, so other members and the connected sites are unaffected.
 - Each member's MCP setup codes carry the team's sites through that member's own token. A member gets working setup codes for the team sites without the owner having to reshare a site key.
 
+## Inviting people
+
+Invites are sent from the dashboard team page by email. Someone you invited who has not accepted yet is never billed. Each member's edits appear in the team audit log under their own identity, so you can see who changed what across every connected site.
+
+## Seats and fair billing
+
+A plan buys your sites; a seat is what you add when another person works alongside you. Full detail at [respira.press/fair-billing](https://www.respira.press/fair-billing); the short version:
+
+- **Owner: always free.** You are also the team's first admin, free.
+- **First member: free, on every plan.** A two person team costs nothing beyond the plan.
+- **Extra members: €5 a month each**, flat at any team size. **A second admin and beyond: €10 a month each.**
+- **Seats bill only in months they are active.** A seat is active when that person ran at least one agent command or made at least one change through the team. Signing in, viewing sites, or reading the audit log is watching, and watching is free. Billing is monthly, in arrears, prorated by active days.
+- **Client seats are free.** A client seat sees exactly one group of sites and nothing else, never billed. Available on Builder and above.
+- **On Maker, your team is you plus one, free forever.** That free plus-one doubles as the client handoff seat. Paid member and client seats start on Builder.
+- **Every new team gets 30 days with unlimited free seats** (Builder and above). The clock starts on your first invite, recorded once. When the window ends, nothing bills until you choose how billing should work: auto-bill active seats, ask before each new person starts billing, or, if you choose nothing, everyone past you plus one pauses with dashboard access intact and nothing deleted.
+- **Founding members stay free.** Anyone holding a seat when team accounts launched is free for life, recorded on the seat itself.
+
+Every consent, mode change and pause is written to the team audit log.
+
 ## Related
 
 - [Multi-Site Management](/guides/multi-site-management) — working across the team's sites
