@@ -208,6 +208,16 @@ If a duplicate has already been published but you do not like the result:
 
 Keeping the rollback flow consistent with normal WordPress editing reduces surprises for your team.
 
+### What MCP safety does not cover: site-boot integrity
+
+A customer field report from July 2026, shared here because it will save you real pain. Activating a version-mismatched plugin (an outdated Elementor Pro alongside a newer Elementor core) caused a boot-time PHP fatal that made the site completely unresponsive. At that point no MCP server could recover it, Respira included: every MCP server for WordPress is or talks to a WordPress plugin, and a plugin needs WordPress to boot. The fix required filesystem access on the host.
+
+The lesson, almost verbatim from that report: **MCP safety protects content, not site-boot integrity.** Snapshots, duplicates and approval queues guard what is on your pages. They cannot guard against a plugin combination that prevents PHP from completing a request. Version-mismatched plugin activation is a filesystem-level risk, and the correct mitigation lives at that level too:
+
+- Take a full-site snapshot (host backup, or a tool like WP Reset PRO) before activating or updating plugins, especially premium plugins whose version must match a free counterpart.
+- Keep a known path to your files (SFTP, host file manager, or container shell) so you can rename a plugin directory if the site stops booting.
+- Treat plugin activation as a higher-risk operation than content edits. Respira ships with plugin management off by default for exactly this reason.
+
 ### If your subscription expired
 
 If your Respira subscription lapses:
