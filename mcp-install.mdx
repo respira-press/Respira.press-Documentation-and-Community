@@ -52,9 +52,9 @@ Then:
 - Do **not** paste your site API key into the connector. The key is only for tools that explicitly ask for one (Claude Code, n8n, custom scripts), never for a browser connector.
 - A tab opens on **respira.press** to sign in and approve. Approve it, and the tools appear.
 
-<Warning>
+<Callout kind="alert">
 If the sign-in tab opens a **"page not found"** on your own site's address (for example `https://your-site.com/authorize`), a **Client ID** was filled in by mistake. Clear the Client ID and Client Secret fields, remove the site key if you pasted it there, and reconnect. Sign-in always happens on respira.press, never on your own WordPress site — there is no `/authorize` page there by design.
-</Warning>
+</Callout>
 
 ### Method 2: Interactive Setup Wizard
 
