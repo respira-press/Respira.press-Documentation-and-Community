@@ -5,7 +5,7 @@ description: "Reference for current Respira MCP tools. Find the right tool for p
 
 # Tools Reference
 
-Respira provides 234 MCP tools for AI assistants to interact with WordPress. This reference documents the core categories and naming patterns.
+Respira provides 260 MCP tools for AI assistants to interact with WordPress (173 in every core plan, plus 87 in the WooCommerce add-on), alongside 228 WebMCP browser abilities. This reference documents the core categories and naming patterns.
 
 ## Tool Categories
 
@@ -203,6 +203,22 @@ Quick single-element additions without building full page structures.
 
 Full ACF and ACF Pro coverage: field reads/writes, field group management, repeater and flexible-content operations, galleries, options pages, relationships, user/term fields, and bulk operations across up to 500 posts. See [ACF tools overview](/tools/acf/overview) for the full list and example workflows.
 
+### Theme Builder — Divi (3 tools) <span style={{color: '#10b981'}}>NEW in 7.6</span>
+
+Discover and edit Divi's global Theme Builder templates (headers, footers, and body layouts), not just regular pages. List the templates on a site, edit a header in place (for example to build a mega menu), or create a new global template with page assignments. Every edit is snapshot-protected. Divi 5.
+
+- `respira_list_theme_builder_templates` (read)
+- `respira_create_theme_builder_template` (write)
+- `respira_update_theme_builder_template` (write)
+
+### Translations — WPML (3 tools) <span style={{color: '#10b981'}}>NEW in 7.6</span>
+
+Create and update WPML translations through the agent. A created translation joins the page's existing language group so WPML treats it as a real translation, and the builder content is carried across into the new copy.
+
+- `respira_get_translations` (read)
+- `respira_create_translation` (write)
+- `respira_update_translation` (write)
+
 ## Quick Reference Table
 
 | Category | Tools | Read-Only | Write |
@@ -230,8 +246,12 @@ Full ACF and ACF Pro coverage: field reads/writes, field group management, repea
 | ACF (v6.6.0) | 54 | 18 | 36 |
 | Bricks deep tools | 20 | 8 | 12 |
 | Elementor deep tools | 8 | 5 | 3 |
+| Theme Builder — Divi <span style={{color: '#10b981'}}>NEW in 7.6</span> | 3 | 1 | 2 |
+| Translations — WPML <span style={{color: '#10b981'}}>NEW in 7.6</span> | 3 | 1 | 2 |
 | WooCommerce (add-on) | 21 | 11 | 10 |
-| **Total** | **234** | **96** | **138** |
+| **Total** | **240** | **98** | **142** |
+
+> This table lists the documented core categories. The full MCP surface is **260 tools** (173 in core plans plus 87 in the WooCommerce add-on) alongside **228 WebMCP browser abilities** — see the live counts on [respira.press](https://respira.press).
 
 ## Tool Naming Convention
 
