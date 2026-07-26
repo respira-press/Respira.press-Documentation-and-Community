@@ -53,6 +53,46 @@ If you know how to review drafts in WordPress, you already know how to review Re
 >
 > — danieliser, Anthropic engineer
 
+## Structural writes: a stricter contract (8.0 "Canopy")
+
+Duplicate-before-edit works because a page is one document. A block template, a template part, a synced pattern, a navigation, or a set of global styles is a shared object: one write reaches every page that uses it, and there is nothing sensible to duplicate. Those writes get their own contract instead.
+
+Every structural write is:
+
+1. **Fingerprint-guarded against a stale base.** The agent's read is fingerprinted. If the object changed underneath it, the write is refused rather than applied over someone else's work.
+2. **Snapshotted** before the change, so it is reversible.
+3. **Read back through WordPress** afterwards, instead of trusting the write call's own return value.
+4. **Server-render verified.** The result is reported as `verified` only once WordPress has actually rendered it.
+
+A structural write can also be **staged as a proposal** for a human to approve rather than applied. That is the site-level equivalent of the duplicate: the agent does the work, you keep the last move.
+
+### What a mutation can tell you
+
+| Result | Meaning |
+|--------|---------|
+| `dry_run` | Nothing was written. A preview of what would change. |
+| `pending_approval` | Staged as a proposal. A human approves before it applies. |
+| `verified` | Written, read back, and confirmed rendered by WordPress. |
+| `stored_unverified` | Written, but the render check did not confirm it. Go look. |
+| `no_match` | The target did not resolve. Nothing was written. |
+| failure | The write did not happen, with the reason. |
+
+<Callout kind="alert">
+
+**Structural writes to site-level objects are beta-gated per site and OFF by default.** Read-only discovery of templates, patterns, navigation, and global styles works everywhere. A bad page edit costs one page. A bad template edit costs every page that uses it, which is why the gate exists. See [Site Editor](/builders/site-editor).
+
+</Callout>
+
+An agent-facing activity history links audit entries to the snapshots, proposals, approvals, and rollbacks they belong to, so the trail of a change is one query rather than a reconstruction.
+
+### Confirmation is not approval
+
+One case does not fit the staging model, and it is documented rather than hidden. Divi Theme Builder global layouts are written **live**. They cannot be staged the way a page can, because Divi resolves a global layout by id and a staged duplicate would compete with the original.
+
+What 8.0 adds there is a confirmation handshake: the first attempt to rewrite a global header, footer, or body is refused with `respira_tb_live_edit_confirmation_required`, naming the layout and stating that it changes every page using it. Re-sending with `confirm_live_edit=true` proceeds.
+
+That is a confirmation, not an approval. Approval means a human reviews a staged change before it exists on the live site. Confirmation means the agent is told what it is about to touch and has to say yes on purpose. The write is still snapshotted and reversible. See [Divi](/builders/divi).
+
 ## How this compares to other safety strategies
 
 Many teams already use safety strategies like staging sites, git-based rollbacks, or careful admin-side editing. Respira’s approach is different: it builds safety into each AI operation instead of relying on environment-level safeguards.

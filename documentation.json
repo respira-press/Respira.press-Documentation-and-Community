@@ -899,6 +899,11 @@
                 "icon": "layout"
               },
               {
+                "title": "Site Editor (FSE)",
+                "path": "builders/site-editor",
+                "icon": "layout"
+              },
+              {
                 "title": "WPBakery",
                 "path": "builders/wpbakery",
                 "icon": "layout"

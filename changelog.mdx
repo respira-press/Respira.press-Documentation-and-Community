@@ -52,6 +52,45 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-07-26" description="Respira for WordPress v8.0.0 'Canopy' + MCP Server v8.0.0 + WooCommerce Add-on v4.0.0: the native Site Editor" tags={["release", "gutenberg", "fse", "site-editor", "safety"]}>
+
+### What's New in v8.0.0 "Canopy"
+
+Respira has always been strong on page builders and thin on the thing WordPress core is actually pushing people toward. 8.0 closes that. The coverage line is now **16 page builders plus the native Site Editor**.
+
+Measured on a live install: **197 tools** on any WordPress site, **302** with the WooCommerce add-on (of which **105** are `woocommerce_*` tools), **269** WebMCP abilities, **37** skills.
+
+**The native WordPress Site Editor is a first-class target**
+- Block templates and template parts (`wp_template`, `wp_template_part`) with template hierarchy and source discovery, so you know whether a template is theme-provided, plugin-provided, or a database customisation
+- Synced and unsynced patterns (`wp_block`). Registered theme and plugin patterns stay read-only. Editable user patterns support the synced/unsynced distinction
+- Block navigation (`wp_navigation`) edited by exact block path, not by rewriting the navigation document. A guessed path is refused. A stale revision is refused
+- Gutenberg design tokens and global styles
+
+**The safety contract for structural writes**
+- Every structural write is fingerprint-guarded against a stale base, snapshotted, read back through WordPress, and server-render verified. It returns `verified` only after WordPress actually rendered it
+- Structural proposals: a write can be staged for human approval instead of applied
+- The mutation-result contract is explicit: `dry_run`, `pending_approval`, `verified`, `stored_unverified`, `no_match`, or a failure with a reason
+- An agent-facing activity history links audit entries to snapshots, proposals, approvals, and rollbacks
+
+**Structural writes are beta-gated**
+- Structural writes to site-level objects are beta-gated per site and OFF by default. Read-only discovery works everywhere. The gate stays until that write path has more live mileage
+
+**Two safety fixes found by auditing the safety layer itself**
+- A Divi 4 serializer rule written for brand-new pages was firing on every write path, retyping existing Code modules on pages it should only have passed through
+- Undoing a Theme Builder create could trash a template the agent never created
+
+**Divi Theme Builder: a confirmation handshake, not an approval**
+- Divi Theme Builder global layouts are snapshotted and reversible but written live, not staged. They cannot be staged the way a page can, because Divi resolves a global layout by id and a duplicate would compete with the original
+- The first attempt to rewrite a global header, footer, or body is now refused with `respira_tb_live_edit_confirmation_required`, naming the layout and saying it changes every page using it. Re-send with `confirm_live_edit=true` to proceed
+- That is a confirmation, not an approval. A confirmed write goes live
+
+**Credit**
+- The FSE work was driven by a published field study from Dale Smith of [revWorx](https://revworx.ai/), who builds exclusively on FSE block themes and documented, live-verified, that Respira's storefront tools went inert on that stack
+
+Documentation: [Site Editor (Full Site Editing)](/builders/site-editor).
+
+</Update>
+
 <Update label="2026-07" description="Respira for WordPress v7.5.x — ChatGPT connector + server-truth connectivity (latest v7.5.18)" tags={["release", "oauth", "chatgpt", "connectivity"]}>
 
 ### What's New in the 7.5.x line
@@ -491,6 +530,37 @@ Download: [respira-for-wordpress-1.9.1.zip](https://respira.press/releases)
 
 ## WooCommerce Add-on Releases
 
+<Update label="2026-07-26" description="WooCommerce Add-on v4.0.0: FSE-first storefront, reporting, webhooks" tags={["feature", "woocommerce", "fse", "reporting", "webhooks"]}>
+
+### WooCommerce Add-on v4.0.0
+
+The storefront layer stops assuming a page builder. 105 tools total. Requires Respira for WordPress plugin 8.0.0 or newer.
+
+**Storefront intelligence is FSE-first with page-builder fallback**
+- On a block theme, analysing a shop page returns real structural analysis against the native `archive-product` template instead of "no page builder detected". Where a page builder is present, the builder path still runs
+
+**Badges match WooCommerce's own product card**
+- Sale and low-stock badges are positioned inside the product image, where WooCommerce puts them
+- An existing badge means the write is refused as a no-op rather than duplicated, so re-running a prompt does not stack badges
+
+**Product-card fields addressed by canonical block name**
+- `woocommerce/product-image`, `woocommerce/product-price`, `woocommerce/product-title`, `woocommerce/product-button`
+- Requested attributes are intersected with the installed block's registered attributes, so an unrecognised key is refused rather than silently accepted
+
+**Reporting**
+- Bounded, HPOS-compatible revenue reporting, sales time-series, top products, orders, and privacy-safe customer reporting
+
+**Read-only store discovery**
+- Store configuration, payment gateways, shipping zones, and tax rates
+
+**Approval-gated native webhooks**
+- HTTPS targets only, allowlisted topics only, write-only secrets, and a human approval on every webhook change
+
+**Credit**
+- The FSE gap was found and published by Dale Smith of [revWorx](https://revworx.ai/), who builds exclusively on FSE block themes and verified live that the storefront tools were inert there
+
+</Update>
+
 <Update label="2026-07-17" description="WooCommerce Add-on v3.2.0: STAGGS configurator suite" tags={["feature", "woocommerce", "configurators"]}>
 
 ### WooCommerce Add-on v3.2.0
@@ -534,9 +604,32 @@ Complete WooCommerce agent coverage: 56 tools.
 
 ## MCP Server Releases
 
-<Update label="2026-03-07" description="MCP Server v3.3.5" tags={["improvement", "telemetry"]}>
+<Update label="2026-07-26" description="MCP Server v8.0.0 'Canopy': Site Editor tools and the mutation-result contract" tags={["release", "mcp", "fse", "site-editor"]}>
 
 ### Latest MCP server version
+
+The current MCP server release is **v8.0.0**, shipped alongside plugin v8.0.0 and WooCommerce add-on v4.0.0.
+
+Install: `npx @respira/wordpress-mcp-server`
+
+npm: [@respira/wordpress-mcp-server](https://www.npmjs.com/package/@respira/wordpress-mcp-server)
+
+### What's New
+
+Measured by booting the server and calling `tools/list`: **197 tools** on any WordPress site, **302** with the WooCommerce add-on active (**105** of those are `woocommerce_*` tools), alongside **269** WebMCP abilities and **37** skills.
+
+- Site Editor tools: block templates and template parts, synced and unsynced patterns, block navigation, and design tokens
+- Navigation is edited by exact block path. A guessed path is refused, and a stale revision is refused
+- Every structural mutation returns one of `dry_run`, `pending_approval`, `verified`, `stored_unverified`, `no_match`, or a failure with a reason. `verified` is only returned after WordPress rendered the result
+- Structural writes to site-level objects are beta-gated per site and off by default. Read-only discovery is available everywhere
+- Activity tools that link audit entries to snapshots, proposals, approvals, and rollbacks
+- Divi Theme Builder global layout writes require the `confirm_live_edit=true` handshake after the first refusal with `respira_tb_live_edit_confirmation_required`
+
+</Update>
+
+<Update label="2026-03-07" description="MCP Server v3.3.5" tags={["improvement", "telemetry"]}>
+
+### MCP server v3.3.5
 
 Install: `npx @respira/wordpress-mcp-server`
 

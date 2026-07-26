@@ -1,11 +1,13 @@
 ---
 title: WooCommerce Add-on
-description: 87 AI tools for WooCommerce including agent-ready commerce (product feeds + llms.txt), storefront design intelligence, Subscriptions, Bookings and Memberships writes, STAGGS configurator editing, bulk pricing with snapshots, and catalog health audits. €95/year for Maker and Builder. Included free with Studio and Founder.
+description: 105 AI tools for WooCommerce including FSE-first storefront intelligence, agent-ready commerce (product feeds + llms.txt), Subscriptions, Bookings and Memberships writes, STAGGS configurator editing, bounded HPOS-compatible reporting, approval-gated webhooks, bulk pricing with snapshots, and catalog health audits. €95/year for Maker and Builder. Included free with Studio and Founder.
 ---
 
 ## Overview
 
-The Respira for WordPress WooCommerce Add-on extends Respira's safety-first workflow to your WooCommerce store. 87 tools (as of add-on v3.2) that connect commerce data to page builder visuals and make the store readable to AI shopping assistants, with a snapshot, a dry-run preview, and an approval step on every change.
+The Respira for WordPress WooCommerce Add-on extends Respira's safety-first workflow to your WooCommerce store. 105 WooCommerce tools (as of add-on v4.0.0) that connect commerce data to page builder visuals and make the store readable to AI shopping assistants, with a snapshot, a dry-run preview, and an approval step on every change.
+
+With the add-on installed, the total MCP surface on the site is 302 tools: the 197 available on any WordPress site plus the 105 `woocommerce_*` tools.
 
 **Pricing:**
 - **Studio and Founder plans:** included free, no separate purchase
@@ -18,6 +20,7 @@ No free trial on the WooCommerce add-on. The core Respira plugin has a 7-day tri
 **Requirements**
 
 - Respira Core installed and connected (Maker, Builder, Studio, or Founder plan)
+- Respira for WordPress plugin 8.0.0 or newer (required by add-on v4.0.0)
 - WooCommerce plugin active on the same site
 - WordPress 6.0 or newer
 - PHP 7.4 or newer
@@ -26,7 +29,40 @@ If you are not set up with Respira yet, start with the base [Installation](/inst
 
 </Callout>
 
-## What's included (87 tools)
+## New in v4.0.0: the storefront works on block themes
+
+Before v4.0.0, storefront intelligence assumed a page builder. On a block theme it found none and returned "no page builder detected", which meant the storefront tools were inert on exactly the stack WordPress core is pushing people toward.
+
+<Callout kind="info">
+
+That gap was found and documented, live-verified, by [Dale Smith of revWorx](https://revworx.ai/), who builds exclusively on FSE block themes and published the field study that drove this work.
+
+</Callout>
+
+**Storefront intelligence is now FSE-first with page-builder fallback**
+- On a block theme, analysing a shop page returns real structural analysis against the native `archive-product` template instead of an unsupported message
+- Where a page builder is present, the existing builder path still runs
+
+**Badges land where WooCommerce puts them**
+- Sale and low-stock badges are positioned inside the product image, matching WooCommerce's own product card rather than floating outside it
+- An existing badge means the write is **refused as a no-op** rather than duplicated. A second run does not stack a second badge
+
+**Product-card fields addressed by canonical block name**
+- Fields are addressed by the WooCommerce block name: `woocommerce/product-image`, `woocommerce/product-price`, `woocommerce/product-title`, `woocommerce/product-button`
+- Requested attributes are intersected with the installed block's registered attributes, so an unrecognised key is refused rather than silently accepted and dropped
+
+**Reporting**
+- Bounded, HPOS-compatible revenue reporting, sales time-series, top-product reporting, order reporting, and privacy-safe customer reporting
+
+**Read-only store discovery**
+- Store configuration, payment gateways, shipping zones and tax rates are readable. They stay read-only
+
+**Native webhook management, approval-gated**
+- Create and manage native WooCommerce webhooks: HTTPS targets only, allowlisted topics only, and secrets are write-only. Every webhook change goes through approval
+
+v4.0.0 requires Respira for WordPress plugin 8.0.0 or newer.
+
+## What's included (105 tools)
 
 The add-on grew from commerce CRUD into the full storefront layer. The areas:
 
@@ -61,8 +97,15 @@ The add-on grew from commerce CRUD into the full storefront layer. The areas:
 - Stock levels, stock status, and low-stock detection
 - An AI-readiness score (0-100) per product and across the catalog (`product_ai_readiness`, `catalog_ai_readiness`) so an agent knows what to fix before it sells
 
-**Storefront design intelligence**
-- Read your shop and product pages in the active builder, score them, and edit product cards and checkout layout through the builder abstraction. Supported on Elementor, Divi, Bricks, Flatsome, and Gutenberg; other builders return a clear unsupported message
+**Storefront design intelligence (FSE-first since v4.0)**
+- Read your shop and product pages, score them, and edit product cards and checkout layout. On a block theme this runs against the native `archive-product` template. Where a page builder is present the builder path is used instead: Elementor, Divi, Bricks, Flatsome, and Gutenberg. Other builders return a clear unsupported message
+
+**Store configuration and webhooks (v4.0)**
+- Read-only discovery of store configuration, payment gateways, shipping zones and tax rates
+- Approval-gated native WooCommerce webhook management: HTTPS targets, allowlisted topics, write-only secrets
+
+**Reporting (v4.0)**
+- Bounded, HPOS-compatible revenue reporting, sales time-series, top products, orders, and privacy-safe customer reporting
 
 **Catalog operations and pricing**
 - Advanced product filtering, bulk product and price updates (percentage, absolute, or set-value) with a 100-product cap and snapshots, catalog-health audits, natural-language product search, and snapshot-backed pricing rollback

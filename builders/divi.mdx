@@ -119,11 +119,39 @@ Respira detects Divi Global Modules. Updates to global modules appear everywhere
 - "List all global modules" → Shows global module library
 - "Update the global footer email address" → Changes it site-wide
 
+## Theme Builder: the live-edit confirmation handshake
+
+Divi Theme Builder global layouts (global headers, global footers, global bodies) are **written live**, not staged.
+
+They cannot be staged the way a page can. Divi resolves a global layout by id, so a staged duplicate would compete with the original instead of sitting quietly next to it. That is a property of how Divi works, and pretending otherwise would be worse than saying it plainly.
+
+What 8.0 adds instead is a confirmation handshake:
+
+- The **first** attempt to rewrite a global header, footer or body is **refused** with `respira_tb_live_edit_confirmation_required`.
+- The refusal names the layout and states that the change affects every page using it.
+- To proceed, re-send the same call with `confirm_live_edit=true`.
+
+<Callout kind="alert">
+
+This is a **confirmation, not an approval.** Approval means a human reviews a staged change before it exists on the live site. Confirmation means the agent is told what it is about to touch, and has to say yes on purpose. A Theme Builder global layout write goes live when confirmed.
+
+</Callout>
+
+Global layout writes are still snapshotted and reversible. If a confirmed write lands wrong, restore the snapshot from the Changes page in WordPress admin.
+
 ## Limitations
 
 - Visual-only settings (hover states) may need Divi builder
 - Per-module custom CSS is supported but complex styling may need builder
 - Dynamic content tokens are preserved but not directly editable
+- Theme Builder global layouts are written live behind a confirmation handshake, not staged for approval
+
+## Recent capabilities (8.0 "Canopy")
+
+Two fixes from auditing the safety layer itself, both on the Divi path:
+
+- **A Divi 4 serializer rule stopped firing where it did not belong.** The rule was written for brand-new pages, but it ran on every write path, which meant it retyped existing Code modules on pages it should only have passed through.
+- **Undoing a Theme Builder create no longer trashes a template the agent never created.** The undo path could reach past its own work.
 
 ## Recent capabilities (plugin v7.5.x)
 

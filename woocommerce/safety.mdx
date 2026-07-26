@@ -224,6 +224,25 @@ Treat payment, shipping, and tax settings as the legal and financial backbone of
 
 </Callout>
 
+### Store configuration discovery (read-only, v4.0)
+
+Add-on v4.0.0 makes store configuration, payment gateway, shipping zone and tax-rate discovery explicit tools. They are reads. Nothing in that group writes.
+
+## Webhooks: approval-gated, v4.0
+
+Add-on v4.0.0 adds native WooCommerce webhook management. A webhook sends your store's data to somewhere else, so it is the one v4.0 write path that leaves the site, and it is fenced accordingly:
+
+- **Approval-gated.** A webhook change is staged and a human approves it before it takes effect.
+- **HTTPS targets only.** A plain HTTP delivery URL is refused.
+- **Allowlisted topics only.** A topic outside the allowlist is refused.
+- **Write-only secrets.** A secret can be set but never read back, so it cannot be exfiltrated through a tool response.
+
+## Storefront writes: no-op instead of duplicate (v4.0)
+
+Storefront card writes are idempotent by refusal. If a sale or low-stock badge is already present on a product card, a second write is refused as a no-op rather than adding a second badge. Re-running the same prompt does not stack decoration on your product cards.
+
+Product-card fields are addressed by canonical WooCommerce block name, and requested attributes are intersected with the installed block's registered attributes. An unrecognised attribute key is refused rather than accepted and quietly dropped, so a write either does what you asked or tells you it did not.
+
 ## Permission controls and opt-in safety
 
 You stay in control of what the WooCommerce add-on can touch in your store.
