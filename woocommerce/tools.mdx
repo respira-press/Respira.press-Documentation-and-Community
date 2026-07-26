@@ -1,6 +1,6 @@
 ---
 title: WooCommerce Tools Reference
-description: Reference for WooCommerce MCP tools provided by the Respira for WordPress WooCommerce Add-on (87 tools), grouped by products, orders, inventory, feeds, extensions, configurators, and reports.
+description: Reference for WooCommerce MCP tools provided by the Respira for WordPress WooCommerce Add-on (105 tools), grouped by products, orders, inventory, storefront, feeds, extensions, configurators, reports, store configuration, and webhooks.
 ---
 
 ## How WooCommerce tools work with your AI assistant
@@ -13,7 +13,7 @@ Your AI assistant typically decides which tool to call based on natural language
 - Set guardrails for what the assistant is allowed to change
 - Review logs and audit which tools were used
 
-When the WooCommerce add-on is installed, the assistant has access to 87 WooCommerce tools (as of add-on v3.2) spanning products, variations and swatches, orders and refunds, coupons, customers, inventory, AI-readiness, storefront design intelligence, product feeds and llms.txt, cart links with agent-order attribution, Subscriptions, Bookings and Memberships, and the STAGGS product configurator. This page documents the primary product, order, inventory, and report tools, then lists the v3.1 and v3.2 groups; see the [overview](/woocommerce/overview) for the full list of areas.
+When the WooCommerce add-on is installed, the assistant has access to 105 `woocommerce_*` tools (as of add-on v4.0.0) spanning products, variations and swatches, orders and refunds, coupons, customers, inventory, AI-readiness, storefront design intelligence, product feeds and llms.txt, cart links with agent-order attribution, Subscriptions, Bookings and Memberships, the STAGGS product configurator, bounded reporting, read-only store configuration, and approval-gated webhooks. That brings the total MCP surface on the site to 302 tools: the 197 available on any WordPress site plus these 105. This page documents the primary product, order, inventory, and report tools, then lists the v3.1, v3.2 and v4.0 groups; see the [overview](/woocommerce/overview) for the full list of areas.
 
 <Callout kind="info">
 
@@ -376,7 +376,7 @@ If you run into issues with WooCommerce tools or need help designing workflows, 
 
 ## Complete tool list
 
-The add-on registers 87 WooCommerce MCP tools (as of v3.2): the `respira-woocommerce/` abilities plus the REST/MCP storefront-design, catalog, pricing, AI-readiness, feeds, cart-link, extension and configurator tools described in the [overview](/woocommerce/overview) and in the section below. Every write is snapshot-backed, runs behind the `manage_woocommerce` capability, and supports `dry_run` where it changes data.
+The add-on registers 105 WooCommerce MCP tools (as of v4.0.0): the `respira-woocommerce/` abilities plus the REST/MCP storefront-design, catalog, pricing, AI-readiness, feeds, cart-link, extension, configurator, reporting, store-configuration and webhook tools described in the [overview](/woocommerce/overview) and in the sections below. Every write is snapshot-backed, runs behind the `manage_woocommerce` capability, and supports `dry_run` where it changes data.
 
 ### Products, categories, tags & brands
 
@@ -489,3 +489,44 @@ All extension writes are dry-run by default and require the real extension plugi
 - `woocommerce_configurator_status`, `woocommerce_get_product_configurator`, `woocommerce_set_product_configurator` — detect STAGGS, read and enable/disable the configurator per product
 - `woocommerce_list_configurator_attributes`, `woocommerce_get_configurator_attribute_items`, `woocommerce_set_configurator_attribute_items` — read attribute groups and rewrite option items (labels, prices, defaults) through the STAGGS/Carbon Fields helpers
 - `woocommerce_get_plugin_state`, `woocommerce_set_plugin_state` — allow-listed plugin settings; any key outside the known-safe set refuses the whole request
+
+## Storefront, reporting, configuration and webhooks (v4.0)
+
+v4.0.0 requires Respira for WordPress plugin 8.0.0 or newer.
+
+### Storefront intelligence, FSE-first
+
+Storefront analysis no longer assumes a page builder. On a block theme it runs against the native `archive-product` template and returns real structural analysis instead of "no page builder detected". Where a page builder is present, the existing builder path still runs.
+
+Two behaviours worth knowing before you call a storefront write:
+
+- **Badges land inside the product image.** Sale and low-stock badges are positioned inside the product image, matching WooCommerce's own product card. If a badge is already there, the write is **refused as a no-op** rather than duplicated, so re-running a prompt does not stack badges.
+- **Product-card fields are addressed by canonical block name.** Use the WooCommerce block name: `woocommerce/product-image`, `woocommerce/product-price`, `woocommerce/product-title`, `woocommerce/product-button`. Requested attributes are intersected with the installed block's registered attributes, so an unrecognised attribute key is refused rather than silently accepted and dropped.
+
+### Reporting
+
+Bounded, HPOS-compatible reporting. Every report has a hard bound so a broad question cannot walk the whole order table.
+
+- Revenue reporting over a date range
+- Sales time-series
+- Top-product reporting
+- Order reporting
+- Customer reporting, privacy-safe by default
+
+### Store configuration discovery (read-only)
+
+Read what the store is actually configured to do before changing anything around it. These are reads. They do not write.
+
+- Store configuration
+- Payment gateways
+- Shipping zones
+- Tax rates
+
+### Native WooCommerce webhooks (approval-gated)
+
+Webhook management is the one v4.0 write path that leaves your site, so it is fenced:
+
+- **Approval-gated.** A webhook change is staged for a human to approve.
+- **HTTPS targets only.** A plain HTTP delivery URL is refused.
+- **Allowlisted topics only.** A topic outside the allowlist is refused.
+- **Write-only secrets.** A secret can be set, never read back.

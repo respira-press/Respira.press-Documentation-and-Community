@@ -5,7 +5,7 @@ description: "Reference for current Respira MCP tools. Find the right tool for p
 
 # Tools Reference
 
-Respira provides 261 MCP tools for AI assistants to interact with WordPress (174 in every core plan, plus 87 in the WooCommerce add-on), alongside 229 WebMCP browser abilities. This reference documents the core categories and naming patterns.
+As of 8.0 "Canopy", Respira exposes **197 MCP tools** on any WordPress site and **302** with the WooCommerce add-on installed (105 of those are `woocommerce_*` tools), alongside **269 WebMCP browser abilities** and **37 skills**. Those numbers were measured by booting the MCP server and calling `tools/list`. This reference documents the core categories and naming patterns.
 
 ## Tool Categories
 
@@ -212,6 +212,21 @@ Discover and edit Divi's global Theme Builder templates (headers, footers, and b
 - `respira_create_theme_builder_template` (write)
 - `respira_update_theme_builder_template` (write)
 
+### Site Editor / FSE (19 tools) <span style={{color: '#10b981'}}>NEW in 8.0</span>
+
+Read and write the native WordPress Site Editor: block templates and template parts, synced and unsynced patterns, block navigation, and global styles. Read-only discovery is available on any site with a block theme. **Structural writes are beta-gated per site and off by default.** See [Site Editor (Full Site Editing)](/builders/site-editor).
+
+- `respira_list_site_templates`, `respira_get_site_template`, `respira_create_site_template`, `respira_update_site_template`, `respira_reset_site_template`
+- `respira_list_site_patterns`, `respira_get_site_pattern`, `respira_create_site_pattern`, `respira_update_site_pattern`, `respira_delete_site_pattern`
+- `respira_list_site_navigations`, `respira_get_site_navigation`, `respira_create_site_navigation`, `respira_update_site_navigation`, `respira_delete_site_navigation`
+- `respira_list_design_tokens`, `respira_create_design_token`, `respira_update_design_token`, `respira_delete_design_token`
+
+### Activity (2 tools) <span style={{color: '#10b981'}}>NEW in 8.0</span>
+
+Agent-facing activity history that links audit entries to the snapshots, proposals, approvals, and rollbacks they belong to.
+
+- `respira_list_activity`, `respira_get_activity`
+
 ### Translations — WPML (3 tools) <span style={{color: '#10b981'}}>NEW in 7.6</span>
 
 Create and update WPML translations through the agent. A created translation joins the page's existing language group so WPML treats it as a real translation, and the builder content is carried across into the new copy.
@@ -249,10 +264,12 @@ Create and update WPML translations through the agent. A created translation joi
 | Elementor deep tools | 8 | 5 | 3 |
 | Theme Builder — Divi <span style={{color: '#10b981'}}>NEW in 7.6</span> | 3 | 1 | 2 |
 | Translations — WPML <span style={{color: '#10b981'}}>NEW in 7.6</span> | 3 | 1 | 2 |
+| Site Editor / FSE <span style={{color: '#10b981'}}>NEW in 8.0</span> | 19 | 7 | 12 |
+| Activity <span style={{color: '#10b981'}}>NEW in 8.0</span> | 2 | 2 | 0 |
 | WooCommerce (add-on) | 21 | 11 | 10 |
-| **Total** | **241** | **98** | **143** |
+| **Total** | **262** | **107** | **155** |
 
-> This table lists the documented core categories. The full MCP surface is **261 tools** (174 in core plans plus 87 in the WooCommerce add-on) alongside **229 WebMCP browser abilities** — see the live counts on [respira.press](https://respira.press).
+> This table lists documented categories, not the per-site surface. Some categories only register when the matching builder or add-on is present, so the column total is higher than what a single site sees. The measured surface is **197 tools** on any WordPress site, **302** with the WooCommerce add-on (105 `woocommerce_*` tools), alongside **269 WebMCP abilities** and **37 skills**. See the live counts on [respira.press](https://respira.press).
 
 ## Tool Naming Convention
 

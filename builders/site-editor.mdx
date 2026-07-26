@@ -1,0 +1,152 @@
+---
+title: "Site Editor (Full Site Editing)"
+description: "How Respira reads and writes the native WordPress Site Editor: block templates and template parts, synced and unsynced patterns, block navigation, and global styles, with the fingerprint and read-back safety contract."
+---
+
+# Site Editor (Full Site Editing)
+
+Respira 8.0 "Canopy" makes the native WordPress Site Editor a first-class target. Before 8.0, a block theme was a blind spot: Respira could read and write a page's blocks, but the things that actually define a block theme site, the templates, the template parts, the patterns, the navigation and the global styles, were not addressable.
+
+That gap is closed. The positioning line for 8.0 is **16 page builders plus the native Site Editor**.
+
+<Callout kind="info">
+
+The FSE work exists because of a published field study by [Dale Smith of revWorx](https://revworx.ai/), who builds exclusively on FSE block themes and documented, live-verified, that Respira's storefront tools went inert on that stack. The study named the gap precisely enough to fix.
+
+</Callout>
+
+## What is addressable
+
+### Block templates and template parts
+
+`wp_template` and `wp_template_part` are readable and writable, with template hierarchy and source discovery. Source discovery matters on a block theme: a template can come from the theme's files, from a plugin, or from the database once a user has customised it, and the three behave differently. Respira reports which one you are looking at instead of guessing.
+
+- `respira_list_site_templates`, `respira_get_site_template`
+- `respira_create_site_template`, `respira_update_site_template`, `respira_reset_site_template`
+
+Resetting a customised template returns it to the theme-provided version, which is the Site Editor's own "clear customisations" behaviour.
+
+### Synced and unsynced patterns
+
+Patterns (`wp_block`) are readable and writable, including their synced or unsynced state.
+
+- Registered theme and plugin patterns stay **read-only**. They live in code, not in the database, and Respira will not pretend otherwise.
+- Editable user patterns support the synced/unsynced distinction. A synced pattern changes every place it is used. An unsynced pattern is a starting point that gets copied.
+
+- `respira_list_site_patterns`, `respira_get_site_pattern`
+- `respira_create_site_pattern`, `respira_update_site_pattern`, `respira_delete_site_pattern`
+
+### Block navigation
+
+Block navigation (`wp_navigation`) is edited **by exact block path**, not by rewriting the navigation document. This is the difference between changing one link and re-serialising a menu.
+
+Two refusals protect that:
+
+- A **guessed path is refused.** If the path does not resolve to a block that is actually there, the write does not happen.
+- A **stale revision is refused.** If the navigation changed since the agent read it, the write does not happen.
+
+- `respira_list_site_navigations`, `respira_get_site_navigation`
+- `respira_create_site_navigation`, `respira_update_site_navigation`, `respira_delete_site_navigation`
+
+### Global styles and design tokens
+
+Gutenberg design tokens and global styles (the `theme.json` layer as WordPress resolves it at runtime) are readable and writable, so colours, typography and spacing can be changed at the source rather than patched per block.
+
+- `respira_list_design_tokens`
+- `respira_create_design_token`, `respira_update_design_token`, `respira_delete_design_token`
+
+## The safety contract for structural writes
+
+A page is one document. A template, a template part, a synced pattern and a navigation are shared objects: one write reaches every page that uses them. Structural writes are held to a stricter contract because of that.
+
+Every structural write is:
+
+1. **Fingerprint-guarded against a stale base.** The agent's read is fingerprinted. If the object moved underneath it, the write is refused rather than applied on top of someone else's change.
+2. **Snapshotted** before the change, so it is reversible.
+3. **Read back through WordPress** after the change, rather than trusting the write call's return value.
+4. **Server-render verified.** The result is only reported as `verified` once WordPress has actually rendered it.
+
+### Mutation-result contract
+
+Every structural mutation returns one of these, and they mean different things:
+
+| Result | Meaning |
+|--------|---------|
+| `dry_run` | Nothing was written. This is the preview of what would change. |
+| `pending_approval` | The change was staged as a proposal. A human approves it before it applies. |
+| `verified` | Written, read back through WordPress, and confirmed rendered. |
+| `stored_unverified` | Written and stored, but the render check did not confirm it. Treat as needing a look. |
+| `no_match` | The target did not resolve. Nothing was written. |
+| failure | The write did not happen, with the reason. |
+
+<Callout kind="tip">
+
+`stored_unverified` is not a success. It is Respira declining to claim more than it can prove. If you see it, open the object in the Site Editor and check.
+
+</Callout>
+
+### Structural proposals
+
+A structural write can be **staged for human approval instead of applied**. The write returns `pending_approval`, the proposed change waits, and a person decides. This is the site-level equivalent of duplicate-before-edit: the agent does the work, you keep the last move.
+
+### Activity history
+
+8.0 adds an agent-facing activity history that links audit entries to the snapshots, proposals, approvals and rollbacks they belong to, so the trail of a change is one query rather than a reconstruction.
+
+- `respira_list_activity`, `respira_get_activity`
+
+## Beta gate: structural writes are off by default
+
+<Callout kind="alert">
+
+**Structural writes to site-level objects (templates, template parts, patterns, navigation, global styles) are beta-gated per site and OFF by default.**
+
+Read-only discovery works everywhere with no gate. If you want structural writes on a given site, they have to be turned on for that site.
+
+</Callout>
+
+This is deliberate. A bad page edit costs you one page. A bad template edit costs you every page that uses the template. The gate stays on until the write path has more live mileage.
+
+## What to ask for
+
+Read-only, available on any site with a block theme:
+
+```text
+List the block templates on this site and tell me which ones
+are theme-provided and which ones have been customised.
+```
+
+```text
+Show me the header template part and the navigation inside it.
+Do not change anything.
+```
+
+```text
+List the synced patterns on this site and tell me which pages use them.
+```
+
+With structural writes enabled on the site:
+
+```text
+Change the third link in the primary navigation to point to /pricing.
+Edit it by block path, do not rewrite the whole menu. Show me a dry run first.
+```
+
+```text
+Stage a change to the footer template part that adds the new address block.
+I want to approve it before it goes live.
+```
+
+## Limits worth knowing
+
+- Registered theme and plugin patterns cannot be edited. They are code. Copy one into a user pattern if you want to change it.
+- A navigation write needs a real block path. Asking an agent to "fix the menu" without reading it first will get a refusal, not a guess.
+- `stored_unverified` means the render check did not confirm. Check it by hand.
+- The beta gate is per site. Turning it on for one site does not turn it on for the rest.
+
+## See also
+
+- [Gutenberg (Block Editor) Reference](/builders/gutenberg) for block-level page editing
+- [Safety Philosophy](/safety-philosophy) for the duplicate-before-edit workflow
+- [Page Builder Support](/builders/overview) for the full builder matrix
+- [WooCommerce Add-on](/woocommerce/overview) for FSE-first storefront analysis

@@ -1,6 +1,6 @@
 ---
 title: "Gutenberg (Block Editor) Reference"
-description: "Technical documentation for using Respira with Gutenberg: WordPress block editing, content updates, and SEO workflows."
+description: "Technical documentation for using Respira with Gutenberg: WordPress block editing, block templates and template parts, synced patterns, block navigation, global styles, content updates, and SEO workflows."
 ---
 
 # Gutenberg (Block Editor) Reference
@@ -10,6 +10,12 @@ Technical documentation for using Respira with the [WordPress Block Editor](http
 ## About Gutenberg
 
 The [WordPress Block Editor](https://wordpress.org/gutenberg/), commonly known as Gutenberg, is WordPress's default content editor since version 5.0. It powers over 40% of all websites on the internet through WordPress core.
+
+<Callout kind="info">
+
+This page covers block-level editing inside a page or post. For the site-level surface, block templates and template parts, synced and unsynced patterns, block navigation and global styles, see [Site Editor (Full Site Editing)](/builders/site-editor), new in Respira 8.0 "Canopy".
+
+</Callout>
 
 ## Prompting for great results on Gutenberg
 
@@ -107,22 +113,40 @@ Set in Block Settings → Advanced → HTML Anchor:
 - "Update the copyright text in the footer on all pages"
 - "Add alt text to all images missing it"
 
-## Reusable Blocks
+## Patterns (formerly Reusable Blocks)
 
-Gutenberg Reusable Blocks (now called Patterns) can be updated through Respira:
+Patterns are addressable through Respira, including their synced or unsynced state:
 
-- "List all reusable blocks" → Shows pattern library
-- "Update the reusable CTA block button text" → Changes it everywhere used
+- Registered theme and plugin patterns are read-only. They live in theme or plugin code, not in the database.
+- Editable user patterns (`wp_block`) can be created, read, updated and deleted, and a synced pattern changes everywhere it is used.
+
+- "List the synced patterns on this site" → shows the editable pattern library with its synced state
+- "Update the CTA pattern button text" → changes it everywhere the synced pattern is used
+
+Full detail, including the safety contract that applies because a synced pattern is a shared object, is on the [Site Editor](/builders/site-editor) page.
 
 ## Full Site Editing (FSE)
 
-For themes using Full Site Editing, Respira can access template parts:
+Respira 8.0 "Canopy" makes the native WordPress Site Editor a first-class target rather than a partial read. On a block theme, these are addressable:
 
-- Header and footer templates
-- Post and page templates
-- Archive templates
+- **Block templates and template parts** (`wp_template`, `wp_template_part`) with template hierarchy and source discovery, so you know whether a template is theme-provided, plugin-provided or a database customisation
+- **Synced and unsynced patterns** (`wp_block`), with registered theme and plugin patterns kept read-only
+- **Block navigation** (`wp_navigation`), edited by exact block path rather than by rewriting the navigation document. A guessed path is refused, and a stale revision is refused
+- **Gutenberg design tokens and global styles**, so colours, typography and spacing change at the source
 
-Example: "Update the site header tagline to 'Your Success Partner'"
+Every structural write is fingerprint-guarded against a stale base, snapshotted, read back through WordPress, and server-render verified. It reports `verified` only after WordPress has actually rendered it. A write can also be staged as a proposal for human approval instead of applied.
+
+<Callout kind="alert">
+
+**Structural writes to site-level objects are beta-gated per site and OFF by default.** Read-only discovery of templates, patterns, navigation and global styles works everywhere. Structural writes have to be enabled for the specific site.
+
+</Callout>
+
+Example: "Show me the header template part and the navigation inside it, and do not change anything."
+
+The FSE work exists because of a published field study by [Dale Smith of revWorx](https://revworx.ai/), who builds exclusively on FSE block themes and documented, live-verified, where Respira went inert on that stack.
+
+See [Site Editor (Full Site Editing)](/builders/site-editor) for the tools, the mutation-result contract, and the beta gate.
 
 ## Best Use Cases
 
@@ -131,16 +155,21 @@ Example: "Update the site header tagline to 'Your Success Partner'"
 - **SEO and readability workflows** - Batch-fix heading hierarchy or missing alt text
 - **Programmatic content** - Update dates, years, or repeated content across pages
 
+## Recent capabilities (8.0 "Canopy")
+
+- **The Site Editor is a first-class target.** Block templates, template parts, synced and unsynced patterns, block navigation and global styles are addressable, with structural writes behind a fingerprint, a snapshot, a read-back and a server-render check. See [Site Editor](/builders/site-editor).
+- **Navigation is edited by block path.** A menu link changes without re-serialising the whole navigation document, and a guessed path or a stale revision is refused instead of applied.
+
 ## Recent capabilities (7.4.x)
 
 - **`build_page` no longer emits a non-existent `core/section` block.** A `section` type used to fall through to `core/section`, which WordPress renders as "This block is not supported" and the front end drops; `row` had the same gap. `section`/`container`/`wrapper` now map to `core/group` and `row` to `core/columns`, so a full-page build is valid, nested and renders. Native block support is otherwise full: Respira reads every registered block from the block registry, core and third-party alike.
 
 ## Limitations
 
-- **Block patterns**: Pattern structure is preserved, but pattern-specific styling may need the editor
+- **Registered theme and plugin patterns are read-only**: they live in code, not the database. Copy one into a user pattern to change it
 - **Third-party blocks**: Respira reads all registered blocks dynamically from the block registry, including core and third-party blocks
 - **Interactive blocks**: Blocks with complex interactivity (forms, carousels) may need manual editing
-- **Theme-specific blocks**: Full Site Editing theme blocks work, but custom themes may vary
+- **Site-level structural writes are beta-gated per site and off by default**: read-only discovery of templates, patterns, navigation and global styles is available everywhere
 
 ## When to Use This Tool
 
@@ -155,4 +184,5 @@ Example: "Update the site header tagline to 'Your Success Partner'"
 - [wordpress_update_page](/tools/pages/update-page) - Update page content
 - [wordpress_analyze_seo](/tools/analysis/analyze-seo) - Analyze page SEO
 - [wordpress_analyze_readability](/tools/analysis/analyze-readability) - Check content readability
+- [Site Editor (Full Site Editing)](/builders/site-editor) - Templates, patterns, navigation, global styles
 - [Page Builder Overview](/builders/overview) - Compare all supported builders
