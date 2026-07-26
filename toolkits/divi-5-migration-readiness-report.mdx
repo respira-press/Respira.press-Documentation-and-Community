@@ -1,0 +1,72 @@
+---
+title: Divi 5 Migration Readiness Report
+description: Generate a readiness report that counts Divi 4, Divi 5 and mixed pages, flags high-risk layouts, and tells you what would break before you migrate.
+---
+
+## Overview
+
+Respira helps you plan and validate your Divi 5 migration. Divi's Migrator performs the actual conversion.
+
+The readiness report answers one question before you touch production: what on this site would not survive a migration cleanly.
+
+**What you'll learn**
+
+- How to generate the report, from wp-admin or through your AI assistant
+- What each section of the report means
+- What the report deliberately does not do
+
+<Callout kind="info">
+
+The report plans and validates. It does not convert anything. Running it changes no pages.
+
+</Callout>
+
+## Generating the report
+
+There are two ways in, and they produce the same report.
+
+**From your AI assistant.** Ask a question like "is my site ready for Divi 5", "should i migrate to Divi 5", or "what would break if i migrated". The assistant calls `respira_get_divi_migration_readiness` and shapes the result into an answer.
+
+**From WordPress.** Open the Divi 5 Migration Copilot screen in wp-admin and generate the report there.
+
+The report is cached per user for 24 hours, so asking twice in a session does not rescan the site. Generate it again from the admin screen when you want fresh numbers.
+
+## What the report contains
+
+<Steps>
+
+<Step title="Version split" icon="chart-bar">
+How many pages are Divi 4, how many are already Divi 5, and how many are mixed. Mixed pages are the ones that usually surprise people: a page can carry both formats at once.
+</Step>
+
+<Step title="High-risk pages" icon="triangle-exclamation">
+Pages flagged as likely to need manual attention, including pages sitting in Compatibility Mode and pages using deprecated shortcodes.
+</Step>
+
+<Step title="Migration candidates" icon="list-check">
+The pages that look safe to migrate first. Useful for picking a low-stakes page to prove the process before touching anything important.
+</Step>
+
+<Step title="Unknown shortcodes" icon="magnifying-glass">
+A tally of shortcodes the scan does not recognise. These are not necessarily broken, but they are the things nobody can promise for you, so they are surfaced rather than hidden.
+</Step>
+
+</Steps>
+
+## Reading the result
+
+The tool returns structured data rather than prose, and your assistant turns it into a readable answer. That means you can ask follow-up questions against the same report: which pages are highest risk, what is the smallest safe first migration, what is the total mixed-format count.
+
+The disclaimer is part of the output and is meant to be surfaced verbatim rather than paraphrased away. Respira plans and validates. Divi's Migrator converts.
+
+## What this does not do
+
+- It does not migrate anything. No page is written and no format is changed.
+- It does not guarantee a clean migration. An unknown shortcode is reported as unknown, not silently judged safe.
+- It does not replace a backup. Take one before you run Divi's Migrator regardless of what the report says.
+
+## Related
+
+<Card title="Divi 5 Migration Prompt Pack" href="/docs/toolkits/divi-5-migration-prompt-pack" icon="list">
+Five structured prompts for planning, validating and cleaning up the migration.
+</Card>

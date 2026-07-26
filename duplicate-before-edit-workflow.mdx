@@ -1,0 +1,83 @@
+---
+title: Duplicate-Before-Edit Workflow
+description: How Respira stages a page edit on a duplicate, why the original stays untouched until you approve, and when a write goes live directly.
+---
+
+## Overview
+
+When an AI assistant edits a page through Respira, the edit does not land on your live page. Respira creates a duplicate, writes to the duplicate, and leaves the original exactly as it was until a human approves the change.
+
+This is the default for everything page-shaped: pages, posts, and custom post types.
+
+**What you'll learn**
+
+- What actually happens to your live page when an agent edits it
+- Where you approve or reject a staged change
+- When a write goes live directly instead, and how to tell in advance
+
+## Why staging rather than undo
+
+Undo is a promise you make after the damage. Staging is a promise you make before it.
+
+An agent that edits live and rolls back on failure still leaves a window where your page is wrong, and it depends on the agent noticing. Staging removes the window: the visitor-facing page does not change until a person says so.
+
+Respira keeps both. Staged writes are the default, and snapshots sit underneath for the cases where a write does go live.
+
+## The flow
+
+<Steps>
+
+<Step title="The agent asks to edit a page" icon="pencil">
+You ask your assistant to change something. It calls a write tool such as `respira_update_page` or `respira_update_element`.
+</Step>
+
+<Step title="Respira creates a duplicate" icon="copy">
+The duplicate is a real WordPress post, marked as a Respira duplicate and linked back to the original. The original is not modified. You can keep working on it in WordPress while the duplicate exists.
+</Step>
+
+<Step title="The write lands on the duplicate" icon="check">
+Builder content, styling and metadata are written to the duplicate. The agent gets back the duplicate's ID and preview URL, so it can show you what changed before you decide.
+</Step>
+
+<Step title="You approve or reject in WordPress" icon="user">
+Approving copies the duplicate's content onto the original and cleans the duplicate up. Rejecting discards the duplicate and leaves the original untouched.
+</Step>
+
+</Steps>
+
+## Where approval happens
+
+Approval is a WordPress admin action, not an agent action. You approve from the Respira screens inside wp-admin.
+
+<Callout kind="info">
+
+This is deliberate and worth stating plainly: `approve_duplicate`, `reject_duplicate` and `detach_duplicate` exist in the plugin's REST layer but are **not** exposed as MCP tools. An agent can create and fill a duplicate. It cannot approve its own work.
+
+</Callout>
+
+So an assistant cannot talk itself into publishing. The approval step needs a person in WordPress, which is the whole point of the design.
+
+## When a write goes live directly
+
+Staging is the default, not the only path. Some writes go straight to the live object, and Respira says which before it does.
+
+**Editing an original on purpose.** If you want the agent to edit the live page rather than a duplicate, the site needs Direct Editing enabled, and the call has to carry both `force=true` and `confirm_live_edit=true`. An attempt without them is refused with a `confirmation_required` response naming what would change. Direct Editing is off by default.
+
+**Site-level structures.** Templates, patterns, navigation and global styles are not pages and have no duplicate to stage on. They use structural proposals instead: a write can be parked as a pending proposal for you to approve, and every write is fingerprint-checked, snapshotted, read back, and server-render verified. Structural writes are beta-gated per site and off by default.
+
+**Divi Theme Builder global layouts.** These are snapshotted and reversible but written live, because Divi resolves a global layout by ID and a duplicate would compete with the original rather than stand in for it. The first attempt is refused and names the blast radius; re-sending with `confirm_live_edit=true` proceeds. That is a confirmation, not an approval.
+
+## What a duplicate is not
+
+A duplicate is not a revision, and not a draft of the original. It is a separate post that Respira tracks. Two consequences worth knowing:
+
+- It appears in your posts list while it exists, marked as a Respira duplicate
+- If you never approve or reject it, it stays there. Rejecting is the tidy way to say no
+
+To keep a duplicate as a standalone page rather than merge it back, detach it. Detaching breaks the link to the original and leaves you with an ordinary page.
+
+## Related
+
+<Card title="Safety philosophy" href="/docs/safety-philosophy" icon="shield">
+The full safety contract: snapshots, verification states, and what "verified" means.
+</Card>
