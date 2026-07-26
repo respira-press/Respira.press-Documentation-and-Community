@@ -1,0 +1,70 @@
+---
+title: Divi 5 Migration Copilot
+description: The wp-admin screen that scans your site for Divi 5 readiness, builds a prompt pack from what it finds, and exports it as Markdown.
+---
+
+## Overview
+
+Respira helps you plan and validate your Divi 5 migration. Divi's Migrator performs the actual conversion.
+
+The Migration Copilot is the WordPress admin screen that ties the readiness scan and the prompt pack together. It looks at your actual site, then hands you prompts written against what it found rather than generic advice.
+
+**What you'll learn**
+
+- Where to find the Copilot and what it does
+- How the prompt pack is built from your own site's data
+- How to export the pack and use it outside WordPress
+
+<Callout kind="info">
+
+The Copilot plans, validates and generates prompts. It never converts a page. The Divi 4 to Divi 5 conversion is done by Divi's own Migrator.
+
+</Callout>
+
+## Where to find it
+
+The Copilot lives in wp-admin under the Respira menu, on the Divi 5 Migration Copilot screen. It appears on sites running Divi.
+
+## What it does
+
+<Steps>
+
+<Step title="Scans the site" icon="magnifying-glass">
+Generates the readiness report: the Divi 4 / Divi 5 / mixed split, high-risk pages, migration candidates, and unrecognised shortcodes. The report is cached per user for 24 hours, and the screen has a button to regenerate it on demand.
+</Step>
+
+<Step title="Builds a prompt pack from your results" icon="wand-magic-sparkles">
+The prompts are generated from your report, not from a fixed template. A site with many Compatibility Mode pages gets different prompts from a site whose main risk is unknown shortcodes.
+</Step>
+
+<Step title="Exports as Markdown" icon="file-arrow-down">
+The pack exports to Markdown so you can paste it into any AI assistant, keep it in a project brief, or hand it to a client alongside a quote.
+</Step>
+
+</Steps>
+
+## Why generate prompts rather than just a report
+
+A readiness report tells you what is risky. It does not tell you what to do next, and the useful next step depends on what the scan actually found.
+
+Generating the prompts from the report closes that gap. The output is specific to the site in front of you: which pages to migrate first, what to check after the Migrator runs, which layouts are worth modernising rather than converting as-is.
+
+## Using it with an agent
+
+The same underlying report is available to your AI assistant through `respira_get_divi_migration_readiness`, so you do not have to work in wp-admin if you would rather ask questions conversationally. The Copilot screen is the place to generate the export and see everything at once.
+
+## What this does not do
+
+- It does not migrate anything. Divi's Migrator performs the conversion.
+- It does not modify pages, settings or layouts. Generating a report and a prompt pack is read-only.
+- It does not replace a backup or a staging site. Plan both before you convert.
+
+## Related
+
+<Card title="Divi 5 Migration Readiness Report" href="/docs/toolkits/divi-5-migration-readiness-report" icon="chart-bar">
+What the scan reports and how to read each section.
+</Card>
+
+<Card title="Divi 5 Migration Prompt Pack" href="/docs/toolkits/divi-5-migration-prompt-pack" icon="list">
+The five structured prompts, with guidance on when to use each.
+</Card>
