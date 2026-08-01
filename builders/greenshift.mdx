@@ -1,0 +1,78 @@
+---
+title: "GreenShift"
+description: "How Respira reads and writes GreenShift natively. GreenShift is one of Respira's 17 supported page builders, edited as native WordPress blocks, with the CSS and saved-markup rules GreenShift needs handled for you."
+---
+
+# GreenShift
+
+Technical documentation for using Respira with [GreenShift](https://go.respira.cafe/greenshift) by Wpsoul, which now ships as **GL - Page Builder** while keeping the `greenshift-blocks/` namespace internally.
+
+GreenShift is a block-native builder built around one very flexible block, `greenshift-blocks/element`, which can render any HTML tag. It is one of Respira's 17 supported page builders, with full read and write, and support covers the core builder **and all five add-ons**: GSAP animation, Query and Meta, WooCommerce, SEO, and Chart. They all register under the same namespace.
+
+<Note>
+  The GreenShift link above is an affiliate link. It costs you nothing and does not affect which builders Respira supports or how well it supports them.
+</Note>
+
+## Data structure
+
+GreenShift stores content as native WordPress blocks in `post_content`, the same as any Gutenberg page:
+
+```html
+<!-- wp:greenshift-blocks/element {"tag":"div","type":"inner","localId":"gsbp-a1"} -->
+<div class="gsbp-a1">
+  <!-- wp:greenshift-blocks/element {"tag":"h2","type":"text","textContent":"Welcome","localId":"gsbp-a2"} -->
+  <h2 class="gsbp-a2">Welcome</h2>
+  <!-- /wp:greenshift-blocks/element -->
+</div>
+<!-- /wp:greenshift-blocks/element -->
+```
+
+Two things about that markup matter more than they look, and they are the reason GreenShift needs its own handling rather than being treated as plain Gutenberg.
+
+### The text lives in the markup, not only in the attribute
+
+GreenShift elements are **static blocks**: what renders is the HTML saved between the block delimiters. `textContent` exists for the editor. A write that sets attributes alone stores a perfectly valid block and produces a page with nothing visible on it.
+
+Respira builds that saved markup for you, from the tag, the classes, the link and media attributes, and the text.
+
+### The CSS is derived, not stored
+
+GreenShift does not keep per-element CSS in the block. It derives it from `styleAttributes` and `dynamicGClasses`, and only emits it when either the page CSS meta (`_gspb_post_css`) is populated, or the block carries `"CSSRender":"1"`. For patterns, templates and template parts, the second is the only option, since those are not posts and have no page CSS meta.
+
+So a plain block write stores correctly and renders **completely unstyled**. Respira stamps `CSSRender` on every block that carries GreenShift styling, which lets the plugin generate its own CSS at render time, at whatever version you are running.
+
+## Responsive values
+
+Every `styleAttributes` value is a per-breakpoint array, in the order `["desktop", "tablet", "mobile_landscape", "mobile_portrait"]`. A desktop-only value is a **one-element** array, not a padded one:
+
+```json
+{ "styleAttributes": { "padding": ["40px"], "color": ["rgb(12,34,56)", "rgb(90,90,90)"] } }
+```
+
+If your agent sends a plain string, Respira converts it to the single-element form and notes that it did. Trailing empty values are trimmed, because the padded form is not what GreenShift expects.
+
+## Priming
+
+Prime once at the start of a session so the agent builds in GreenShift blocks rather than raw HTML:
+
+> *"This is a GreenShift site. Build and edit with greenshift-blocks/element and core blocks, not raw HTML, and duplicate any live page before editing."*
+
+## What Respira can do
+
+- Read the full block structure of any GreenShift page, including all add-on blocks
+- Update text, tags, classes, links, images and styling on any `greenshift-blocks/*` block
+- Build new pages and sections that render **styled**, not just stored
+- Find blocks by type, content match, or anchor
+- Preserve existing attributes and styling on every write
+
+## Known limits
+
+- **`customJs` does not execute from the block attribute.** GreenShift loads block scripts from the `gspb_block_js` site option, keyed by block id, so a `customJs` value written programmatically is stored and never runs. Respira warns rather than silently dropping it. Use a `core/html` block with a real `<script>` tag instead.
+- **`type: "text"` with no `textContent`** renders an empty tag. Respira warns that the element will be invisible. Use `type: "no"` if you want a deliberate spacer.
+- The **Query and Meta add-on** (`greenshiftquery` 5.9.7) currently conflicts with GL - Page Builder 3.3.3 at the PHP level: both declare `gspb_get_post_object_by_id()`. This is a GreenShift-side conflict, reported upstream; WordPress's activation sandbox catches it, so the site stays healthy and the add-on simply will not activate alongside that core version.
+
+## Verified against
+
+GL - Page Builder 3.3.3, with the GSAP (3.7.7), WooCommerce (2.4), SEO (1.0.3) and Chart (1.2.3) add-ons, on WordPress 7.0.2 / PHP 8.3.32 with WooCommerce 10.9.4 and a block theme. Added in Respira 8.2.0.
+
+For the shared block workflow, block identification and prompt patterns, see [Gutenberg (Block Editor)](/builders/gutenberg).

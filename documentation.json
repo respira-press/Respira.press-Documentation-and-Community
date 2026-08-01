@@ -954,6 +954,11 @@
                 "icon": "layout"
               },
               {
+                "title": "GreenShift",
+                "path": "builders/greenshift",
+                "icon": "layout"
+              },
+              {
                 "title": "SeedProd",
                 "path": "builders/seedprod",
                 "icon": "layout"
