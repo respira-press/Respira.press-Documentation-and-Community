@@ -91,7 +91,7 @@ respira_invoke_ability({
 Two things to keep in mind about invocation:
 
 - The wire field is `args`, never `input`. Respira binds the incoming `args` object under the name `input` inside the Playbook executor, which is why the step templates reference `{{input.client_name}}`.
-- Playbooks under the `respira-playbooks/` namespace skip the Inhale opt-in gate that other Abilities go through, because your own agent authored them on-site through `respira_create_playbook` (which already ran the destructive-tool refusal validator). Any other Ability still has to be inhaled from the Respira MCP Abilities screen before it can be invoked.
+- Playbooks under the `respira-playbooks/` namespace skip the [Inhale](https://www.respira.press/inhale-mcp-abilities) opt-in gate that other Abilities go through, because your own agent authored them on-site through `respira_create_playbook` (which already ran the destructive-tool refusal validator). Any other Ability still has to be inhaled from the Respira MCP Abilities screen before it can be invoked.
 
 Playbooks also appear in the streamable MCP `tools/list`, so a client sees them alongside the built-in tools.
 
