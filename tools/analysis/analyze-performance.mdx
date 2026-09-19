@@ -9,9 +9,24 @@ Analyze page performance metrics including load time, image optimization, CSS/JS
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| pageId | number | Yes | WordPress page ID to analyze |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `page_id` | number | yes | Page ID to analyze |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_analyze_performance",
+  "arguments": {
+    "page_id": 123
+  }
+}
+```
 
 ## Response
 
@@ -40,11 +55,17 @@ Analyze page performance metrics including load time, image optimization, CSS/JS
 }
 ```
 
-## Example Prompts
+## What it changes
 
-- "Analyze performance of my homepage"
-- "Check speed issues on page 42"
-- "What are the biggest performance problems on the services page?"
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## How long it takes
+
+A typical call takes about 1.9 seconds. 19 in 20 finish within 3.6 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
 
 ## Full Example
 
@@ -76,14 +97,18 @@ Analyze page performance metrics including load time, image optimization, CSS/JS
 }
 ```
 
-## Related Tools
-
-- [wordpress_get_core_web_vitals](/tools/analysis/get-core-web-vitals) - LCP/FID/CLS metrics
-- [wordpress_analyze_images](/tools/analysis/analyze-images) - Image-specific opportunities
-
 ## Notes
 
 - Read-only tool - doesn’t modify content
 - Use it as the first step before a performance fix sprint
 
+## Example Prompts
 
+- "Analyze performance of my homepage"
+- "Check speed issues on page 42"
+- "What are the biggest performance problems on the services page?"
+
+## Related Tools
+
+- [wordpress_get_core_web_vitals](/tools/analysis/get-core-web-vitals) - LCP/FID/CLS metrics
+- [wordpress_analyze_images](/tools/analysis/analyze-images) - Image-specific opportunities

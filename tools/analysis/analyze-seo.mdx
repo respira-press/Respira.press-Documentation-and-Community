@@ -9,9 +9,24 @@ Comprehensive SEO analysis including meta tags, heading structure, image alt tex
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| pageId | number | Yes | WordPress page ID to analyze |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `page_id` | number | yes | Page ID to analyze |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_analyze_seo",
+  "arguments": {
+    "page_id": 123
+  }
+}
+```
 
 ## Response
 
@@ -50,6 +65,24 @@ Comprehensive SEO analysis including meta tags, heading structure, image alt tex
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 1.6 seconds. 19 in 20 finish within 3.4 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## What It Checks
 
 - **Meta Tags**: Title (50-60 chars), description (120-160 chars), Open Graph
@@ -58,14 +91,6 @@ Comprehensive SEO analysis including meta tags, heading structure, image alt tex
 - **Links**: Internal link count, external link count
 - **Content**: Word count (300+ recommended), keyword density
 - **Schema**: JSON-LD presence, appropriate types
-
-## Example Prompts
-
-- "Analyze the SEO of my homepage"
-- "Check SEO on page 42"
-- "Run an SEO audit on the About page"
-- "What SEO issues does my contact page have?"
-- "Give me SEO recommendations for the services page"
 
 ## Full Example
 
@@ -125,12 +150,6 @@ Comprehensive SEO analysis including meta tags, heading structure, image alt tex
 - Bonus: +5 for 90%+ alt text coverage
 - Bonus: +5 for 500+ word count
 
-## Related Tools
-
-- [wordpress_check_seo_issues](/tools/analysis/check-seo-issues) - Quick issue check
-- [wordpress_analyze_readability](/tools/analysis/analyze-readability) - Content readability
-- [wordpress_analyze_aeo](/tools/analysis/analyze-aeo) - AI Engine Optimization
-
 ## Notes
 
 - Read-only tool - doesn't modify content
@@ -142,3 +161,17 @@ Comprehensive SEO analysis including meta tags, heading structure, image alt tex
 After running an SEO analysis, fix issues with [wordpress_update_page](/tools/pages/update-page). The update tool uses a safe duplicate workflow so you can review changes before they go live.
 
 For a complete audit workflow, see the [SEO Audit Workflow Guide](/guides/seo-audit-workflow).
+
+## Example Prompts
+
+- "Analyze the SEO of my homepage"
+- "Check SEO on page 42"
+- "Run an SEO audit on the About page"
+- "What SEO issues does my contact page have?"
+- "Give me SEO recommendations for the services page"
+
+## Related Tools
+
+- [wordpress_check_seo_issues](/tools/analysis/check-seo-issues) - Quick issue check
+- [wordpress_analyze_readability](/tools/analysis/analyze-readability) - Content readability
+- [wordpress_analyze_aeo](/tools/analysis/analyze-aeo) - AI Engine Optimization

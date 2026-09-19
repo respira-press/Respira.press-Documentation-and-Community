@@ -9,11 +9,33 @@ Inject structured content into a page builder.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| builder | string | Yes | Builder name |
-| pageId | number | Yes | Page ID |
-| content | object | Yes | Structured content to inject |
+8 parameters, 3 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `builder` | string | yes | Builder identifier. Use exactly: gutenberg, divi, elementor, bricks, beaver, oxygen, breakdance, brizy, thrive, visual-composer, wpbakery, flatsome, spectra, kadence, generateblocks, greenshift. |
+| `page_id` | number | yes | Page ID |
+| `content` | array or object | yes | Structured content to inject in simplified format. In "replace" mode (default), this REPLACES all existing content. In "append" mode, this is added after existing content. For Gutenberg: array of blocks [&#123;type: "core/heading", attrs: &#123;level: 2&#125;, content: "Hello"&#125;, &#123;type: "core/paragraph", attrs: &#123;&#125;, content: "Text here"&#125;]. For Beaver Builder: &#123;rows: [&#123;cols: [&#123;modules: [&#123;type: "rich-text", settings: &#123;text: "..."&#125;&#125;]&#125;]&#125;]&#125;. For Elementor: array of widget objects. For Divi 5: array of section nodes (see the canonical nested shape in this tool's description). Use extract_builder_content to see the format for any builder. |
+| `expected_version` | string | no | Optional. The content_version from your last read or write of this page. The write is refused with respira_version_conflict (409, nothing written) if the page changed since, e.g. another agent or an editor saved it. Read again, reapply your change, and retry with the new content_version. |
+| `mode` | string | no | replace (default): OVERWRITES all existing page content. append: adds new content after existing elements, preserving the current layout. Replacing a page that already has content requires confirm_replace=true. One of: `replace`, `append`. |
+| `confirm_replace` | boolean | no | Required when mode="replace" (or unset, since replace is the default) AND the page already has content. Pass true only when you genuinely want to overwrite the existing structure. Without it, the plugin returns 409 respira_replace_confirmation_required so the agent can decide between mode="append" (preserve) and mode="replace"+confirm_replace=true (overwrite). |
+| `edit_target` | string | no | When editing an original, choose ask, live, or duplicate. Defaults to ask when direct editing is enabled. One of: `ask`, `live`, `duplicate`. |
+| `divi_version` | string | no | Divi generation hint ("4" for shortcode format, "5" for block format). Required for all Divi inject calls. One of: `4`, `5`. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_inject_builder_content",
+  "arguments": {
+    "builder": "value",
+    "page_id": 123,
+    "content": []
+  }
+}
+```
 
 ## Response
 
@@ -29,6 +51,30 @@ Inject structured content into a page builder.
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. It supports a dry run, which reports what would change without changing it. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_direct_edit_disabled`: The site only allows edits on a copy, never on the original page. Create a duplicate with `wordpress_create_page_duplicate` and edit that. A person approves it in wp-admin.
+- `respira_replace_confirmation_required`: The page already has content, and the call did not say whether to add to it or replace it. Pass `mode=append` to add after what is there, or `mode=replace` to overwrite it.
+
+## How long it takes
+
+A typical call takes about 3.5 seconds. 19 in 20 finish within 7.0 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works with Gutenberg, Elementor, Divi, Bricks, Oxygen, Beaver Builder, Breakdance, Flatsome, Brizy, Visual Composer, WPBakery, Thrive Architect, Spectra, Kadence Blocks, GenerateBlocks, GreenShift. Available since Respira 1.0.0.
+
+## Notes
+
+- This is a write operation and will use Respira’s safety workflow (duplicate-first)
+- Use when you need to replace the entire builder structure (large refactors)
+
 ## Example Prompts
 
 - "Replace the Elementor layout on page 42 with this new structure"
@@ -39,10 +85,3 @@ Inject structured content into a page builder.
 
 - [wordpress_extract_builder_content](/tools/builders/extract-content) - View existing structure first
 - [wordpress_update_module](/tools/builders/update-module) - Prefer targeted module updates when possible
-
-## Notes
-
-- This is a write operation and will use Respira’s safety workflow (duplicate-first)
-- Use when you need to replace the entire builder structure (large refactors)
-
-

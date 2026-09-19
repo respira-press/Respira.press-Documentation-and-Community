@@ -9,7 +9,22 @@ Get comprehensive information about the WordPress site including version, theme,
 
 ## Parameters
 
-This tool takes no parameters.
+1 parameter, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `detail` | string | no | Response detail level: "basic" (default) or "full". One of: `basic`, `full`. |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_get_site_context",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -44,6 +59,31 @@ This tool takes no parameters.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+- `respira_invalid_site_token`: The site rejected the token. It was revoked, or the site was reconnected since. Reconnect the site from the Respira dashboard.
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 1.9 seconds. 19 in 20 finish within 4.5 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Read-only tool - doesn’t modify content
+- Best first step before doing any major content or builder changes
+
 ## Example Prompts
 
 - "Get site context"
@@ -54,10 +94,3 @@ This tool takes no parameters.
 
 - [wordpress_get_theme_docs](/tools/context/get-theme-docs) - Theme templates and docs
 - [wordpress_get_builder_info](/tools/context/get-builder-info) - Active builder modules/widgets
-
-## Notes
-
-- Read-only tool - doesn’t modify content
-- Best first step before doing any major content or builder changes
-
-

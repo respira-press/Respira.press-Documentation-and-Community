@@ -9,9 +9,24 @@ Validate content for security issues before saving.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| content | string | Yes | Content to validate |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `content` | string | yes | Content to validate |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_validate_security",
+  "arguments": {
+    "content": "Hello from Respira."
+  }
+}
+```
 
 ## Response
 
@@ -23,6 +38,22 @@ Validate content for security issues before saving.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## How long it takes
+
+A typical call takes about 460 ms. 19 in 20 finish within 730 ms. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Use this when you are about to inject HTML/JS/CSS and want an extra safety check
+
 ## Example Prompts
 
 - "Validate this HTML before saving"
@@ -32,9 +63,3 @@ Validate content for security issues before saving.
 
 - [wordpress_update_page](/tools/pages/update-page)
 - [wordpress_update_post](/tools/posts/update-post)
-
-## Notes
-
-- Use this when you are about to inject HTML/JS/CSS and want an extra safety check
-
-

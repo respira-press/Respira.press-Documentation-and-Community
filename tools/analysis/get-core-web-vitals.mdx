@@ -9,9 +9,24 @@ Get Core Web Vitals metrics (LCP, FID, CLS) for a page.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| pageId | number | Yes | WordPress page ID to analyze |
+3 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `page_id` | number | no | Page ID to measure. Resolved to its public permalink. |
+| `url` | string | no | Explicit public URL to measure instead of a page ID. |
+| `strategy` | string | no | Device profile. Default mobile. One of: `mobile`, `desktop`. Default: `"mobile"`. |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_get_core_web_vitals",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -31,11 +46,23 @@ Get Core Web Vitals metrics (LCP, FID, CLS) for a page.
 }
 ```
 
-## Example Prompts
+## What it changes
 
-- "Get Core Web Vitals for my homepage"
-- "What are the LCP/FID/CLS scores for page 42?"
-- "Check CLS on the pricing page"
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_pagespeed_rate_limited`: Google PageSpeed refused the request because too many were made. Wait a minute and run it again.
+
+## How long it takes
+
+A typical call takes about 1.6 seconds. 19 in 20 finish within 3.0 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
 
 ## Full Example
 
@@ -59,14 +86,18 @@ Get Core Web Vitals metrics (LCP, FID, CLS) for a page.
 }
 ```
 
-## Related Tools
-
-- [wordpress_analyze_performance](/tools/analysis/analyze-performance) - Detailed performance analysis
-- [wordpress_analyze_images](/tools/analysis/analyze-images) - Image optimization opportunities
-
 ## Notes
 
 - Read-only tool - doesn’t modify content
 - Use it to establish a baseline before/after performance changes
 
+## Example Prompts
 
+- "Get Core Web Vitals for my homepage"
+- "What are the LCP/FID/CLS scores for page 42?"
+- "Check CLS on the pricing page"
+
+## Related Tools
+
+- [wordpress_analyze_performance](/tools/analysis/analyze-performance) - Detailed performance analysis
+- [wordpress_analyze_images](/tools/analysis/analyze-images) - Image optimization opportunities

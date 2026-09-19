@@ -9,12 +9,26 @@ List all pages with optional filtering.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| status | string | No | Filter by status (publish, draft, pending) |
-| search | string | No | Search term |
-| page | number | No | Page number for pagination |
-| perPage | number | No | Number of items per page |
+5 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `status` | string | no | Filter by status (publish, draft, pending) |
+| `search` | string | no | Search term |
+| `page` | number | no | Page number for pagination |
+| `per_page` | number | no | Number of items per page |
+| `include` | string | no | Optional v2 include CSV (basic, content.rendered, builder.payload, snapshot.current, etc.) |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_list_pages",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -34,6 +48,33 @@ List all pages with optional filtering.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_invalid_site_token`: The site rejected the token. It was revoked, or the site was reconnected since. Reconnect the site from the Respira dashboard.
+- `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+- `respira_unknown_include`: The `include` parameter asked for a part this tool does not return. The error lists the supported values. Use those.
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 2.2 seconds. 19 in 20 finish within 4.5 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Next Steps
+
+Found a page? Read its full content with [wordpress_read_page](/tools/pages/read-page), then make changes using [wordpress_update_page](/tools/pages/update-page).
+
+For bulk operations across many pages, see the [Bulk Content Updates Guide](/guides/bulk-content-updates).
+
 ## Example Prompts
 
 - "List all pages on my WordPress site"
@@ -45,9 +86,3 @@ List all pages with optional filtering.
 
 - [wordpress_read_page](/tools/pages/read-page) - Read full page content
 - [wordpress_update_page](/tools/pages/update-page) - Update a page (safe duplicate workflow)
-
-## Next Steps
-
-Found a page? Read its full content with [wordpress_read_page](/tools/pages/read-page), then make changes using [wordpress_update_page](/tools/pages/update-page).
-
-For bulk operations across many pages, see the [Bulk Content Updates Guide](/guides/bulk-content-updates).

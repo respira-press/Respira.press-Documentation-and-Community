@@ -9,9 +9,22 @@ List WordPress options (with optional search filter).
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| search | string | No | Search term to filter option names |
+1 parameter, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `search` | string | no | Search term to filter option names |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_list_options",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -27,6 +40,18 @@ List WordPress options (with optional search filter).
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## How long it takes
+
+A typical call takes about 1.6 seconds. 19 in 20 finish within 3.3 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "List options containing 'blog'"
@@ -36,5 +61,3 @@ List WordPress options (with optional search filter).
 
 - [wordpress_get_option](/tools/options/get-option)
 - [wordpress_update_option](/tools/options/update-option)
-
-

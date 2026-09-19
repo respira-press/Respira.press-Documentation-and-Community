@@ -9,7 +9,22 @@ Get information about the active page builder including available modules/widget
 
 ## Parameters
 
-This tool takes no parameters.
+1 parameter, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `debug` | boolean | no | When true, bypass the 1-hour detection cache and include detection_signals for each builder that exposes them. Use to diagnose false negatives. |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_get_builder_info",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -30,6 +45,31 @@ This tool takes no parameters.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+- `respira_invalid_site_token`: The site rejected the token. It was revoked, or the site was reconnected since. Reconnect the site from the Respira dashboard.
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 2.0 seconds. 19 in 20 finish within 4.4 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works with Gutenberg, Elementor, Divi, Bricks, Oxygen, Beaver Builder, Breakdance, Flatsome, Brizy, Visual Composer, WPBakery, Thrive Architect, Spectra, Kadence Blocks, GenerateBlocks, GreenShift, SeedProd. Available since Respira 1.0.0.
+
+## Notes
+
+- Read-only tool - doesn’t modify content
+- Use this to confirm builder support before trying module-level edits
+
 ## Example Prompts
 
 - "What page builder is active on this site?"
@@ -41,10 +81,3 @@ This tool takes no parameters.
 - [wordpress_get_site_context](/tools/context/get-site-context) - Site overview including detected builders
 - [wordpress_extract_builder_content](/tools/builders/extract-content) - Extract structure for a specific page
 - [Builder Reference: Divi](/builders/divi) - Builder-specific notes
-
-## Notes
-
-- Read-only tool - doesn’t modify content
-- Use this to confirm builder support before trying module-level edits
-
-

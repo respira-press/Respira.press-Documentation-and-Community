@@ -9,10 +9,26 @@ Get term details.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| taxonomy | string | Yes | Taxonomy name |
-| id | number | Yes | Term ID |
+2 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `taxonomy` | string | yes | Taxonomy name |
+| `id` | number | yes | Term ID |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_get_term",
+  "arguments": {
+    "taxonomy": "value",
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -29,6 +45,24 @@ Get term details.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 2.1 seconds. 19 in 20 finish within 3.6 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Get term 12 in taxonomy category"
@@ -38,5 +72,3 @@ Get term details.
 
 - [wordpress_list_terms](/tools/taxonomies/list-terms)
 - [wordpress_update_term](/tools/taxonomies/update-term)
-
-

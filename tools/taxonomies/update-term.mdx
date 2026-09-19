@@ -9,14 +9,30 @@ Update a term.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| taxonomy | string | Yes | Taxonomy name |
-| id | number | Yes | Term ID |
-| name | string | No | Term name |
-| slug | string | No | Term slug |
-| description | string | No | Term description |
-| parent | number | No | Parent term ID |
+6 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `taxonomy` | string | yes | Taxonomy name |
+| `id` | number | yes | Term ID |
+| `name` | string | no | Term name |
+| `slug` | string | no | Term slug |
+| `description` | string | no | Term description |
+| `parent` | number | no | Parent term ID |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_update_term",
+  "arguments": {
+    "taxonomy": "value",
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -29,6 +45,18 @@ Update a term.
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## How long it takes
+
+A typical call takes about 2.7 seconds. 19 in 20 finish within 4.7 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Rename category 123 to 'News & Updates'"
@@ -38,5 +66,3 @@ Update a term.
 
 - [wordpress_get_term](/tools/taxonomies/get-term)
 - [wordpress_list_terms](/tools/taxonomies/list-terms)
-
-

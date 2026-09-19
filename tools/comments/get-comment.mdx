@@ -9,9 +9,24 @@ Get comment details by ID.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | number | Yes | Comment ID |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | number | yes | Comment ID |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_get_comment",
+  "arguments": {
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -26,6 +41,14 @@ Get comment details by ID.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Get comment 9001"
@@ -35,5 +58,3 @@ Get comment details by ID.
 
 - [wordpress_list_comments](/tools/comments/list-comments)
 - [wordpress_update_comment](/tools/comments/update-comment)
-
-

@@ -9,10 +9,27 @@ Delete a term.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| taxonomy | string | Yes | Taxonomy name |
-| id | number | Yes | Term ID |
+3 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `taxonomy` | string | yes | Taxonomy name |
+| `id` | number | yes | Term ID |
+| `approval_token` | string | no | One-time token from a prior respira_approval_required response. Omit on the first call; the tool will reject with a token if approval is required, then re-call with this parameter set to that token to confirm and execute. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_delete_term",
+  "arguments": {
+    "taxonomy": "value",
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -25,6 +42,18 @@ Delete a term.
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## How long it takes
+
+A typical call takes about 2.0 seconds. 19 in 20 finish within 3.3 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Delete category 123"
@@ -34,5 +63,3 @@ Delete a term.
 
 - [wordpress_list_terms](/tools/taxonomies/list-terms)
 - [wordpress_update_term](/tools/taxonomies/update-term)
-
-

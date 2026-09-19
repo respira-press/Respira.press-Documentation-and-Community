@@ -9,9 +9,24 @@ Delete a menu item.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| item_id | number | Yes | Menu item ID |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `item_id` | number | yes | Menu item ID |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_delete_menu_item",
+  "arguments": {
+    "item_id": 123
+  }
+}
+```
 
 ## Response
 
@@ -23,6 +38,18 @@ Delete a menu item.
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## How long it takes
+
+A typical call takes about 1.9 seconds. 19 in 20 finish within 4.3 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Delete menu item 1001"
@@ -32,5 +59,3 @@ Delete a menu item.
 
 - [wordpress_list_menu_items](/tools/menus/list-menu-items)
 - [wordpress_update_menu_item](/tools/menus/update-menu-item)
-
-

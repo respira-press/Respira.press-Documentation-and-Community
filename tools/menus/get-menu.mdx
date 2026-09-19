@@ -9,9 +9,24 @@ Get a navigation menu with all its items. Includes WPML translation info if avai
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | number | Yes | Menu ID |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | number | yes | Menu ID |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_get_menu",
+  "arguments": {
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -33,6 +48,24 @@ Get a navigation menu with all its items. Includes WPML translation info if avai
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 1.4 seconds. 19 in 20 finish within 3.3 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Get menu 10"
@@ -42,5 +75,3 @@ Get a navigation menu with all its items. Includes WPML translation info if avai
 
 - [wordpress_list_menu_items](/tools/menus/list-menu-items)
 - [wordpress_create_menu_item](/tools/menus/create-menu-item)
-
-

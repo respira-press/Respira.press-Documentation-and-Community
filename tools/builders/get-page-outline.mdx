@@ -11,10 +11,24 @@ Works on every supported builder. Adapters with a dedicated outline implementati
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| pageId | number | Yes | Page or post ID |
-| builder | string | No | Builder name. Auto-detected from the active site builder when omitted. |
+3 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `builder` | string | no | Builder name. Optional — auto-detected from the active site builder when omitted. |
+| `page_id` | number | no | Page or post ID |
+| `id` | number | no | Alias for page_id (every sibling read tool calls it id, so both are accepted). |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_get_page_outline",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -36,11 +50,25 @@ One entry per top-level row, each shaped like this:
 }
 ```
 
-## Example Prompts
+## What it changes
 
-- "What is the structure of the homepage?"
-- "Give me an outline of page 42 before we edit it"
-- "How many rows does the About page have and what is in each?"
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_post_not_found`: No post or page has that ID. List the pages or posts and take the ID from the result.
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+- `respira_invalid_site_token`: The site rejected the token. It was revoked, or the site was reconnected since. Reconnect the site from the Respira dashboard.
+
+## How long it takes
+
+A typical call takes about 2.7 seconds. 19 in 20 finish within 6.0 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
 
 ## When to use this vs extract_builder_content
 
@@ -50,12 +78,18 @@ One entry per top-level row, each shaped like this:
 
 If `extract_builder_content` runs into the response-size cap on a large page, the truncation hint points you back here: get the outline first, then extract just the subtree you care about.
 
+## Notes
+
+- Read-only tool - doesn't modify content
+
+## Example Prompts
+
+- "What is the structure of the homepage?"
+- "Give me an outline of page 42 before we edit it"
+- "How many rows does the About page have and what is in each?"
+
 ## Related Tools
 
 - [wordpress_extract_builder_content](/tools/builders/extract-content) - Full structured builder JSON
 - [wordpress_inject_builder_content](/tools/builders/inject-content) - Replace or append to the builder structure
 - [wordpress_update_module](/tools/builders/update-module) - Update a specific module
-
-## Notes
-
-- Read-only tool - doesn't modify content

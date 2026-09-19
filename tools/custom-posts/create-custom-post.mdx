@@ -9,12 +9,39 @@ Create a new custom post.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| type | string | Yes | Post type name |
-| title | string | Yes | Post title |
-| content | string | No | Post content |
-| status | string | No | Post status (default: draft) |
+15 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `type` | string | yes | Post type name (e.g. "post", "page", "product") |
+| `title` | string | yes | Post title |
+| `content` | string | no | Post content |
+| `status` | string | no | Post status (default: draft) |
+| `slug` | string | no | URL slug (post_name). Example: "my-post" produces /my-post/. |
+| `excerpt` | string | no | Optional post excerpt. |
+| `date` | string | no | Optional publish date in YYYY-MM-DD HH:MM:SS (server local time) for backdating. |
+| `author` | any | no | Author (user id or user login). Requires edit_others_posts capability when different from the acting user. |
+| `categories` | array of values | no | Shorthand for the built-in "category" taxonomy. Accepts term ids (number) or slugs/names (string). |
+| `tags` | array of values | no | Shorthand for the built-in "post_tag" taxonomy. Accepts term ids (number) or slugs/names (string). |
+| `taxonomies` | object | no | Generic map of taxonomy slug to array of term ids/slugs for custom taxonomies (e.g. product_cat). Example: &#123; "product_cat": [12, "featured"] &#125;. |
+| `featured_media` | number | no | Attachment ID to set as the featured image. |
+| `create_missing_terms` | boolean | no | When true, auto-create taxonomy terms that do not exist by name. Default false (strict: unknown slug returns 400 and the post is rolled back). |
+| `post_parent` | number | no | Parent post ID. Pass 0 for no parent. Useful when creating sub-pages or nested custom post types. |
+| `meta` | object | no | Post meta data (map of meta key to value). |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_create_custom_post",
+  "arguments": {
+    "type": "value",
+    "title": "Example title"
+  }
+}
+```
 
 ## Response
 
@@ -27,6 +54,24 @@ Create a new custom post.
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_post_type_not_found`: That post type is not registered on the site. Call `wordpress_list_post_types` to see the ones that are.
+
+## How long it takes
+
+A typical call takes about 4.0 seconds. 19 in 20 finish within 17.9 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Create a new product called 'Starter Plan'"
@@ -36,5 +81,3 @@ Create a new custom post.
 
 - [wordpress_update_custom_post](/tools/custom-posts/update-custom-post)
 - [wordpress_delete_custom_post](/tools/custom-posts/delete-custom-post)
-
-

@@ -11,10 +11,25 @@ The response includes a **share preview link** (`preview_url`): send it to anyon
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| originalId | number | Yes | ID of the original page to duplicate |
-| suffix | string | No | Optional suffix for the duplicated page title |
+4 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `original_id` | number | no | ID of the original page to duplicate |
+| `page_id` | number | no | Alias for original_id, matching the builder page tools |
+| `post_id` | number | no | Alias for original_id, matching tools that operate on any post type |
+| `suffix` | string | no | Optional suffix for the duplicated page title |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_create_page_duplicate",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -30,6 +45,24 @@ The response includes a **share preview link** (`preview_url`): send it to anyon
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 2.2 seconds. 19 in 20 finish within 4.5 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Create a duplicate of the About page"
@@ -42,5 +75,3 @@ The response includes a **share preview link** (`preview_url`): send it to anyon
 - [wordpress_update_page](/tools/pages/update-page)
 - [wordpress_delete_page](/tools/pages/delete-page)
 - [wordpress_read_page](/tools/pages/read-page)
-
-

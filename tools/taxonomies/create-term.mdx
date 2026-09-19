@@ -9,13 +9,29 @@ Create a new term.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| taxonomy | string | Yes | Taxonomy name |
-| name | string | Yes | Term name |
-| slug | string | No | Term slug |
-| description | string | No | Term description |
-| parent | number | No | Parent term ID |
+5 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `taxonomy` | string | yes | Taxonomy name |
+| `name` | string | yes | Term name |
+| `slug` | string | no | Term slug |
+| `description` | string | no | Term description |
+| `parent` | number | no | Parent term ID |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_create_term",
+  "arguments": {
+    "taxonomy": "value",
+    "name": "Example title"
+  }
+}
+```
 
 ## Response
 
@@ -28,6 +44,18 @@ Create a new term.
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## How long it takes
+
+A typical call takes about 2.3 seconds. 19 in 20 finish within 4.2 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Create a new category called 'Announcements'"
@@ -37,5 +65,3 @@ Create a new term.
 
 - [wordpress_update_term](/tools/taxonomies/update-term)
 - [wordpress_delete_term](/tools/taxonomies/delete-term)
-
-

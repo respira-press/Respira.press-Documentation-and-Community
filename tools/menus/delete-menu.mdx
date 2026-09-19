@@ -9,9 +9,25 @@ Delete a navigation menu.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | number | Yes | Menu ID |
+2 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | number | yes | Menu ID |
+| `approval_token` | string | no | Single-use approval token from a prior respira_approval_required response. Pass the token from data.approval_request.approval_token to complete the delete. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_delete_menu",
+  "arguments": {
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -23,6 +39,18 @@ Delete a navigation menu.
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Deleting a menu does not delete pages/posts it links to
+
 ## Example Prompts
 
 - "Delete menu 10"
@@ -32,9 +60,3 @@ Delete a navigation menu.
 
 - [wordpress_list_menus](/tools/menus/list-menus)
 - [wordpress_get_menu](/tools/menus/get-menu)
-
-## Notes
-
-- Deleting a menu does not delete pages/posts it links to
-
-

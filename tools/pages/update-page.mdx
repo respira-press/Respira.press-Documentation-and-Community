@@ -9,26 +9,36 @@ Update a WordPress page. Respira automatically creates a duplicate for safety - 
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | number | Yes | Page ID to update |
-| title | string | No | New page title |
-| content | string | No | New page content (HTML) |
-| status | string | No | Page status: publish, draft, pending |
-| customCss | string | No | Custom CSS for the page |
-| meta | object | No | Post meta data |
-| force | boolean | No | ⚠️ Force direct edit (not recommended) |
+13 parameters, 1 required.
 
-## Safety Workflow
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | number | yes | Page ID |
+| `expected_version` | string | no | Optional. The content_version from your last read or write of this page. The write is refused with respira_version_conflict (409, nothing written) if the page changed since, e.g. another agent or an editor saved it. Read again, reapply your change, and retry with the new content_version. |
+| `title` | string | no | New page title |
+| `content` | string | no | New page content (HTML) |
+| `status` | string | no | Page status (publish, draft, pending) |
+| `slug` | string | no | URL slug (post_name). Example: "about-us" produces /about-us/. |
+| `excerpt` | string | no | Post excerpt (wp_posts.post_excerpt) — the "Excerpt"/"Zajawka" panel, RSS summaries and archive teasers. Do NOT pass this inside meta: an excerpt written as post meta reads back fine and renders nowhere. |
+| `custom_css` | string | no | Custom CSS for the page. Auto-detects builder: Divi → _et_pb_custom_css, Elementor → _elementor_page_settings.custom_css. |
+| `meta` | object | no | Post meta data |
+| `post_parent` | number | no | Parent page ID. Pass 0 to detach from any parent (make a root page). Accepts parent, parent_id, or post_parent. |
+| `edit_target` | string | no | Choose ask, live, or duplicate when the target is an original page. One of: `ask`, `live`, `duplicate`. |
+| `force` | boolean | no | Backward-compatible alias for explicit live editing when direct editing is enabled. |
+| `skip_security_check` | boolean | no | Advanced: bypass Respira content security checks and sanitization for this update. Use only with trusted content. |
 
-By default, Respira never edits live pages directly:
+## Example call
 
-1. You request an update to page 42
-2. Respira creates a duplicate (page 43)
-3. Changes are applied to the duplicate
-4. You review in WordPress Admin → Respira → Approve Edits
-5. Approve: duplicate replaces original
-6. Reject: duplicate deleted, original untouched
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_update_page",
+  "arguments": {
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -49,12 +59,37 @@ By default, Respira never edits live pages directly:
 
 When the edit is staged on a duplicate, `preview_url` is a **share preview link**: it opens the staged page with no WordPress login for 14 days by default, and the response message repeats it as "Share preview (no WordPress login needed, valid until …)". See [Share preview links](/docs/share-preview-links).
 
-## Example Prompts
+## What it changes
 
-- "Update the homepage title to 'Welcome Home'"
-- "Change the about page content to include our new mission statement"
-- "Set the contact page to draft status"
-- "Update page 42 with the new pricing information"
+It removes or overwrites something on the site, so treat it as the careful kind of call. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_direct_edit_disabled`: The site only allows edits on a copy, never on the original page. Create a duplicate with `wordpress_create_page_duplicate` and edit that. A person approves it in wp-admin.
+- `respira_duplicate_exists`: A copy of this page is already waiting for review. Edit that copy (its ID is in the error), or approve or reject it first.
+- `respira_security_validation_failed`: The content contains a pattern the security check blocks, such as a script tag or an inline event handler. Remove it. If it is meant to be there, the error names the pattern and how to allow it.
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 2.9 seconds. 19 in 20 finish within 5.6 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Safety Workflow
+
+By default, Respira never edits live pages directly:
+
+1. You request an update to page 42
+2. Respira creates a duplicate (page 43)
+3. Changes are applied to the duplicate
+4. You review in WordPress Admin → Respira → Approve Edits
+5. Approve: duplicate replaces original
+6. Reject: duplicate deleted, original untouched
 
 ## Full Example
 
@@ -96,16 +131,21 @@ For pages built with Divi, Elementor, etc., use:
 
 Direct content updates work best for Gutenberg/classic editor pages.
 
-## Related Tools
-
-- [wordpress_read_page](/tools/pages/read-page) - Read page content first
-- [wordpress_create_page_duplicate](/tools/pages/create-duplicate) - Manual duplicate
-- [wordpress_update_module](/tools/builders/update-module) - Page builder updates
-
 ## Notes
 
 - Always creates a duplicate unless `force: true` and direct editing is enabled
 - Preserves all page meta, featured images, and builder data
 - Original page remains published and unchanged until approval
 
+## Example Prompts
 
+- "Update the homepage title to 'Welcome Home'"
+- "Change the about page content to include our new mission statement"
+- "Set the contact page to draft status"
+- "Update page 42 with the new pricing information"
+
+## Related Tools
+
+- [wordpress_read_page](/tools/pages/read-page) - Read page content first
+- [wordpress_create_page_duplicate](/tools/pages/create-duplicate) - Manual duplicate
+- [wordpress_update_module](/tools/builders/update-module) - Page builder updates

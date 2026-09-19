@@ -9,12 +9,25 @@ List all comments with optional filtering.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| status | string | No | Comment status (approve, hold, spam, trash) |
-| post_id | number | No | Filter by post ID |
-| page | number | No | Page number |
-| perPage | number | No | Items per page |
+4 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `status` | string | no | Comment status (approve, hold, spam, trash) |
+| `post_id` | number | no | Filter by post ID |
+| `page` | number | no | Page number |
+| `per_page` | number | no | Items per page |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_list_comments",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -33,6 +46,18 @@ List all comments with optional filtering.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## How long it takes
+
+A typical call takes about 1.9 seconds. 19 in 20 finish within 2.8 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "List approved comments"
@@ -43,5 +68,3 @@ List all comments with optional filtering.
 
 - [wordpress_get_comment](/tools/comments/get-comment)
 - [wordpress_update_comment](/tools/comments/update-comment)
-
-

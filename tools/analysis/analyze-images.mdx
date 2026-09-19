@@ -9,9 +9,24 @@ Analyze image optimization opportunities including missing alt text, large files
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| pageId | number | Yes | WordPress page ID to analyze |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `page_id` | number | yes | Page ID to analyze |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_analyze_images",
+  "arguments": {
+    "page_id": 123
+  }
+}
+```
 
 ## Response
 
@@ -39,6 +54,23 @@ Analyze image optimization opportunities including missing alt text, large files
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## How long it takes
+
+A typical call takes about 2.3 seconds. 19 in 20 finish within 4.1 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Read-only tool - doesn’t modify content
+- Pair with `wordpress_update_media` to fix alt text/title/captions
+
 ## Example Prompts
 
 - "Analyze images on my homepage"
@@ -49,10 +81,3 @@ Analyze image optimization opportunities including missing alt text, large files
 
 - [wordpress_analyze_seo](/tools/analysis/analyze-seo)
 - [wordpress_analyze_performance](/tools/analysis/analyze-performance)
-
-## Notes
-
-- Read-only tool - doesn’t modify content
-- Pair with `wordpress_update_media` to fix alt text/title/captions
-
-

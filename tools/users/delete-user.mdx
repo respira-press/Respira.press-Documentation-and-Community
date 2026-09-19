@@ -9,10 +9,26 @@ Delete a user.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | number | Yes | User ID |
-| reassign | number | No | User ID to reassign posts to (optional) |
+3 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | number | yes | User ID |
+| `reassign` | number | no | User ID to reassign posts to (optional) |
+| `approval_token` | string | no | Single-use approval token from a prior respira_approval_required response. Pass the token from data.approval_request.approval_token to complete the delete. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_delete_user",
+  "arguments": {
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -24,6 +40,18 @@ Delete a user.
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Prefer reassigning content to an admin/editor instead of deleting posts
+
 ## Example Prompts
 
 - "Delete user 55 and reassign posts to user 1"
@@ -33,9 +61,3 @@ Delete a user.
 
 - [wordpress_get_user](/tools/users/get-user)
 - [wordpress_list_users](/tools/users/list-users)
-
-## Notes
-
-- Prefer reassigning content to an admin/editor instead of deleting posts
-
-

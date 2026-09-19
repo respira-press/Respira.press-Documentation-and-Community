@@ -11,6 +11,17 @@ List all registered menu locations and their assigned menus.
 
 This tool takes no parameters.
 
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_list_menu_locations",
+  "arguments": {}
+}
+```
+
 ## Response
 
 ```json
@@ -26,6 +37,18 @@ This tool takes no parameters.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## How long it takes
+
+A typical call takes about 1.0 seconds. 19 in 20 finish within 1.7 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "List menu locations"
@@ -35,5 +58,3 @@ This tool takes no parameters.
 
 - [wordpress_assign_menu_location](/tools/menus/assign-menu-location)
 - [wordpress_list_menus](/tools/menus/list-menus)
-
-

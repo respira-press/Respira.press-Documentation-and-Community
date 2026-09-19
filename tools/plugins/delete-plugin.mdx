@@ -9,9 +9,25 @@ EXPERIMENTAL: Permanently delete a plugin. Requires plugin management to be enab
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| slug | string | Yes | Plugin slug |
+2 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `slug` | string | yes | Plugin folder name, or the exact plugin file wordpress_list_plugins reports. Both work, including names with spaces and capitals ("WP PROTECTION" or "WP PROTECTION/SECURITY.php"). Do not sanitize the name yourself: pass it exactly as WordPress spells it. |
+| `approval_token` | string | no | Second-step approval token returned by the first call. Echo it back unchanged with the same slug to confirm deletion. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_delete_plugin",
+  "arguments": {
+    "slug": "example-slug"
+  }
+}
+```
 
 ## Response
 
@@ -23,6 +39,23 @@ EXPERIMENTAL: Permanently delete a plugin. Requires plugin management to be enab
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## How long it takes
+
+A typical call takes about 2.2 seconds. 19 in 20 finish within 3.9 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Experimental: enable plugin management in Respira settings first
+- Deleting plugins can break a site; prefer doing this on staging first
+
 ## Example Prompts
 
 - "Delete the plugin slug 'hello-dolly'"
@@ -32,10 +65,3 @@ EXPERIMENTAL: Permanently delete a plugin. Requires plugin management to be enab
 
 - [wordpress_deactivate_plugin](/tools/plugins/deactivate-plugin)
 - [wordpress_list_plugins](/tools/plugins/list-plugins)
-
-## Notes
-
-- Experimental: enable plugin management in Respira settings first
-- Deleting plugins can break a site; prefer doing this on staging first
-
-

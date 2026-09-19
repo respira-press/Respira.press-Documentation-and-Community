@@ -9,11 +9,24 @@ List all media files (images, videos, etc.).
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| search | string | No | Search term |
-| page | number | No | Page number |
-| perPage | number | No | Items per page |
+3 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `search` | string | no | Search term |
+| `page` | number | no | Page number |
+| `per_page` | number | no | Items per page |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_list_media",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -31,6 +44,24 @@ List all media files (images, videos, etc.).
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+
+## How long it takes
+
+A typical call takes about 1.9 seconds. 19 in 20 finish within 3.5 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "List my media library"
@@ -40,5 +71,3 @@ List all media files (images, videos, etc.).
 
 - [wordpress_get_media](/tools/media/get-media)
 - [wordpress_upload_media](/tools/media/upload-media)
-
-

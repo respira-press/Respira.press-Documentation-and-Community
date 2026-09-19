@@ -9,10 +9,26 @@ Assign a menu to a theme location.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| location | string | Yes | Location slug (e.g., \"primary\", \"footer\") |
-| menu_id | number | Yes | Menu ID to assign (use 0 to unassign) |
+2 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `location` | string | yes | Location slug (e.g., "primary", "footer") |
+| `menu_id` | number | yes | Menu ID to assign (use 0 to unassign) |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_assign_menu_location",
+  "arguments": {
+    "location": "value",
+    "menu_id": 123
+  }
+}
+```
 
 ## Response
 
@@ -25,6 +41,14 @@ Assign a menu to a theme location.
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Assign menu 10 to the primary location"
@@ -34,5 +58,3 @@ Assign a menu to a theme location.
 
 - [wordpress_list_menu_locations](/tools/menus/list-menu-locations)
 - [wordpress_list_menus](/tools/menus/list-menus)
-
-

@@ -9,12 +9,27 @@ Update media metadata (title, alt text, caption).
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | number | Yes | Media ID |
-| title | string | No | Media title |
-| alt | string | No | Alt text |
-| caption | string | No | Caption |
+4 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | number | yes | Media ID |
+| `title` | string | no | Media title |
+| `alt` | string | no | Alt text |
+| `caption` | string | no | Caption |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_update_media",
+  "arguments": {
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -26,6 +41,18 @@ Update media metadata (title, alt text, caption).
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## How long it takes
+
+A typical call takes about 1.8 seconds. 19 in 20 finish within 2.9 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Set alt text for media 501 to 'Respira logo'"
@@ -35,5 +62,3 @@ Update media metadata (title, alt text, caption).
 
 - [wordpress_get_media](/tools/media/get-media)
 - [wordpress_analyze_images](/tools/analysis/analyze-images)
-
-

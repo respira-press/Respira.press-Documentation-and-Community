@@ -9,9 +9,24 @@ Get a single menu item by ID.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| item_id | number | Yes | Menu item ID |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `item_id` | number | yes | Menu item ID |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_get_menu_item",
+  "arguments": {
+    "item_id": 123
+  }
+}
+```
 
 ## Response
 
@@ -27,6 +42,14 @@ Get a single menu item by ID.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Get menu item 1001"
@@ -36,5 +59,3 @@ Get a single menu item by ID.
 
 - [wordpress_list_menu_items](/tools/menus/list-menu-items)
 - [wordpress_update_menu_item](/tools/menus/update-menu-item)
-
-

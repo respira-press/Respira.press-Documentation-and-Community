@@ -9,11 +9,26 @@ Update a comment.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | number | Yes | Comment ID |
-| content | string | No | Comment content |
-| status | number | No | Comment status |
+3 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | number | yes | Comment ID |
+| `content` | string | no | Comment content |
+| `status` | number | no | Comment status |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_update_comment",
+  "arguments": {
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -25,6 +40,14 @@ Update a comment.
 }
 ```
 
+## What it changes
+
+It writes to the site. It is not covered by a snapshot, so check the arguments before calling it. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Approve comment 9001"
@@ -34,5 +57,3 @@ Update a comment.
 
 - [wordpress_get_comment](/tools/comments/get-comment)
 - [wordpress_list_comments](/tools/comments/list-comments)
-
-

@@ -9,10 +9,27 @@ Delete a page. IMPORTANT: By default, this only works on Respira-created duplica
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | number | Yes | Page ID |
-| force | boolean | No | Force delete even if not a duplicate |
+4 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | number | yes | Page ID |
+| `force` | boolean | no | Force delete even if not a duplicate. Requires confirm_live_edit=true. |
+| `confirm_live_edit` | boolean | no | Operator confirmation that a force-delete on an original is intended. Required alongside force=true, and honoured only when "Allow Direct Editing" is enabled in Respira settings. |
+| `approval_token` | string | no | Single-use approval token from a prior respira_approval_required response. The plugin returns a fresh token on every blocked call (data.approval_request.approval_token); pass that exact string here on the retry to complete the delete. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_delete_page",
+  "arguments": {
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -24,6 +41,32 @@ Delete a page. IMPORTANT: By default, this only works on Respira-created duplica
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_mcp_approval_required`: The tool is set to need a person's approval before it runs. Approve it in the AI app or in wp-admin, then call again. This is a safety setting doing its job, not a fault.
+- `respira_not_duplicate`: The page is not a Respira copy, so there is nothing to approve, reject or detach. Check the ID. Copies are listed with their original in `wordpress_list_pages`.
+- `respira_direct_edit_disabled`: The site only allows edits on a copy, never on the original page. Create a duplicate with `wordpress_create_page_duplicate` and edit that. A person approves it in wp-admin.
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 1.8 seconds. 19 in 20 finish within 2.7 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Prefer deleting duplicates instead of live pages
+- If you need to remove a live page, do it in WordPress Admin unless you fully understand the risk
+
 ## Example Prompts
 
 - "Delete the duplicate page I just created"
@@ -34,10 +77,3 @@ Delete a page. IMPORTANT: By default, this only works on Respira-created duplica
 
 - [wordpress_create_page_duplicate](/tools/pages/create-duplicate)
 - [wordpress_update_page](/tools/pages/update-page)
-
-## Notes
-
-- Prefer deleting duplicates instead of live pages
-- If you need to remove a live page, do it in WordPress Admin unless you fully understand the risk
-
-

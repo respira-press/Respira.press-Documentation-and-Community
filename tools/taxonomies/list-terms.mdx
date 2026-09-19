@@ -9,12 +9,27 @@ List terms in a taxonomy.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| taxonomy | string | Yes | Taxonomy name |
-| search | string | No | Search term |
-| page | number | No | Page number |
-| perPage | number | No | Items per page |
+4 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `taxonomy` | string | yes | Taxonomy name |
+| `search` | string | no | Search term |
+| `page` | number | no | Page number |
+| `per_page` | number | no | Items per page |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_list_terms",
+  "arguments": {
+    "taxonomy": "value"
+  }
+}
+```
 
 ## Response
 
@@ -32,6 +47,24 @@ List terms in a taxonomy.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+
+## How long it takes
+
+A typical call takes about 1.5 seconds. 19 in 20 finish within 2.9 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "List terms in category"
@@ -41,5 +74,3 @@ List terms in a taxonomy.
 
 - [wordpress_get_term](/tools/taxonomies/get-term)
 - [wordpress_create_term](/tools/taxonomies/create-term)
-
-

@@ -9,19 +9,35 @@ Create a new menu item. Can link to pages, posts, custom URLs, or categories.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| menu_id | number | Yes | Menu ID |
-| title | string | Yes | Menu item title |
-| url | string | No | Custom URL (for custom links) |
-| object_type | string | No | Object type: \"post\", \"page\", \"category\", \"custom\", etc. |
-| object_id | number | No | ID of the linked object (post ID, page ID, etc.) |
-| parent | number | No | Parent menu item ID for nested items |
-| position | number | No | Position in menu (1-based) |
-| target | string | No | Link target (\"_blank\" for new window) |
-| classes | string | No | CSS classes (space-separated) |
-| attr_title | string | No | Title attribute (tooltip) |
-| description | string | No | Item description |
+11 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `menu_id` | number | yes | Menu ID |
+| `title` | string | yes | Menu item title |
+| `url` | string | no | Custom URL (for custom links) |
+| `object_type` | string | no | Object type: "post", "page", "category", "custom", etc. |
+| `object_id` | number | no | ID of the linked object (post ID, page ID, etc.) |
+| `parent` | number | no | Parent menu item ID for nested items |
+| `position` | number | no | Position in menu (1-based) |
+| `target` | string | no | Link target ("_blank" for new window) |
+| `classes` | string | no | CSS classes (space-separated) |
+| `attr_title` | string | no | Title attribute (tooltip) |
+| `description` | string | no | Item description |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_create_menu_item",
+  "arguments": {
+    "menu_id": 123,
+    "title": "Example title"
+  }
+}
+```
 
 ## Response
 
@@ -33,6 +49,18 @@ Create a new menu item. Can link to pages, posts, custom URLs, or categories.
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## How long it takes
+
+A typical call takes about 1.9 seconds. 19 in 20 finish within 3.4 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Add a 'Contact' link to my primary menu pointing to /contact"
@@ -43,5 +71,3 @@ Create a new menu item. Can link to pages, posts, custom URLs, or categories.
 
 - [wordpress_list_menu_items](/tools/menus/list-menu-items)
 - [wordpress_update_menu_item](/tools/menus/update-menu-item)
-
-

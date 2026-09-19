@@ -9,9 +9,24 @@ List all items in a menu with their hierarchy.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| menu_id | number | Yes | Menu ID |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `menu_id` | number | yes | Menu ID |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_list_menu_items",
+  "arguments": {
+    "menu_id": 123
+  }
+}
+```
 
 ## Response
 
@@ -31,6 +46,24 @@ List all items in a menu with their hierarchy.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 1.3 seconds. 19 in 20 finish within 2.7 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "List menu items for menu 10"
@@ -40,5 +73,3 @@ List all items in a menu with their hierarchy.
 
 - [wordpress_create_menu_item](/tools/menus/create-menu-item)
 - [wordpress_update_menu_item](/tools/menus/update-menu-item)
-
-

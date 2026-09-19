@@ -9,14 +9,30 @@ Upload a media file (image, document, video) to WordPress. Supports base64 encod
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| file | string | Yes | File content as base64 string, file URL to download, or file path |
-| filename | string | Yes | Filename for the uploaded file |
-| mimeType | string | No | MIME type (e.g., image/jpeg, image/png, application/pdf) |
-| title | string | No | Optional title for the media item |
-| alt | string | No | Optional alt text for images |
-| caption | string | No | Optional caption for the media item |
+6 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `file` | string | yes | File content as base64 string, file URL to download, or file path |
+| `filename` | string | yes | Filename for the uploaded file |
+| `mime_type` | string | no | MIME type of the file (e.g., image/jpeg, image/png, application/pdf) |
+| `title` | string | no | Optional title for the media item |
+| `alt` | string | no | Optional alt text for images |
+| `caption` | string | no | Optional caption for the media item |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_upload_media",
+  "arguments": {
+    "file": "value",
+    "filename": "Example title"
+  }
+}
+```
 
 ## Response
 
@@ -28,6 +44,32 @@ Upload a media file (image, document, video) to WordPress. Supports base64 encod
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `upload_error`: WordPress could not save the uploaded file. Check the file type is allowed on the site and that the uploads folder is writable.
+- `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+- `respira_rate_limit_exceeded`: The site reached its hourly limit of calls for this key. Reads count too. Wait, or raise the limit in WP admin under Respira, Settings, Rate limit.
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 5.3 seconds. 19 in 20 finish within 15.8 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Always provide a descriptive `alt` text for images (accessibility + SEO)
+- Use `mimeType` when uploading from base64 or a file path to avoid mis-detection
+
 ## Example Prompts
 
 - "Upload this image and set the alt text to 'Respira logo'"
@@ -38,10 +80,3 @@ Upload a media file (image, document, video) to WordPress. Supports base64 encod
 
 - [wordpress_update_media](/tools/media/update-media)
 - [wordpress_delete_media](/tools/media/delete-media)
-
-## Notes
-
-- Always provide a descriptive `alt` text for images (accessibility + SEO)
-- Use `mimeType` when uploading from base64 or a file path to avoid mis-detection
-
-

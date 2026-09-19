@@ -9,10 +9,25 @@ Create a duplicate of an existing post for safe editing. After creating a duplic
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| originalId | number | Yes | Original post ID |
-| suffix | string | No | Optional suffix |
+4 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `original_id` | number | no | Original post ID |
+| `post_id` | number | no | Alias for original_id, matching tools that operate on any post type |
+| `page_id` | number | no | Alias for original_id, matching the builder page tools |
+| `suffix` | string | no | Optional suffix |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_create_post_duplicate",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -26,6 +41,18 @@ Create a duplicate of an existing post for safe editing. After creating a duplic
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## How long it takes
+
+A typical call takes about 3.0 seconds. 19 in 20 finish within 4.6 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Duplicate post 101"
@@ -35,5 +62,3 @@ Create a duplicate of an existing post for safe editing. After creating a duplic
 
 - [wordpress_update_post](/tools/posts/update-post)
 - [wordpress_delete_post](/tools/posts/delete-post)
-
-

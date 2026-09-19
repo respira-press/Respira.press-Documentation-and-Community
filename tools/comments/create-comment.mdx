@@ -9,14 +9,32 @@ Create a new comment.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| post_id | number | Yes | Post ID |
-| author | string | Yes | Author name |
-| author_email | string | Yes | Author email |
-| content | string | Yes | Comment content |
-| parent | number | No | Parent comment ID (for replies) |
-| status | number | No | Comment status (1=approved, 0=hold) |
+6 parameters, 4 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `post_id` | number | yes | Post ID |
+| `author` | string | yes | Author name |
+| `author_email` | string | yes | Author email |
+| `content` | string | yes | Comment content |
+| `parent` | number | no | Parent comment ID (for replies) |
+| `status` | number | no | Comment status (1=approved, 0=hold) |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_create_comment",
+  "arguments": {
+    "post_id": 123,
+    "author": "value",
+    "author_email": "value",
+    "content": "Hello from Respira."
+  }
+}
+```
 
 ## Response
 
@@ -28,6 +46,14 @@ Create a new comment.
 }
 ```
 
+## What it changes
+
+It writes to the site. It is not covered by a snapshot, so check the arguments before calling it. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Add a comment to post 101 from Jane saying 'Great post!'"
@@ -37,5 +63,3 @@ Create a new comment.
 
 - [wordpress_update_comment](/tools/comments/update-comment)
 - [wordpress_delete_comment](/tools/comments/delete-comment)
-
-

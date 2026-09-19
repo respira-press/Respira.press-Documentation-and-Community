@@ -9,10 +9,25 @@ Create a new navigation menu.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | Yes | Menu name |
-| description | string | No | Menu description |
+2 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `name` | string | yes | Menu name |
+| `description` | string | no | Menu description |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_create_menu",
+  "arguments": {
+    "name": "Example title"
+  }
+}
+```
 
 ## Response
 
@@ -24,6 +39,22 @@ Create a new navigation menu.
 }
 ```
 
+## What it changes
+
+It writes to the site. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## How long it takes
+
+A typical call takes about 2.1 seconds. 19 in 20 finish within 4.5 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Next Steps
+
+After creating a menu, add items with [wordpress_create_menu_item](/tools/menus/create-menu-item), then assign it to a location with [wordpress_assign_menu_location](/tools/menus/assign-menu-location).
+
 ## Example Prompts
 
 - "Create a new menu called 'Footer Menu'"
@@ -33,7 +64,3 @@ Create a new navigation menu.
 
 - [wordpress_update_menu](/tools/menus/update-menu) - Rename or modify menu settings
 - [wordpress_assign_menu_location](/tools/menus/assign-menu-location) - Assign menu to a theme location
-
-## Next Steps
-
-After creating a menu, add items with [wordpress_create_menu_item](/tools/menus/create-menu-item), then assign it to a location with [wordpress_assign_menu_location](/tools/menus/assign-menu-location).

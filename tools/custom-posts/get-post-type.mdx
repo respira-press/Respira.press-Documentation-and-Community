@@ -9,9 +9,24 @@ Get post type details.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| type | string | Yes | Post type name |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `type` | string | yes | Post type name |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_get_post_type",
+  "arguments": {
+    "type": "value"
+  }
+}
+```
 
 ## Response
 
@@ -24,6 +39,20 @@ Get post type details.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_post_type_not_found`: That post type is not registered on the site. Call `wordpress_list_post_types` to see the ones that are.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Get post type details for 'product'"
@@ -33,5 +62,3 @@ Get post type details.
 
 - [wordpress_list_post_types](/tools/custom-posts/list-post-types)
 - [wordpress_list_custom_posts](/tools/custom-posts/list-custom-posts)
-
-

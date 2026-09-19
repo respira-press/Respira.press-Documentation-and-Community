@@ -9,13 +9,29 @@ List posts of a custom post type.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| type | string | Yes | Post type name |
-| status | string | No | Post status |
-| search | string | No | Search term |
-| page | number | No | Page number |
-| perPage | number | No | Items per page |
+6 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `type` | string | yes | Post type name |
+| `status` | string | no | Post status |
+| `search` | string | no | Search term |
+| `page` | number | no | Page number |
+| `per_page` | number | no | Items per page |
+| `include` | string | no | Optional v2 include CSV |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_list_custom_posts",
+  "arguments": {
+    "type": "value"
+  }
+}
+```
 
 ## Response
 
@@ -33,6 +49,26 @@ List posts of a custom post type.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_post_type_not_found`: That post type is not registered on the site. Call `wordpress_list_post_types` to see the ones that are.
+- `respira_unknown_include`: The `include` parameter asked for a part this tool does not return. The error lists the supported values. Use those.
+- `respira_scope_denied`: The connection is read-only, and this call would write. Use a connection with write access, or switch the site out of read-only in Respira settings.
+
+## How long it takes
+
+A typical call takes about 1.7 seconds. 19 in 20 finish within 4.0 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "List products"
@@ -43,5 +79,3 @@ List posts of a custom post type.
 
 - [wordpress_get_custom_post](/tools/custom-posts/get-custom-post)
 - [wordpress_create_custom_post](/tools/custom-posts/create-custom-post)
-
-

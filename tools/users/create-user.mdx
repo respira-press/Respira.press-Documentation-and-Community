@@ -9,12 +9,30 @@ Create a new user.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| username | string | Yes | Username |
-| email | string | Yes | Email address |
-| password | string | Yes | Password |
-| role | string | No | User role (default: subscriber) |
+5 parameters, 3 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `username` | string | yes | Username |
+| `email` | string | yes | Email address |
+| `password` | string | yes | Password |
+| `role` | string | no | User role (default: subscriber) |
+| `approval_token` | string | no | Single-use approval token from a prior respira_approval_required response. The plugin returns a fresh token on every blocked call (data.approval_request.approval_token); pass that exact string here on the retry to complete the create. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_create_user",
+  "arguments": {
+    "username": "Example title",
+    "email": "value",
+    "password": "value"
+  }
+}
+```
 
 ## Response
 
@@ -26,6 +44,18 @@ Create a new user.
 }
 ```
 
+## What it changes
+
+It writes to the site. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice does the work twice. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Use strong passwords and least-privilege roles
+
 ## Example Prompts
 
 - "Create a new user for john@example.com"
@@ -35,9 +65,3 @@ Create a new user.
 
 - [wordpress_update_user](/tools/users/update-user)
 - [wordpress_delete_user](/tools/users/delete-user)
-
-## Notes
-
-- Use strong passwords and least-privilege roles
-
-

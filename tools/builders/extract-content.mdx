@@ -9,10 +9,25 @@ Extract structured content from a page builder (Divi, Elementor, etc.).
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| builder | string | Yes | Builder name (gutenberg, divi, elementor, etc.) |
-| pageId | number | Yes | Page ID |
+2 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `page_id` | number | yes | Page or post ID (works with any post type, including custom post types) |
+| `builder` | string | no | Optional. Builder name. Use exactly: gutenberg, divi, elementor, bricks, beaver, oxygen, breakdance, brizy, thrive, visual-composer, wpbakery, flatsome, spectra, kadence, generateblocks, greenshift. Omit to auto-detect the active site builder. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_extract_builder_content",
+  "arguments": {
+    "page_id": 123
+  }
+}
+```
 
 ## Response
 
@@ -45,6 +60,29 @@ Extract structured content from a page builder (Divi, Elementor, etc.).
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+
+## How long it takes
+
+A typical call takes about 1.8 seconds. 19 in 20 finish within 5.4 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works with Gutenberg, Elementor, Divi, Bricks, Oxygen, Beaver Builder, Breakdance, Flatsome, Brizy, Visual Composer, WPBakery, Thrive Architect, Spectra, Kadence Blocks, GenerateBlocks, GreenShift, SeedProd. Available since Respira 1.0.0.
+
+## Notes
+
+- Read-only tool - doesn’t modify content
+- Use this before updating modules by `path` or `type`
+
 ## Example Prompts
 
 - "Show me the structure of the homepage"
@@ -55,10 +93,3 @@ Extract structured content from a page builder (Divi, Elementor, etc.).
 
 - [wordpress_update_module](/tools/builders/update-module) - Update a specific module
 - [wordpress_inject_builder_content](/tools/builders/inject-content) - Replace the builder structure
-
-## Notes
-
-- Read-only tool - doesn’t modify content
-- Use this before updating modules by `path` or `type`
-
-

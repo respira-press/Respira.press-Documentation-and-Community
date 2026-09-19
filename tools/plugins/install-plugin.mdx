@@ -9,10 +9,26 @@ EXPERIMENTAL: Install a plugin from WordPress.org or a ZIP URL. Requires plugin 
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| slugOrUrl | string | Yes | Plugin slug (from WordPress.org) or ZIP file URL |
-| source | string | No | Source type: \"wordpress.org\" or \"url\" |
+3 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `slug_or_url` | string | yes | Plugin slug (from WordPress.org) or ZIP file URL |
+| `source` | string | no | Source type: "wordpress.org" or "url" One of: `wordpress.org`, `url`. |
+| `approval_token` | string | no | Second-step approval token returned by the first call. Echo it back unchanged to complete the install. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_install_plugin",
+  "arguments": {
+    "slug_or_url": "https://example.com/"
+  }
+}
+```
 
 ## Response
 
@@ -24,6 +40,29 @@ EXPERIMENTAL: Install a plugin from WordPress.org or a ZIP URL. Requires plugin 
 }
 ```
 
+## What it changes
+
+It writes to the site. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_mcp_approval_required`: The tool is set to need a person's approval before it runs. Approve it in the AI app or in wp-admin, then call again. This is a safety setting doing its job, not a fault.
+
+## How long it takes
+
+A typical call takes about 3.4 seconds. 19 in 20 finish within 9.3 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Experimental: enable plugin management in Respira settings first
+- Always verify plugin source before installing
+
 ## Example Prompts
 
 - "Install Yoast SEO"
@@ -33,10 +72,3 @@ EXPERIMENTAL: Install a plugin from WordPress.org or a ZIP URL. Requires plugin 
 
 - [wordpress_activate_plugin](/tools/plugins/activate-plugin)
 - [wordpress_delete_plugin](/tools/plugins/delete-plugin)
-
-## Notes
-
-- Experimental: enable plugin management in Respira settings first
-- Always verify plugin source before installing
-
-

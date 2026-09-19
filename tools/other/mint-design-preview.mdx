@@ -17,9 +17,23 @@ This link lasts **15 minutes** and is meant for you, inside Respira: the respira
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| post_id | number | No | ID of the page or post. Drafts, pending posts, scheduled posts and Respira duplicates are allowed. Omit it for the front page. |
+2 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `post_id` | number | no | Optional post/page id; omit for the front page. Drafts and Respira duplicates are allowed. |
+| `ttl_days` | number | no | Optional lifetime in days, 1 to 90. Set it when a person will open the link; leave it out for the dashboard frame. |
+
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_mint_design_preview",
+  "arguments": {}
+}
+```
 
 ## Response
 
@@ -30,6 +44,24 @@ This link lasts **15 minutes** and is meant for you, inside Respira: the respira
   "expires_at": "2026-09-10T18:08:16+00:00"
 }
 ```
+
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 1.2 seconds. 19 in 20 finish within 2.7 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 8.6.15.
 
 ## What the link does
 
@@ -49,14 +81,14 @@ For 15 minutes, a request that carries the link's `respira_preview` token:
 
 Nothing is stored when a link is minted. The token is signed with your site's own secret and checked on every request.
 
-## Example Prompts
-
-- "Show me a preview of the draft you just made"
-- "Mint a preview link for page 57"
-- "Open the homepage preview in the AER browser"
-
 ## Related
 
 - [Share preview links](/docs/share-preview-links): the 14-day link to send to people without a login
 - [Duplicate-Before-Edit Workflow](/docs/duplicate-before-edit-workflow)
 - [wordpress_create_page_duplicate](/docs/tools/pages/create-duplicate)
+
+## Example Prompts
+
+- "Show me a preview of the draft you just made"
+- "Mint a preview link for page 57"
+- "Open the homepage preview in the AER browser"

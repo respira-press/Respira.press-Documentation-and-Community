@@ -9,10 +9,28 @@ Update an option value.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| option | string | Yes | Option name |
-| value | string | Yes | Option value |
+4 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `option` | string | yes | Option name |
+| `value` | any | yes | Option value, in the type get_option returns for this option. Text stays text (JSON-encode it if needed). Objects or arrays only for options that already hold them, such as theme_mods. |
+| `allow_type_change` | boolean | no | Set true only to really replace an option that holds text with an object or array. Without it that write is refused, because a plugin that decodes its own text option can crash on every page load. |
+| `allow_object_overwrite` | boolean | no | Set true only to replace an option that stores a PHP object, and only when the new value keeps the same shape. Without it that write is refused. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_update_option",
+  "arguments": {
+    "option": "value",
+    "value": "value"
+  }
+}
+```
 
 ## Response
 
@@ -24,6 +42,28 @@ Update an option value.
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+
+## How long it takes
+
+A typical call takes about 2.2 seconds. 19 in 20 finish within 4.6 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Options can affect site behavior; prefer making changes on staging first
+
 ## Example Prompts
 
 - "Update the blogname option to 'Respira Demo Site'"
@@ -33,9 +73,3 @@ Update an option value.
 
 - [wordpress_get_option](/tools/options/get-option)
 - [wordpress_delete_option](/tools/options/delete-option)
-
-## Notes
-
-- Options can affect site behavior; prefer making changes on staging first
-
-

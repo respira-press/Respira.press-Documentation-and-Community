@@ -9,9 +9,24 @@ Get taxonomy details.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| taxonomy | string | Yes | Taxonomy name |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `taxonomy` | string | yes | Taxonomy name |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_get_taxonomy",
+  "arguments": {
+    "taxonomy": "value"
+  }
+}
+```
 
 ## Response
 
@@ -26,6 +41,14 @@ Get taxonomy details.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Get taxonomy details for 'category'"
@@ -35,5 +58,3 @@ Get taxonomy details.
 
 - [wordpress_list_terms](/tools/taxonomies/list-terms)
 - [wordpress_create_term](/tools/taxonomies/create-term)
-
-

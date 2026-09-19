@@ -11,6 +11,17 @@ EXPERIMENTAL: List all installed plugins with their status, version, and update 
 
 This tool takes no parameters.
 
+## Example call
+
+No parameter is required, so the smallest valid call is empty:
+
+```json
+{
+  "name": "wordpress_list_plugins",
+  "arguments": {}
+}
+```
+
 ## Response
 
 ```json
@@ -28,6 +39,29 @@ This tool takes no parameters.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+- `respira_invalid_site_token`: The site rejected the token. It was revoked, or the site was reconnected since. Reconnect the site from the Respira dashboard.
+
+## How long it takes
+
+A typical call takes about 1.6 seconds. 19 in 20 finish within 3.7 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Experimental: enable plugin management in Respira settings first
+
 ## Example Prompts
 
 - "List installed plugins"
@@ -37,9 +71,3 @@ This tool takes no parameters.
 
 - [wordpress_update_plugin](/tools/plugins/update-plugin)
 - [wordpress_activate_plugin](/tools/plugins/activate-plugin)
-
-## Notes
-
-- Experimental: enable plugin management in Respira settings first
-
-

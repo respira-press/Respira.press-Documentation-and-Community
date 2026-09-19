@@ -9,10 +9,29 @@ Delete a custom post.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| type | string | Yes | Post type name |
-| id | number | Yes | Post ID |
+5 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `type` | string | yes | Post type name |
+| `id` | number | yes | Post ID |
+| `force` | boolean | no | Force delete even if the post is an original (not a Respira-created duplicate). Requires confirm_live_edit=true as well. |
+| `confirm_live_edit` | boolean | no | Operator confirmation that a live-edit on an original is intended. Required alongside force=true. The "Allow Direct Editing" setting in Respira must also be enabled. |
+| `approval_token` | string | no | Single-use approval token from a prior respira_approval_required response. Pass the token from data.approval_request.approval_token to complete the delete. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_delete_custom_post",
+  "arguments": {
+    "type": "value",
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -25,6 +44,25 @@ Delete a custom post.
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `respira_direct_edit_disabled`: The site only allows edits on a copy, never on the original page. Create a duplicate with `wordpress_create_page_duplicate` and edit that. A person approves it in wp-admin.
+- `respira_not_duplicate`: The page is not a Respira copy, so there is nothing to approve, reject or detach. Check the ID. Copies are listed with their original in `wordpress_list_pages`.
+
+## How long it takes
+
+A typical call takes about 2.2 seconds. 19 in 20 finish within 5.0 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
 ## Example Prompts
 
 - "Delete product 3001"
@@ -34,5 +72,3 @@ Delete a custom post.
 
 - [wordpress_list_custom_posts](/tools/custom-posts/list-custom-posts)
 - [wordpress_update_custom_post](/tools/custom-posts/update-custom-post)
-
-

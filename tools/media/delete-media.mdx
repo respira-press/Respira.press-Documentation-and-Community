@@ -9,9 +9,26 @@ Delete a media file.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | number | Yes | Media ID |
+3 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | number | yes | Media ID |
+| `approval_token` | string | no | Approval token returned by the first call. Send the exact token verbatim on the second call to confirm the deletion. Tokens are single-use, tied to the &#123;action, media_id&#125; pair, and expire after 5 minutes. |
+| `force` | boolean | no | When true, bypasses Trash and permanently deletes the file (and any sibling thumbnails). Defaults to false. The WP default is to move the attachment to Trash; pass force=true to remove the underlying file too. |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_delete_media",
+  "arguments": {
+    "id": 123
+  }
+}
+```
 
 ## Response
 
@@ -23,6 +40,28 @@ Delete a media file.
 }
 ```
 
+## What it changes
+
+It removes or overwrites something on the site, so treat it as the careful kind of call. Respira takes a snapshot before the write, and the change can be undone from that snapshot for 90 days. On a page or post the edit lands on a copy first. The live page changes only when a person approves the copy in wp-admin. Calling it twice with the same arguments leaves the site in the same state as calling it once. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 2.0 seconds. 19 in 20 finish within 4.6 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Deleting media may break pages that reference it; check usage before removing
+
 ## Example Prompts
 
 - "Delete media 501"
@@ -32,9 +71,3 @@ Delete a media file.
 
 - [wordpress_list_media](/tools/media/list-media)
 - [wordpress_get_media](/tools/media/get-media)
-
-## Notes
-
-- Deleting media may break pages that reference it; check usage before removing
-
-

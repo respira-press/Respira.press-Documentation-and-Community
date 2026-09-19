@@ -9,9 +9,24 @@ Check for common SEO issues and get quick recommendations.
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| pageId | number | Yes | WordPress page ID to analyze |
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `page_id` | number | yes | Page ID to analyze |
+
+## Example call
+
+The smallest valid call, with the required parameters only:
+
+```json
+{
+  "name": "wordpress_check_seo_issues",
+  "arguments": {
+    "page_id": 123
+  }
+}
+```
 
 ## Response
 
@@ -32,6 +47,29 @@ Check for common SEO issues and get quick recommendations.
 }
 ```
 
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+The failures seen most often on real sites in the last 30 days, most common first:
+
+- `rest_no_route`: The WordPress site has no such endpoint. Almost always an old plugin version, or a security plugin blocking the REST API. Update Respira for WordPress on the site and try again.
+
+## How long it takes
+
+A typical call takes about 1.8 seconds. 19 in 20 finish within 3.4 seconds. Measured on real sites over the last week, so it includes the site's own hosting.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. Available since Respira 1.0.0.
+
+## Notes
+
+- Read-only tool - doesn’t modify content
+- Use `wordpress_analyze_seo` when you need full metrics and scoring
+
 ## Example Prompts
 
 - "Check SEO issues on my homepage"
@@ -42,10 +80,3 @@ Check for common SEO issues and get quick recommendations.
 
 - [wordpress_analyze_seo](/tools/analysis/analyze-seo) - Full SEO analysis
 - [wordpress_analyze_readability](/tools/analysis/analyze-readability) - Improve clarity and structure
-
-## Notes
-
-- Read-only tool - doesn’t modify content
-- Use `wordpress_analyze_seo` when you need full metrics and scoring
-
-
