@@ -1,0 +1,68 @@
+---
+title: "respira_list_skills"
+description: "List the site's own skills: standing instructions its owner wrote for agents working here, with name, description, enabled, source and updated. Bodies come from respira_get_skill."
+---
+
+# respira_list_skills
+
+List this site's own skills: standing instructions its owner (or a past session, at the owner's request) wrote for agents working here. Returns name, description, enabled, source and updated for each; bodies come from `respira_get_skill`. The enabled ones also arrive in `respira_get_site_context` under `site_skills`, so call this when you need the disabled ones or a fresh list.
+
+## Parameters
+
+1 parameter, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `enabled_only` | boolean | no | Only skills that are switched on. |
+
+## Example call
+
+```json
+{
+  "name": "respira_list_skills",
+  "arguments": {}
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "skills": [
+    {
+      "name": "blog-post-format",
+      "title": "Blog post format",
+      "description": "How a post on this site is structured: intro, three sections, a summary box.",
+      "enabled": true,
+      "source": "owner",
+      "updated": "2026-09-25T14:10:00+00:00"
+    }
+  ]
+}
+```
+
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## Availability
+
+Plugin 9.1.0 and MCP server 8.4.0. On the site's own MCP endpoint the tool is `respira_wordpress_list_skills`; over REST it is `GET /respira/v1/skills`.
+
+## Notes
+
+- A draft skill is listed but stays out of the site context until it is published
+- Skills are edited by the owner under Respira > AI Skills in wp-admin
+
+## Example Prompts
+
+- "What skills does this site have?"
+- "List the disabled skills too"
+
+## Related Tools
+
+- [respira_get_skill](/tools/context/get-skill)
+- [respira_write_skill](/tools/context/write-skill)
+- [respira_delete_skill](/tools/context/delete-skill)
+- [Site Skills](/site-skills)

@@ -1,0 +1,83 @@
+---
+title: "respira_delete_skill"
+description: "Move a site skill to the trash. Approval-gated: a person confirms before it runs, and the owner can restore it from Respira > AI Skills."
+---
+
+# respira_delete_skill
+
+Move a site skill to the trash. Approval-gated: the first call returns `code: respira_approval_required` with `data.approval_request.approval_token` and deletes nothing; a person confirms, and the retry passes that exact token in `approval_token`. The token is for the person, not for the agent: show them the predicted effect, ask, and send it back only after they say yes. The site owner can restore a trashed skill from Respira > AI Skills in wp-admin. A skill marked as not editable by agents refuses this call.
+
+## Parameters
+
+2 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `name` | string | yes | Skill name from `respira_list_skills`. |
+| `approval_token` | string | no | Approval token from a prior `respira_approval_required` response. Omit on the first call; re-call with this parameter set to that exact token to confirm. The token is bound to this tool and expires after 10 minutes. |
+
+## Example call
+
+```json
+{
+  "name": "respira_delete_skill",
+  "arguments": {
+    "name": "case-study-format"
+  }
+}
+```
+
+## Response
+
+The first call:
+
+```json
+{
+  "code": "respira_approval_required",
+  "message": "Deleting the skill case-study-format needs a person's approval.",
+  "data": { "approval_request": { "approval_token": "…", "expires_in": 600 } }
+}
+```
+
+The retry with the token:
+
+```json
+{
+  "success": true,
+  "skill": {
+    "name": "case-study-format",
+    "title": "Case study format",
+    "enabled": false,
+    "source": "agent",
+    "updated": "2026-09-27T11:40:00+00:00"
+  }
+}
+```
+
+## What it changes
+
+It moves the skill to the trash, where the owner can restore it. Nothing on the public site changes. Approval-gated like deleting a page. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+- `respira_approval_required`: the expected first answer. Approve, then call again with the token.
+- The skill is marked as not editable by agents: refused, with a sentence telling the agent that only the site owner can change it from Respira > AI Skills.
+
+## Availability
+
+Plugin 9.1.0 and MCP server 8.4.0. On the site's own MCP endpoint the tool is `respira_wordpress_delete_skill`; over REST it is `DELETE /respira/v1/skills/{name}`.
+
+## Notes
+
+- Prefer switching a skill off (`respira_write_skill` with `enabled: false`) when the instructions may come back
+
+## Example Prompts
+
+- "Delete the case-study-format skill"
+- "Remove the old newsletter skill from this site"
+
+## Related Tools
+
+- [respira_list_skills](/tools/context/list-skills)
+- [respira_write_skill](/tools/context/write-skill)
+- [Site Skills](/site-skills)

@@ -1,0 +1,71 @@
+---
+title: Site Skills
+description: A site keeps its own instructions for AI agents. Short Markdown pages under Respira > AI Skills in wp-admin, read by every agent through the site context, written by agents only when asked, with revisions and an "agents may edit" switch.
+---
+
+## What a skill is
+
+A skill is a short Markdown page the site owner writes for every agent that works on this site: how a blog post is formatted here, what a case study needs, which pages carry legal copy. It has a title, a one-line description saying when an agent should open it, a body in Markdown, an on/off switch and an "agents may edit" switch.
+
+Respira keeps three stores side by side, and a skill is the third:
+
+| Store | What it holds | Shape |
+|---|---|---|
+| Site Memory | Short notes and enforced rules | Facts, not procedures |
+| Playbooks | Typed workflows that run on the site as abilities | JSON, executed |
+| Site Skills | Longer, human-readable instructions an agent reads before a task | Markdown, read |
+
+A skill's body is information about the site. It is never an instruction to Respira's tools and never authorization: anything it asks for still needs the user to have asked. Nothing executes a body. Plugin 9.1.0 or later.
+
+## Respira > AI Skills in wp-admin
+
+Skills are edited where posts are edited. Respira > AI Skills opens the standard post editor: the body is a plain Markdown box (the block editor is switched off for skills), the Excerpt box is named Description, and a sidebar box holds the two switches, the skill's name and who last wrote it.
+
+- Every save is a revision. Ten are kept, and any of them can be restored from the standard revisions screen; the sidebar links to it, and a restore says so.
+- A skill gets its name from the title on the first save, draft included, made unique across every skill. A draft is listed but stays out of the site context until it is published.
+- A deleted skill goes to the trash and can be restored from there.
+
+## How skills reach every session
+
+`respira_get_site_context` carries a `site_skills` block next to `site_memory`: the enabled skills' names and descriptions, and one paragraph telling the agent to read a matching skill before the task. Bodies never ride along, so the block stays small; they come from `respira_get_skill` on demand. The compact projection of the site context (`detail: basic`, the default) keeps the block too.
+
+So a session does not have to be told the skills exist. The agent sees "blog-post-format: how a post on this site is structured" in the context, and when the task is a blog post it opens that skill first.
+
+## The four tools
+
+| Tool | What it does |
+|---|---|
+| [respira_list_skills](/tools/context/list-skills) | Every skill with name, description, enabled, source and updated. Bodies are not included. |
+| [respira_get_skill](/tools/context/get-skill) | One skill in full: body, title, description and switches. |
+| [respira_write_skill](/tools/context/write-skill) | Create or update a skill by name. Only when the user asks for something to be kept for future sessions, the same rule as `respira_remember`. Refused on a skill marked as not editable by agents. Re-using a name updates the skill and keeps the previous version as a revision. |
+| [respira_delete_skill](/tools/context/delete-skill) | Move a skill to the trash. Approval-gated, like deleting a page. |
+
+The same four are on the site's own MCP endpoint and under `/respira/v1/skills` over REST.
+
+## The "agents may edit" switch
+
+Each skill has a switch, on by default when the owner creates one, that says whether agents may change it later. With it off, `respira_write_skill` and `respira_delete_skill` refuse the call; the write answers `respira_skill_not_agent_editable` and a sentence telling the agent that only the site owner can change it, from Respira > AI Skills, and not to work around it. The owner flips it in the sidebar box. An agent writing a new skill can set `agent_editable: false` on it, but cannot turn the switch back on for a skill the owner locked.
+
+## What your AI is told
+
+A new screen under Respira, What your AI is told, shows in order everything an agent receives from this site:
+
+1. The connection instructions the site's MCP endpoint sends, read from the same method the endpoint calls, with a note about what the npm server adds.
+2. Site Memory, with each note's source.
+3. The skills, with a link to edit each one.
+4. The playbooks.
+5. The active design direction.
+
+It is read-only. Every section says where the change is made.
+
+## Example prompts
+
+- "Keep this for future sessions: a case study on this site has a client quote, a results box and a related-services footer."
+- "What skills does this site have?"
+- "Read the blog-post-format skill before you write the post."
+
+## Related pages
+
+- [Playbooks](/playbooks)
+- [wordpress_get_site_context](/tools/context/get-site-context)
+- [Safety Philosophy](/safety-philosophy)
