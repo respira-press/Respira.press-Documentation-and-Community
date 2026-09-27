@@ -1,0 +1,72 @@
+---
+title: "respira_check_guarded_update"
+description: "Everything the guarded plugin update checks before it writes, as a read: the offer, whether a rollback is possible, requirements, permission and governance, the site's backup plugin and tier, and whether the site answers."
+---
+
+# respira_check_guarded_update
+
+Everything `respira_guarded_plugin_update` checks before it writes, as a read: the offer for the plugin, whether its previous version is archived on wordpress.org (a premium plugin is not), PHP and WordPress requirements of the new version, permission and governance, the backup plugin the site has and its tier (backup and verify, trigger and watch, detect and warn, none) with when it last ran, and whether the site answers now. Use it to say why an update is possible or not before offering it.
+
+## Parameters
+
+3 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `slug` | string | yes | Plugin folder. |
+| `target_version` | string | no | The version that closes the advisory; the offer must reach it. |
+| `expect_version` | string | no | The exact offer seen earlier; refused when it changed. |
+
+## Example call
+
+```json
+{
+  "name": "respira_wordpress_check_guarded_update",
+  "arguments": {
+    "slug": "advanced-custom-fields"
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "ok": true,
+  "checks": [
+    { "id": "rollback", "ok": true, "label": "Rollback possible", "detail": "advanced-custom-fields 6.8.9 is archived on wordpress.org" },
+    { "id": "reachable", "ok": true, "label": "Site answers", "detail": "REST 200, front 200" }
+  ],
+  "refusals": [],
+  "plugin": { "slug": "advanced-custom-fields", "name": "Advanced Custom Fields", "from": "6.8.9", "to": "6.8.10" },
+  "rollback": { "available": true, "url": "https://downloads.wordpress.org/plugin/advanced-custom-fields.6.8.9.zip", "status": 200 },
+  "restore_point": { "tier": "backup_and_verify", "provider": "duplicator", "name": "Duplicator", "drivable": true, "last_backup_at": "2026-09-26T18:02:11+00:00" },
+  "site": { "verdict": "healthy", "summary": "REST 200, front 200" }
+}
+```
+
+When `ok` is false, `refusals` holds one entry per reason, with a code and a sentence.
+
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo. It does make requests: a check of the archive on wordpress.org and a fetch of the site's own pages from its server.
+
+## Availability
+
+Plugin 9.1.0. On the site's own MCP endpoint, where the tool is `respira_wordpress_check_guarded_update`. Not on the npm MCP server in 8.4.0.
+
+## Notes
+
+- The dashboard's security page runs this before it enables the update button, so the line under the button can say what the site allows
+- The `/security` and `/backups` cards in Respira AER read the `restore_point` block from it
+
+## Example Prompts
+
+- "Could you update this plugin safely? What restore point does the site have?"
+- "Check whether a rollback is possible for Advanced Custom Fields"
+
+## Related Tools
+
+- [respira_guarded_plugin_update](/tools/plugins/guarded-plugin-update)
+- [respira_get_guarded_update](/tools/plugins/get-guarded-update)
+- [respira_take_backup](/tools/plugins/take-backup)

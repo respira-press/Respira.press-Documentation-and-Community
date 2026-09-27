@@ -1,0 +1,84 @@
+---
+title: "respira_take_backup"
+description: "Take a backup of the site through its own backup plugin, with no update afterwards: the guarded update's restore point step as a standalone call, for the backups card in Respira AER."
+---
+
+# respira_take_backup
+
+Take a backup of this site through its own backup plugin, on its own, with no update afterwards: the same path the guarded update uses for its restore point. With Duplicator or BackWPup it starts a backup through their abilities and polls until it reports finished, up to ten minutes; with UpdraftPlus it fires the action its own command line fires and reads the record it writes when the backup ends. With any other backup plugin, or none, it refuses and says what to do instead. Returns a receipt: the provider and its tier, the id or file the provider named, how long it took, and one plain sentence.
+
+## Parameters
+
+3 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `run_id` | string | no | An id of 8 to 64 letters, digits and dashes you choose, so progress can be read with `respira_get_guarded_update` while the backup is queued. |
+| `reason` | string | no | Why the backup is taken, recorded with it where the provider keeps a note (Duplicator). Up to 200 characters. |
+| `approval_token` | string | no | Approval token from the first call's `respira_approval_required` answer. |
+
+Send `_respira_async: true` as well: the run is queued and the answer carries a `job_id`.
+
+## Example call
+
+```json
+{
+  "name": "respira_wordpress_take_backup",
+  "arguments": {
+    "run_id": "bk-7d2e9f10",
+    "reason": "Before the redesign of the pricing page",
+    "_respira_async": true
+  }
+}
+```
+
+## Response
+
+The receipt, once the run has finished:
+
+```json
+{
+  "run_id": "bk-7d2e9f10",
+  "kind": "backup",
+  "outcome": "finished",
+  "success": true,
+  "provider": { "slug": "duplicator", "name": "Duplicator", "tier": "backup_and_verify" },
+  "last_backup_at": "2026-09-26T18:02:11+00:00",
+  "backup": { "ok": true, "id": "3", "detail": "Duplicator backup 3, full site", "duration_ms": 104000 },
+  "message": "Duplicator finished a backup of this site (backup 3, full site).",
+  "started_at": "2026-09-27T10:02:00+00:00",
+  "ended_at": "2026-09-27T10:03:45+00:00",
+  "duration_ms": 105000
+}
+```
+
+`outcome` is `finished`, `failed` (the provider did not finish within ten minutes, or reported an error) or `refused` (no drivable backup plugin).
+
+## What it changes
+
+It writes a backup through the site's own backup plugin; nothing else on the site changes. Approval-gated: the first call returns `respira_approval_required` with an approval token and starts nothing; a person confirms; the retry carries the token. The run is written to the activity log as `take_backup`. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+- Refused: no backup plugin is active, or the one that is cannot be driven from outside the site (All-in-One WP Migration, WPvivid, BlogVault, WP Staging, Migrate Guru, BackupBuddy, Solid Backups, WP Time Capsule). The message names it and says to install Duplicator, BackWPup or UpdraftPlus, or to take the backup in the plugin itself.
+- Failed: the provider did not report finished within ten minutes. Nothing else was touched.
+
+## Availability
+
+Plugin 9.1.0. On the site's own MCP endpoint, where the tool is `respira_wordpress_take_backup`. Not on the npm MCP server in 8.4.0. Readiness manifest key `take_backup`.
+
+## Notes
+
+- The `/backups` card in Respira AER presses this, one site at a time, queued on the site and polled to finished
+- Host-level restore points (a managed host's own backups) are not detected; the site only reports its active plugins
+
+## Example Prompts
+
+- "Take a backup of the site before you start"
+- "Which backup plugin does this site have, and can you run it?"
+
+## Related Tools
+
+- [respira_guarded_plugin_update](/tools/plugins/guarded-plugin-update)
+- [respira_check_guarded_update](/tools/plugins/check-guarded-update)
+- [respira_get_guarded_update](/tools/plugins/get-guarded-update)

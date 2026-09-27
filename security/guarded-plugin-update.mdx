@@ -1,0 +1,151 @@
+---
+title: "Guarded plugin update"
+description: "Update one wordpress.org plugin to the exact version offered, with a restore point before, four health checks after, and the previous version put back from wordpress.org when a check fails. From the dashboard, from Respira AER, or from an MCP client."
+---
+
+# Guarded plugin update
+
+A plugin update replaces files. Respira's page snapshots cover content, not files, so until 9.1.0 a failed update had nothing to go back to, and Respira's plugin tools said so: "make sure you have backups before updating".
+
+The guarded plugin update is one plugin, one advisory, with a way back. It updates a wordpress.org plugin to the exact version the site was offered, takes a restore point first, checks the site afterwards, and puts the previous version back from wordpress.org when a check fails. Everything it did goes into one receipt. Plugin 9.1.0 or later.
+
+## What it checks before writing anything
+
+The preflight runs before a single file changes. Each answer goes into the receipt.
+
+1. **The offer.** The plugin exists, WordPress offers an update for it, and the offered version is the one the caller expected (`expect_version`). A changed offer is refused with `version_changed`. When the update is meant to close an advisory, the offer has to reach `target_version`.
+2. **Rollback possible.** The previous version is archived on wordpress.org, checked with a request to `downloads.wordpress.org/plugin/<slug>.<version>.zip`. A plugin that updates from its own server has no public archive of its previous version, so it is refused with `no_rollback_source`. Premium plugins get no button.
+3. **Requirements.** The new version's PHP and WordPress requirements are met by this site.
+4. **Permission and governance.** Plugin management is on in Respira settings, the key's scope allows it, and the site's tool switches and profile allow it.
+5. **The restore point.** Which backup plugin the site runs, its tier, and when it last ran.
+6. **The site answers.** A fresh probe of the site from its own server: REST and the front page. A site that does not answer normally is refused (`site_unhealthy`), because an update cannot be judged against a broken baseline; a site that cannot fetch its own pages is refused (`site_unprobeable`), because the health check afterwards would be blind.
+
+`respira_check_guarded_update` is this preflight as a read. A button can say why it is disabled before anyone presses it.
+
+## Restore point tiers
+
+Respira takes the restore point through the backup plugin the site already has. What it can do depends on the plugin:
+
+| Tier | Plugins | What Respira does |
+|---|---|---|
+| Backup and verify | Duplicator, Duplicator Pro, BackWPup, BackWPup Pro | Takes a fresh backup through the plugin's own abilities and polls until it reports finished. Nothing is updated while a backup is still running. |
+| Trigger and watch | UpdraftPlus | Starts a backup the way UpdraftPlus's own command line does and reads the record it writes when the backup ends. |
+| Detect and warn | All-in-One WP Migration, WPvivid, BlogVault, WP Staging, Migrate Guru, BackupBuddy, Solid Backups, WP Time Capsule | Names the plugin and, where the site can read it, when it last ran. Nothing on it can be driven from outside the site, so the one-click path stays closed. |
+| None | No backup plugin among the active plugins | The "No backup detected" finding, below. |
+
+The run waits up to ten minutes for a backup. Past that it stops with `backup_failed` and nothing is updated. Inside a queued run the wait holds no PHP worker: the job reads the backup's state, hands the worker back, and starts again a few seconds later, so the backup plugin's own requests are not starved on a host with one or two workers.
+
+With a plugin in the detect-and-warn tier, or none, the update runs only when the caller says, in its own argument, that no restore point is accepted (`accept_no_restore_point: true`). The dashboard and the AER card ask the person before sending it, with the sentence: "No restore point. If the plugin's new version breaks the site, Respira reinstalls the previous version from wordpress.org, but nothing else on the site can be put back."
+
+### The "No backup detected" finding
+
+A site with no backup plugin among its active plugins gets a finding of its own on the dashboard's security page, under the Restore point heading: none of the active plugins takes backups, an update replaces a plugin's files, Respira's page snapshots cover content, not files, so a failed update would have nothing to go back to. The suggestion is to install Duplicator, BackWPup or UpdraftPlus so an update can start from a restore point. Host-level restore points (a managed host's own backups) are not detected, because the hosts' helpers are must-use plugins the site never reports; check with the host before relying on one.
+
+## The four health checks
+
+After the update, Respira checks the site from its own server:
+
+1. **The site answers.** REST and the front page respond.
+2. **Front page and the most recently edited page answer.** The front page and the most recently modified published page or post are fetched.
+3. **No new fatal in debug.log.** The log is marked before the update and read after it; when `WP_DEBUG_LOG` is off, the receipt says the log was not checked.
+4. **The builder still renders.** The key pages are put through Respira's render validator.
+
+Any failed check starts the rollback.
+
+## Rollback from wordpress.org
+
+When a health check fails, Respira downloads the previous version's archive from wordpress.org, reinstalls it and reactivates the plugin, then checks the site again. The receipt's outcome says what happened:
+
+| Outcome | Meaning |
+|---|---|
+| `updated` | The update landed and the site passed its health check. |
+| `refused` | The preflight refused before anything was written. |
+| `backup_failed` | The restore point could not be taken. Nothing was updated. |
+| `update_failed` | The update itself did not land. |
+| `rolled_back` | The update landed, a health check failed, and the previous version was put back. The site answered normally after the rollback. |
+| `rollback_failed` | The update landed, a health check failed, and putting the previous version back did not succeed. Check the site now. |
+
+## The receipt
+
+Every run ends in one receipt, written to the site's activity log and returned to the caller:
+
+```json
+{
+  "run_id": "gu-3f9c1a2b",
+  "outcome": "updated",
+  "success": true,
+  "plugin": { "slug": "advanced-custom-fields", "file": "advanced-custom-fields/acf.php", "name": "Advanced Custom Fields", "active": true },
+  "from": "6.8.9",
+  "to": "6.8.10",
+  "target_version": "6.8.10",
+  "landed": "6.8.10",
+  "advisory": { "ids": ["…"], "cves": ["CVE-2026-…"], "titles": ["…"] },
+  "preflight": { "ok": true, "checks": [ { "id": "rollback", "ok": true, "label": "Rollback possible", "detail": "advanced-custom-fields 6.8.9 is archived on wordpress.org" } ], "refusals": [] },
+  "backup": { "ok": true, "provider": "duplicator", "id": "2", "detail": "Duplicator backup 2, full site", "duration_ms": 105000 },
+  "update": { "ok": true },
+  "health": {
+    "ok": true,
+    "checks": [
+      { "id": "site_answers", "ok": true, "label": "The site answers", "detail": "REST 200, front 200" },
+      { "id": "key_pages", "ok": true, "label": "Front page and the most recently edited page answer", "detail": "front page 200; most recently edited page 200" },
+      { "id": "debug_log", "ok": true, "label": "No new fatal in debug.log", "detail": "not checked: WP_DEBUG_LOG is off" },
+      { "id": "builder_renders", "ok": true, "label": "The builder still renders", "detail": "1 page rendered" }
+    ],
+    "summary": "the site answers, the front page and the most recently edited page answer, no new fatal was logged, and the builder renders"
+  },
+  "rollback": { "attempted": false, "ok": null },
+  "message": "Advanced Custom Fields was updated from 6.8.9 to 6.8.10. The site answered normally afterwards.",
+  "started_at": "2026-09-27T09:14:02+00:00",
+  "ended_at": "2026-09-27T09:16:02+00:00",
+  "duration_ms": 120000
+}
+```
+
+The shape above is from a real run on 2026-09-27: Advanced Custom Fields 6.8.9 to 6.8.10 on a site with Duplicator, queued through the site's MCP endpoint. The Duplicator backup took 105 seconds of the 120 seconds end to end; the update and the four checks took the rest. Runs are kept for a day and can be read back with `respira_get_guarded_update`.
+
+## Running it
+
+### From the dashboard's security page
+
+On [respira.press/dashboard/security](https://www.respira.press/dashboard/security), each known vulnerability that an offered update closes shows a button: "Update <plugin> to <version> and close <CVE>". Before it is enabled, the dashboard runs `check_guarded_update` on the site, and the line under the button says what the site allows: the restore point it has, or the reason the button stays off. Pressing it is the approval. The page shows the run's steps as they happen (checking, taking a restore point, updating the plugin, checking the site) and then the receipt. Premium plugins with no wordpress.org archive get no button.
+
+A site on a plugin older than 9.1.0 sees the reason on the button instead of a call that answers "tool not found".
+
+### From the `/security` card in Respira AER
+
+In Respira AER, `/security` lists the known vulnerabilities on one site or a fleet that an available update closes, one row each, with the restore point the site has. Ticking rows and pressing the button is the approval: each row runs a guarded update with the site's own approval token answered once, and the card shows one receipt per site. One row failing or rolling back never stops the next. No model reads the advisories: every number, version and record on the card is what the site said. See [Cards in Respira AER](/dashboard/aer-cards).
+
+### From an MCP client
+
+The run takes minutes, longer than many hosts keep a request open, so it is queued:
+
+```json
+{
+  "name": "respira_wordpress_guarded_plugin_update",
+  "arguments": {
+    "slug": "advanced-custom-fields",
+    "expect_version": "6.8.10",
+    "run_id": "gu-3f9c1a2b",
+    "_respira_async": true
+  }
+}
+```
+
+The first call answers `respira_approval_required` with an approval token; the person confirms; the retry carries the token and answers at once with `status: queued`, a `job_id` and the `run_id`. Poll `respira_get_job_status` with the `job_id`, or read the run with `respira_get_guarded_update` and the `run_id`, until the receipt is there.
+
+`expect_version` is the version the person was offered, not the installed one.
+
+A call that carries neither `_respira_async` nor `run_inline: true` is refused with a sentence that names both, on the REST route (`POST /respira/v1/security/guarded-update`) and on the site's MCP endpoint alike. `run_inline: true` runs the whole sequence inside the request, which on a real host was cut off by the proxy after about five minutes with the run record left "running", so use it only where the request can live that long.
+
+These tools live on the site's own MCP endpoint (Claude Desktop, claude.ai, ChatGPT, Respira AER, the dashboard). They are not on the npm MCP server in 8.4.0.
+
+## A backup on its own
+
+`respira_take_backup` is the restore point step as a standalone call: the same tiers, the same ten-minute limit, the same run record and the same activity row, with no update afterwards. It is what the `/backups` card in Respira AER presses. See [respira_take_backup](/tools/plugins/take-backup).
+
+## Related pages
+
+- [respira_guarded_plugin_update](/tools/plugins/guarded-plugin-update), [respira_check_guarded_update](/tools/plugins/check-guarded-update), [respira_get_guarded_update](/tools/plugins/get-guarded-update), [respira_take_backup](/tools/plugins/take-backup)
+- [wordpress_update_plugin](/tools/plugins/update-plugin), the plain update with no restore point and no rollback
+- [Cards in Respira AER](/dashboard/aer-cards)
+- [Safety Philosophy](/safety-philosophy), on what MCP safety does and does not cover

@@ -1,0 +1,110 @@
+---
+title: "respira_guarded_plugin_update"
+description: "Update one wordpress.org plugin to the exact version offered, tied to one advisory, with a restore point before, four health checks after, and the previous version put back from wordpress.org when a check fails."
+---
+
+# respira_guarded_plugin_update
+
+Update one wordpress.org plugin to the exact version offered, tied to one advisory, with a restore point before and a health check after. Before writing anything it checks the offer, that the previous version is archived on wordpress.org, PHP and WordPress requirements, permission and governance, the backup plugin the site has, and that the site answers. With Duplicator or BackWPup it takes a fresh backup through their abilities and waits for it; with UpdraftPlus it starts one and reads its record; with any other provider, or none, it refuses unless `accept_no_restore_point` is true. After the update: the site answers, the front page and the most recently edited page answer, no new fatal in debug.log, and the builder renders. On failure it reinstalls the previous version from wordpress.org and reactivates it. Returns a receipt.
+
+The full sequence, the tiers and the receipt are on [Guarded plugin update](/security/guarded-plugin-update).
+
+## Parameters
+
+8 parameters, 2 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `slug` | string | yes | Plugin folder, as the security audit and the update roster list it. |
+| `expect_version` | string | yes | The exact `new_version` the site offers (from `respira_check_guarded_update` or `respira_list_updates`). The run refuses if the offer changed. This is the version the person was offered, not the installed one. |
+| `target_version` | string | no | The version that closes the advisory. The offer must reach it. |
+| `advisory` | object | no | The advisory this update closes, for the receipt: `ids` (vulnerability record ids), `cves`, `titles`, each an array of strings. |
+| `run_id` | string | no | An id of 8 to 64 letters, digits and dashes you choose, so progress can be read with `respira_get_guarded_update` while the run is queued. |
+| `accept_no_restore_point` | boolean | no | True only when the person chose, knowingly, to update without a restore point taken by Respira. |
+| `run_inline` | boolean | no | True to run the whole sequence inside this call instead of queueing it with `_respira_async`. It can take minutes, longer than many hosts keep a request open. |
+| `approval_token` | string | no | Approval token from the first call's `respira_approval_required` answer. |
+
+Send `_respira_async: true` as well: the run is queued and the answer carries a `job_id`.
+
+## Example call
+
+```json
+{
+  "name": "respira_wordpress_guarded_plugin_update",
+  "arguments": {
+    "slug": "advanced-custom-fields",
+    "expect_version": "6.8.10",
+    "run_id": "gu-3f9c1a2b",
+    "_respira_async": true
+  }
+}
+```
+
+## Response
+
+The queued answer:
+
+```json
+{
+  "status": "queued",
+  "job_id": "job_…",
+  "dispatch": "loopback",
+  "poll_tool": "respira_get_job_status",
+  "message": "Write queued. Poll respira_get_job_status with this job_id until it completes or fails."
+}
+```
+
+The receipt, once the run has finished, from `respira_get_job_status` or `respira_get_guarded_update`:
+
+```json
+{
+  "run_id": "gu-3f9c1a2b",
+  "outcome": "updated",
+  "success": true,
+  "plugin": { "slug": "advanced-custom-fields", "name": "Advanced Custom Fields", "active": true },
+  "from": "6.8.9",
+  "to": "6.8.10",
+  "landed": "6.8.10",
+  "advisory": { "ids": [], "cves": [], "titles": [] },
+  "preflight": { "ok": true, "checks": ["…"], "refusals": [] },
+  "backup": { "ok": true, "provider": "duplicator", "id": "2", "duration_ms": 105000 },
+  "health": { "ok": true, "checks": ["…"] },
+  "rollback": { "attempted": false, "ok": null },
+  "message": "Advanced Custom Fields was updated from 6.8.9 to 6.8.10. The site answered normally afterwards.",
+  "duration_ms": 120000
+}
+```
+
+`outcome` is one of `updated`, `refused`, `backup_failed`, `update_failed`, `rolled_back`, `rollback_failed`.
+
+## What it changes
+
+It replaces a plugin's files, so treat it as the careful kind of call. Approval-gated: the first call returns `respira_approval_required` with an approval token and changes nothing; a person confirms; the retry carries the token. Before the files change, a restore point is taken through the site's backup plugin, and when a health check fails afterwards the previous version is reinstalled from wordpress.org. Plugin management has to be on in Respira settings. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+- Refused before it started, with the reason in `preflight.refusals`: `version_changed` (the offer is not `expect_version`), `no_rollback_source` (the plugin updates from its own server, not wordpress.org; premium plugins get no button), `previous_version_unavailable`, `archive_unreachable`, `site_unhealthy`, `site_unprobeable`, or no drivable restore point without `accept_no_restore_point`.
+- A call with neither `_respira_async` nor `run_inline: true` is refused with a sentence that names both.
+- `respira_guarded_update_cannot_queue`: only a Respira API key or a dashboard connection can queue a background run, because the key is checked again when the run starts.
+
+## Availability
+
+Plugin 9.1.0. On the site's own MCP endpoint (Claude Desktop, claude.ai, ChatGPT, Respira AER, the dashboard), where the tool is `respira_wordpress_guarded_plugin_update`. Not on the npm MCP server in 8.4.0. Readiness manifest key `guarded_update`.
+
+## Notes
+
+- One plugin per run, by design
+- The dashboard's security page and the `/security` card in Respira AER call this tool; the button's press is the approval
+- For a plugin update with no restore point and no rollback, `wordpress_update_plugin` still exists
+
+## Example Prompts
+
+- "Update Advanced Custom Fields to 6.8.10 with a restore point first"
+- "Close the known vulnerability in this plugin, and roll back if the site breaks"
+
+## Related Tools
+
+- [respira_check_guarded_update](/tools/plugins/check-guarded-update)
+- [respira_get_guarded_update](/tools/plugins/get-guarded-update)
+- [respira_take_backup](/tools/plugins/take-backup)
+- [wordpress_update_plugin](/tools/plugins/update-plugin)
