@@ -123,6 +123,11 @@
                 "title": "Partner Program",
                 "path": "dashboard/partner",
                 "icon": "handshake"
+              },
+              {
+                "title": "Cards in Respira AER",
+                "path": "dashboard/aer-cards",
+                "icon": "layout-grid"
               }
             ]
           },
@@ -197,6 +202,11 @@
                 "icon": "repeat"
               },
               {
+                "title": "Site Skills",
+                "path": "site-skills",
+                "icon": "graduation-cap"
+              },
+              {
                 "title": "Team Accounts",
                 "path": "team-accounts",
                 "icon": "users"
@@ -221,6 +231,26 @@
                 "title": "wordpress_get_builder_info",
                 "path": "tools/context/get-builder-info",
                 "icon": "layout"
+              },
+              {
+                "title": "respira_list_skills",
+                "path": "tools/context/list-skills",
+                "icon": "list"
+              },
+              {
+                "title": "respira_get_skill",
+                "path": "tools/context/get-skill",
+                "icon": "file-search"
+              },
+              {
+                "title": "respira_write_skill",
+                "path": "tools/context/write-skill",
+                "icon": "edit-3"
+              },
+              {
+                "title": "respira_delete_skill",
+                "path": "tools/context/delete-skill",
+                "icon": "trash-2"
               }
             ]
           },
@@ -601,6 +631,26 @@
                 "title": "wordpress_delete_plugin",
                 "path": "tools/plugins/delete-plugin",
                 "icon": "trash-2"
+              },
+              {
+                "title": "respira_check_guarded_update",
+                "path": "tools/plugins/check-guarded-update",
+                "icon": "search-check"
+              },
+              {
+                "title": "respira_guarded_plugin_update",
+                "path": "tools/plugins/guarded-plugin-update",
+                "icon": "shield-check"
+              },
+              {
+                "title": "respira_get_guarded_update",
+                "path": "tools/plugins/get-guarded-update",
+                "icon": "file-search"
+              },
+              {
+                "title": "respira_take_backup",
+                "path": "tools/plugins/take-backup",
+                "icon": "archive"
               }
             ]
           },
@@ -679,6 +729,36 @@
                 "title": "wordpress_mint_design_preview",
                 "path": "tools/other/mint-design-preview",
                 "icon": "eye"
+              },
+              {
+                "title": "respira_begin_session",
+                "path": "tools/other/begin-session",
+                "icon": "play"
+              },
+              {
+                "title": "respira_get_plan",
+                "path": "tools/other/get-plan",
+                "icon": "list-checks"
+              },
+              {
+                "title": "respira_apply_plan",
+                "path": "tools/other/apply-plan",
+                "icon": "check-circle"
+              },
+              {
+                "title": "respira_discard_plan",
+                "path": "tools/other/discard-plan",
+                "icon": "x-circle"
+              },
+              {
+                "title": "respira_search_abilities",
+                "path": "tools/other/search-abilities",
+                "icon": "search"
+              },
+              {
+                "title": "respira_invoke_ability",
+                "path": "tools/other/invoke-ability",
+                "icon": "zap"
               }
             ]
           },
@@ -715,6 +795,11 @@
                 "title": "Host Blocks the Browser Connector",
                 "path": "guides/host-user-agent-block",
                 "icon": "shield-off"
+              },
+              {
+                "title": "Plan mode for MCP clients",
+                "path": "guides/plan-mode-for-mcp-clients",
+                "icon": "list-checks"
               }
             ]
           },
@@ -762,6 +847,11 @@
                 "title": "Data Privacy",
                 "path": "security/data-privacy",
                 "icon": "eye-off"
+              },
+              {
+                "title": "Guarded plugin update",
+                "path": "security/guarded-plugin-update",
+                "icon": "shield-check"
               }
             ]
           },
