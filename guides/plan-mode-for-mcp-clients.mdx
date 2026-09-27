@@ -1,0 +1,179 @@
+---
+title: Plan mode for MCP clients
+description: Ask an agent to show every write it would make to a WordPress site before any of it runs, then apply the plan with one call. Works in Claude Code, Cursor, Claude Desktop and ChatGPT, because it lives in tool results.
+---
+
+# Plan mode for MCP clients
+
+Respira AER has had a Plan mode for a while: the agent drafts a plan card, the person reads it, and each step runs only on their say-so. An MCP client had nothing like it. It had approval tokens for the destructive few tools, read-only key scopes and duplicate-first writes, but no way to say "show me everything you would do to this site, then do it when i say yes".
+
+Plan mode is that, for every MCP client. Plugin 9.1.0 and MCP server 8.4.0 or later.
+
+## Turning it on
+
+Call `respira_begin_session` with `mode: "plan"`:
+
+```json
+{
+  "name": "respira_begin_session",
+  "arguments": { "mode": "plan" }
+}
+```
+
+From then on, every write the session sends answers a `respira_plan_step` instead of changing the site. Reads run as usual. The answer says how long the session lasts and how many steps were already waiting:
+
+```json
+{
+  "success": true,
+  "session_id": "sess_2f1a…",
+  "plan_mode": true,
+  "expires_in": 14400,
+  "pending_steps": 0
+}
+```
+
+To plan a single write without a session, send `_respira_plan: true` in that write's arguments. The write becomes a step the same way, and nothing else about the connection changes.
+
+## What a planned write looks like
+
+A write in plan mode returns this instead of a result:
+
+```json
+{
+  "code": "respira_plan_step",
+  "planned": true,
+  "mutation_performed": false,
+  "message": "Plan mode: nothing was written. This write is now step 1 of the plan. Show the person the plan and call respira_apply_plan only after they say yes; sending the write again does not run it.",
+  "step_id": "step_7c0d3e",
+  "position": 1,
+  "tool": "respira_update_page",
+  "arguments": { "id": 42, "title": "Our story" },
+  "predicted_effect": "Update page 42 (About): title.",
+  "lands_on": {
+    "where": "copy",
+    "post_id": 42,
+    "copy_id": null,
+    "note": "This lands on a new draft copy of item 42, made when the step runs. The live item stays as it is until a person approves the copy."
+  },
+  "approval_required": false,
+  "deduplicated": false,
+  "plan": {
+    "mode": "plan",
+    "step_ids": ["step_7c0d3e"],
+    "pending_steps": 1,
+    "expires_in": 14312
+  }
+}
+```
+
+What each field says:
+
+- `arguments` is the request as it arrived, with secrets hidden. Keys that look like `api_key`, `token`, `password`, `secret` or `cookie` show as redacted.
+- `predicted_effect` is one sentence on what the step would do.
+- `lands_on.where` is `copy` when the write would land on a new draft copy of a page or post, and `live` when it changes the live site (a menu, an option, a plugin, or a page edit on a site with direct editing on). For a page or post where the route itself decides between a copy and asking, the note says so and how to settle it: discard the step and plan the write again with `edit_target: "duplicate"`.
+- `approval_required` is true when the tool asks a person to approve it before it runs (deletes, plugin updates). The step then carries an `approval_note`: applying the plan counts as that approval, so apply only after the person has read this step and said yes.
+- `deduplicated` is true when the same write was sent again; the plan keeps one step, it does not grow.
+
+Three things still run in plan mode: reads, the tools that manage the plan or the session (`begin_session`, `end_session`, `get_plan`, `apply_plan`, `discard_plan`, `report_issue`, `redeem_token`, `diagnose_connection`, `get_job_status`), and refusals. A write the connection could never make, because a tool switch, the key's scope or a permission check refuses it, is refused rather than planned. The plan only holds steps that could run.
+
+## Reading and trimming the plan
+
+`respira_get_plan` returns every step in order with its status. Nothing on the site changes.
+
+```json
+{
+  "success": true,
+  "plan_mode": true,
+  "mode": "plan",
+  "session_id": "sess_2f1a…",
+  "expires_in": 13980,
+  "pending_steps": 3,
+  "steps": [
+    { "step_id": "step_7c0d3e", "position": 1, "status": "planned", "tool": "respira_update_page", "arguments": { "id": 42, "title": "Our story" }, "predicted_effect": "Update page 42 (About): title.", "lands_on": { "where": "copy", "post_id": 42, "copy_id": null, "note": "…" }, "approval_required": false }
+  ],
+  "message": "3 steps are waiting for the person's yes. Nothing in them has touched the site."
+}
+```
+
+`respira_discard_plan` removes steps without running them: all of them, or the ones named in `step_ids`. Plan mode stays on until `respira_end_session`.
+
+## Applying the plan
+
+`respira_apply_plan` runs the planned steps on the site, in plan order. Leave `step_ids` out to run every step that is waiting, or name the ones the person accepted. Each step replays the request it stored through the same door it arrived by and through the same checks a direct call meets: site governance, key scope, permission, the duplicate-first rule. There is no shortcut.
+
+Two rules matter here:
+
+- **The apply call is the approval.** A step whose tool asks a person to approve it (`approval_required: true`) runs without a separate approval token, because the person's yes to the plan is that approval. The receipt names every step approved this way under `approved_by_apply`. This is why an agent must show the plan and wait for a yes before calling apply.
+- **The run stops at the first failed step** unless `continue_on_error` is true. Steps that did not run stay in the plan, with `not_run` in the receipt, so they can be applied again or discarded.
+
+The receipt:
+
+```json
+{
+  "success": true,
+  "code": "respira_plan_applied",
+  "message": "Plan applied: 3 step(s) ran and landed, 0 failed, 0 did not run. These steps asked for a person's approval, and this apply call was taken as that approval: step_a91f22.",
+  "applied": 3,
+  "failed": 0,
+  "not_run": 0,
+  "approved_by_apply": ["step_a91f22"],
+  "steps": [
+    {
+      "step_id": "step_7c0d3e",
+      "position": 1,
+      "tool": "respira_update_page",
+      "predicted_effect": "Update page 42 (About): title.",
+      "approved_by_apply": false,
+      "outcome": "applied",
+      "snapshots": ["3b9e…"],
+      "links": ["https://example.com/?respira_preview=…"],
+      "result": { "success": true, "id": 187, "is_duplicate": true }
+    }
+  ],
+  "plan_mode": true
+}
+```
+
+Every applied step carries the snapshot ids taken for it, so `respira_restore_snapshot` undoes any one of them, and the share preview links of any copy it created. A failed step carries `error` with the code, message and HTTP status the site answered.
+
+## The session
+
+- A plan lives for 4 hours from the last `begin_session`. The answers carry `expires_in` in seconds. An expired plan is swept and its steps are gone.
+- **One plan per API key.** The plan is keyed on the calling credential, because the npm server calls the site's REST routes and sends no MCP session id, while the site's own MCP endpoint does. A key therefore has one plan at a time, whichever client is using it. A connection with no key of its own (a shared or anonymous credential) is refused with `respira_plan_needs_key`, because its plan would be shared with every other such caller.
+- A plan holds up to 50 steps.
+- `respira_end_session` turns plan mode off, drops the plan, and answers with `discarded_steps`: how many steps never ran.
+
+## Where it works
+
+Plan mode lives entirely in tool results. There is no client feature to enable and nothing a client has to understand: a planned write answers a normal tool result whose `code` is `respira_plan_step`, and the MCP server passes it through as the plugin sent it, with `isError: false`, whatever the tool's own client method would have made of the response.
+
+- **Claude Code and Cursor**, through the npm MCP server: `respira_begin_session`, `respira_get_plan`, `respira_apply_plan`, `respira_discard_plan`. SOUL.md, the rules the server ships, tells the agent that a `respira_plan_step` is a question for the person: show them the plan in plain words, ask, and apply only after they say yes.
+- **Claude Desktop, claude.ai and ChatGPT**, through the site's own MCP endpoint: the same tools carry the endpoint's names, `respira_wordpress_begin_session` and `respira_wordpress_apply_plan`. The endpoint's own instructions tell the agent how to propose changes instead of making them, and `_respira_plan: true` works on a single write there too.
+
+A tool that makes several writes in one call (a page build, a batch update) returns every step it would take, and says so when it had to stop because it needed a write's result to plan the next one.
+
+## How it relates to Plan mode in Respira AER
+
+Respira AER's Plan mode is the same idea inside Respira's own console: the agent drafts a plan card, the person reads it and approves steps. Plan mode for MCP clients brings that contract to any agent that talks MCP, using nothing but tool results. The site enforces both the same way: nothing changes until a person says yes.
+
+## A worked example with three writes
+
+The person asks: "On the About page change the title to Our story, add a Services link to the main menu, and get rid of the old Team draft."
+
+1. The agent calls `respira_begin_session` with `mode: "plan"`.
+2. It sends `respira_update_page` for page 42 with the new title. Step 1 comes back: lands on a copy of page 42.
+3. It sends `respira_create_menu_item` for the main menu. Step 2 comes back: `lands_on.where` is `live`, because a menu has no draft copy.
+4. It sends `respira_delete_page` for draft 311. Step 3 comes back with `approval_required: true` and the approval note.
+5. It calls `respira_get_plan` and shows the person the three steps in plain words: a copy of the About page with a new title for them to approve, a live change to the menu, and the Team draft moved to the trash, which they are approving now.
+6. The person says yes. The agent calls `respira_apply_plan`.
+7. The receipt lists three applied steps: the copy's id and preview link, the menu item's id, and the trashed draft with the `snapshot_uuid` that brings it back. `approved_by_apply` names step 3.
+8. The agent calls `respira_end_session`. `discarded_steps` is 0.
+
+Had the person said "not the menu", the agent would call `respira_discard_plan` with step 2's id and then apply.
+
+## Related pages
+
+- [respira_begin_session](/tools/other/begin-session), [respira_get_plan](/tools/other/get-plan), [respira_apply_plan](/tools/other/apply-plan), [respira_discard_plan](/tools/other/discard-plan)
+- [Safety Philosophy](/safety-philosophy)
+- [Duplicate-Before-Edit Workflow](/duplicate-before-edit-workflow)
+- [Desktop AI (MCP Server)](/mcp-server)

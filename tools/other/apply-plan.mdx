@@ -1,0 +1,100 @@
+---
+title: "respira_apply_plan"
+description: "Run the planned steps on the site in plan order, each through the same checks as a direct call, and return one receipt with each step's outcome, snapshot ids and preview links. This call is the person's approval."
+---
+
+# respira_apply_plan
+
+Run the planned steps on the site, in plan order, each through the same checks it would meet as a direct call, and return one receipt with each step's outcome, snapshot ids and preview links.
+
+Call it only after the person has read the plan and said yes: this call is their approval, including for steps whose tool asks for approval, and the receipt lists those steps. It stops at the first failed step unless `continue_on_error` is true; steps that did not run stay in the plan.
+
+## Parameters
+
+2 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `step_ids` | array of string | no | Steps to run. Leave out to run every step that is waiting, in plan order. |
+| `continue_on_error` | boolean | no | Keep running later steps after one fails. Default false. |
+
+## Example call
+
+```json
+{
+  "name": "respira_apply_plan",
+  "arguments": {}
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "code": "respira_plan_applied",
+  "message": "Plan applied: 2 step(s) ran and landed, 0 failed, 0 did not run. These steps asked for a person's approval, and this apply call was taken as that approval: step_a91f22.",
+  "applied": 2,
+  "failed": 0,
+  "not_run": 0,
+  "approved_by_apply": ["step_a91f22"],
+  "steps": [
+    {
+      "step_id": "step_7c0d3e",
+      "position": 1,
+      "tool": "respira_update_page",
+      "predicted_effect": "Update page 42 (About): title.",
+      "approved_by_apply": false,
+      "outcome": "applied",
+      "snapshots": ["3b9e…"],
+      "links": ["https://example.com/?respira_preview=…"],
+      "result": { "success": true, "id": 187, "is_duplicate": true }
+    },
+    {
+      "step_id": "step_a91f22",
+      "position": 2,
+      "tool": "respira_delete_page",
+      "predicted_effect": "Move page 311 (Team, draft) to the trash.",
+      "approved_by_apply": true,
+      "outcome": "applied",
+      "snapshots": ["9c41…"],
+      "links": [],
+      "result": { "success": true, "deleted": "trash", "snapshot_uuid": "9c41…" }
+    }
+  ],
+  "plan_mode": true
+}
+```
+
+A step's `outcome` is `applied`, `failed` (with `error.code`, `error.message` and `error.status`) or `not_run` (an earlier step failed and `continue_on_error` was not set; the step is still in the plan).
+
+## What it changes
+
+It runs the writes the plan holds, so treat it as the careful kind of call. Each step replays the request it stored through the same door it arrived by and the same gates a direct call meets: site governance, key scope, permission, the duplicate-first rule. Respira takes a snapshot for each step and the receipt carries the ids, so any one step can be undone with `respira_restore_snapshot`. A step whose tool asks for a person's approval runs without a separate token, because this call is that approval; the receipt names those steps under `approved_by_apply`. On a connection set to read-only nothing was ever planned, so there is nothing to apply.
+
+## When it fails
+
+- `respira_plan_step_not_pending`: a named step is not waiting (already applied, failed, or discarded). Call `respira_get_plan` for the current ids.
+- `respira_plan_step_unknown`: a named step id is not in this key's plan.
+- `respira_plan_needs_key`: the connection has no Respira key of its own, so it has no plan.
+
+## Availability
+
+Plugin 9.1.0 and MCP server 8.4.0. On the site's own MCP endpoint the tool is `respira_wordpress_apply_plan`.
+
+## Notes
+
+- Never call this on your own. A `respira_plan_step` is a question for the person; apply only after they say yes
+- Applying does not end plan mode; the next write is planned again until `respira_end_session`
+
+## Example Prompts
+
+- "Yes, go ahead with the plan"
+- "Apply steps 1 and 3, leave the menu change out"
+
+## Related Tools
+
+- [respira_get_plan](/tools/other/get-plan)
+- [respira_discard_plan](/tools/other/discard-plan)
+- [respira_begin_session](/tools/other/begin-session)
+- [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients)
