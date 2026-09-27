@@ -143,6 +143,20 @@ Returns:
 - FAQ opportunities
 - Entity recognition
 
+## Abilities from other plugins
+
+Other plugins register abilities of their own through WordPress's Abilities API: Elementor's page structure and widget schemas, a form plugin's entries, a mail plugin's status. Two things changed in plugin 9.1.0.
+
+**Search reads the site, not a list.** `respira_search_abilities` searches every ability registered on the site at the moment of the call, from every active plugin, with the plugin's own label, description, category and read-only and destructive annotations. Results are ranked, 20 by default and never more than 100. Each one says whether Respira can invoke it right now and, when it cannot, why not and what the site owner would change.
+
+**Read-only reach, one switch.** Respira > Abilities has a setting, off unless the site owner turns it on: **Let Respira run read-only abilities**. With it on, an agent can call any ability that another plugin declares read-only and not destructive, without the owner enabling each one by name. The plugin's own label decides, so this trusts each plugin to label its abilities honestly. Every call still runs through Respira's safety wrap and the activity log, which records that the setting let it through, and through the plugin's own permission check. Anything that can change the site, or that does not say it is read-only, still has to be enabled by name.
+
+```
+Search this site's abilities for anything about widget schemas, and tell me which ones you can run
+```
+
+See [respira_search_abilities](/tools/other/search-abilities) and [respira_invoke_ability](/tools/other/invoke-ability).
+
 ## Common Workflows
 
 <ExpandableGroup>

@@ -1,0 +1,68 @@
+---
+title: "respira_invoke_ability"
+description: "Run an ability another plugin registered on the site, through Respira's safety wrap, when the site owner has enabled it or it is declared read-only and read-only reach is on."
+---
+
+# respira_invoke_ability
+
+Run a WordPress ability that another plugin registered on this site. The ability must be registered on the site via `wp_register_ability` and either enabled by name at Respira > Abilities or, when the site owner has turned on read-only reach, declared read-only and not destructive by its plugin. Abilities under the `respira-playbooks/` namespace bypass the enable step, because the site's own agent authored them through `respira_create_playbook`. Otherwise the call returns a structured 403 or 404 with instructions and a sample of the ability names that are registered.
+
+## Parameters
+
+2 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `ability` | string | yes | The full registered name, `vendor/ability-name`. Call `respira_search_abilities` first if you do not know it. |
+| `args` | object | no | The ability's input. The wire field is `args`, not `input`; a playbook step that reads `{{input.x}}` is reading this object. |
+
+## Example call
+
+```json
+{
+  "name": "respira_invoke_ability",
+  "arguments": {
+    "ability": "elementor/get-widget-schema",
+    "args": { "widget": "heading" }
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "ability": "elementor/get-widget-schema",
+  "result": { "…": "the ability's own output" }
+}
+```
+
+## What it changes
+
+Whatever the ability does. A read-only ability changes nothing; a write ability changes the site the way its plugin implements it. Every call runs through Respira's safety wrap (a snapshot where one applies, a time budget and an activity row, which records when the read-only reach setting let the call through) and through the ability's own permission callback, as the WordPress user behind the key. On a connection set to read-only a write ability is refused with `respira_scope_denied`.
+
+## When it fails
+
+- A 403 with instructions: the ability is registered but not enabled by name, and it is not declared read-only or read-only reach is off. The message says what the site owner would change.
+- A 404 with a sample of registered names: no ability of that name is registered on the site. Check with `respira_search_abilities`.
+
+## Availability
+
+Works on any WordPress site with the Abilities API. Read-only reach needs plugin 9.1.0.
+
+## Notes
+
+- Read-only reach is off unless the site owner turns it on, under Respira > Abilities: "Let Respira run read-only abilities". The plugin's own label decides, so it trusts each plugin to label its abilities honestly
+- Prefer Respira's own tool when `respira_search_abilities` names a replacement: it carries the duplicate-first and snapshot guarantees an ability may not
+
+## Example Prompts
+
+- "Use Elementor's own ability to read the widget schema for the heading widget"
+- "Run the case-study-create playbook for AcmeBank"
+
+## Related Tools
+
+- [respira_search_abilities](/tools/other/search-abilities)
+- [Playbooks](/playbooks)
+- [Inhale: MCP Abilities](/inhale-mcp-abilities/overview)
