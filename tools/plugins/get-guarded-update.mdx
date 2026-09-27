@@ -1,0 +1,73 @@
+---
+title: "respira_get_guarded_update"
+description: "The progress or the receipt of a guarded update run or a standalone backup: its steps with their state, and once finished the full receipt. Runs are kept for a day."
+---
+
+# respira_get_guarded_update
+
+The progress or the receipt of a guarded update run: its steps (preflight, restore point, update, health, rollback) with their state and detail, and once finished the full receipt (versions, advisory, every preflight answer, the four health checks, the rollback if any, duration). A standalone backup taken with `respira_take_backup` is read the same way. Runs are kept for a day.
+
+## Parameters
+
+1 parameter, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `run_id` | string | yes | The `run_id` given to `respira_guarded_plugin_update` or `respira_take_backup`. |
+
+## Example call
+
+```json
+{
+  "name": "respira_wordpress_get_guarded_update",
+  "arguments": {
+    "run_id": "gu-3f9c1a2b"
+  }
+}
+```
+
+## Response
+
+While the run is going:
+
+```json
+{
+  "run_id": "gu-3f9c1a2b",
+  "status": "running",
+  "step": "backup",
+  "steps": [
+    { "id": "preflight", "label": "Checking before anything is written", "state": "done", "detail": "Advanced Custom Fields 6.8.9 to 6.8.10; rollback from wordpress.org possible; Duplicator is installed and its abilities are registered" },
+    { "id": "backup", "label": "Taking a restore point with Duplicator", "state": "running" }
+  ],
+  "plugin": { "slug": "advanced-custom-fields" },
+  "started_at": "2026-09-27T09:14:02+00:00",
+  "updated_at": "2026-09-27T09:14:40+00:00",
+  "receipt": null
+}
+```
+
+Once finished, `status` is `completed`, `outcome` names the result and `receipt` holds the full receipt described on [Guarded plugin update](/security/guarded-plugin-update).
+
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## Availability
+
+Plugin 9.1.0. On the site's own MCP endpoint, where the tool is `respira_wordpress_get_guarded_update`. Not on the npm MCP server in 8.4.0.
+
+## Notes
+
+- `respira_get_job_status` with the `job_id` answers the same run from the job queue's side, and says how the job was started (`dispatch`) and what ran it (`ran_via`)
+- A run whose process stopped reporting reads back as failed rather than staying "running"
+
+## Example Prompts
+
+- "How is the plugin update going?"
+- "Show me the receipt for run gu-3f9c1a2b"
+
+## Related Tools
+
+- [respira_guarded_plugin_update](/tools/plugins/guarded-plugin-update)
+- [respira_check_guarded_update](/tools/plugins/check-guarded-update)
+- [respira_take_backup](/tools/plugins/take-backup)

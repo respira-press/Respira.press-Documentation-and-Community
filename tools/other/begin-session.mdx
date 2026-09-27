@@ -1,0 +1,73 @@
+---
+title: "respira_begin_session"
+description: "Begin an explicit snapshot session so a batch of changes can be rolled back together, or, with mode plan, a session in which every write is proposed instead of run."
+---
+
+# respira_begin_session
+
+Begin an explicit snapshot session. Every change made after this, until `respira_end_session`, is grouped under one `session_id`, so the whole batch can be rolled back together with `respira_restore_session`. Without an explicit session, changes are auto-grouped by a time window.
+
+With `mode: "plan"`, nothing on the site changes until the plan is applied: every write returns a `respira_plan_step` with its predicted effect and a `step_id` instead of running, reads work as usual, and `respira_apply_plan` runs the steps the person accepted.
+
+## Parameters
+
+1 parameter, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `mode` | string | no | Leave out for a normal session. `plan` makes every write in this session a proposed step instead of a change to the site. One of: `default`, `plan`. |
+
+## Example call
+
+```json
+{
+  "name": "respira_begin_session",
+  "arguments": {
+    "mode": "plan"
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "session_id": "sess_2f1a…",
+  "plan_mode": true,
+  "expires_in": 14400,
+  "pending_steps": 0
+}
+```
+
+`expires_in` is in seconds: a plan lives for 4 hours from the last `begin_session`. `pending_steps` counts steps already waiting in this key's plan, because beginning again keeps them.
+
+## What it changes
+
+Nothing on the site. It opens a grouping for the writes that follow. In plan mode it also switches the key's writes to proposals, so from this call until `respira_end_session` a write adds a step to the plan and changes nothing.
+
+## When it fails
+
+- `respira_plan_needs_key`: plan mode needs a connection with its own Respira key, and this one has none. A plan is keyed on the credential, and a shared credential would share its plan with every other caller. Connect with an API key or a site token.
+
+## Availability
+
+Works on any WordPress site, whichever page builder it uses. `mode: "plan"` needs plugin 9.1.0 and MCP server 8.4.0. On the site's own MCP endpoint the tool is `respira_wordpress_begin_session`.
+
+## Notes
+
+- One plan per API key, whichever client is using the key
+- To plan one write without a session, send `_respira_plan: true` in that write's arguments
+- `respira_end_session` turns plan mode off and says how many steps never ran
+
+## Example Prompts
+
+- "Plan the changes first and show me before you do anything"
+- "Start a session so I can undo this whole batch at once"
+
+## Related Tools
+
+- [respira_get_plan](/tools/other/get-plan)
+- [respira_apply_plan](/tools/other/apply-plan)
+- [respira_discard_plan](/tools/other/discard-plan)
+- [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients)

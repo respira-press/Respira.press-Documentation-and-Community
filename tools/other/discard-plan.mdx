@@ -1,0 +1,63 @@
+---
+title: "respira_discard_plan"
+description: "Remove steps from the plan without running them: all of them, or the ones named. Nothing on the site changes. Plan mode stays on."
+---
+
+# respira_discard_plan
+
+Remove steps from the plan without running them: all of them, or the ones named. Nothing on the site changes. Plan mode stays on until `respira_end_session`.
+
+## Parameters
+
+1 parameter, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `step_ids` | array of string | no | Steps to remove. Leave out to empty the plan. |
+
+## Example call
+
+```json
+{
+  "name": "respira_discard_plan",
+  "arguments": {
+    "step_ids": ["step_a91f22"]
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "discarded_steps": 1,
+  "removed_steps": ["step_a91f22"],
+  "plan_mode": true,
+  "message": "1 step was removed from the plan. Nothing in it had touched the site."
+}
+```
+
+## What it changes
+
+Nothing on the site. It removes proposals from the plan; nothing in them had touched the site.
+
+## Availability
+
+Plugin 9.1.0 and MCP server 8.4.0. On the site's own MCP endpoint the tool is `respira_wordpress_discard_plan`.
+
+## Notes
+
+- Use it when the person says no to one step and yes to the rest, then call `respira_apply_plan`
+- To turn plan mode off as well, call `respira_end_session`, which drops the plan and says how many steps never ran
+
+## Example Prompts
+
+- "Drop the menu change from the plan"
+- "Forget the plan, start over"
+
+## Related Tools
+
+- [respira_get_plan](/tools/other/get-plan)
+- [respira_apply_plan](/tools/other/apply-plan)
+- [respira_begin_session](/tools/other/begin-session)

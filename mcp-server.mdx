@@ -77,6 +77,29 @@ Both modes use the same safety workflow, but tool totals differ by runtime and a
 - Desktop MCP: `82` WordPress tools + `21` WooCommerce tools (`103` total with add-on active)
 - Browser AI/WebMCP: separate registry contract aligned to current plugin release
 
+## What plugin 9.1.0 and MCP server 8.4.0 change on the connection
+
+### Governance applies on every door
+
+A tool switched off in Respira > Tools, and the Observe and Content profiles, bind on every way into the site: the REST routes the npm server calls, and the site's own MCP endpoint that Claude Desktop, claude.ai, ChatGPT and Respira AER use. Before 9.1.0 the endpoint's ability ids, which carry two prefixes, were only half stripped before the lookup, so a blocked tool went through on that door. Both id shapes now land on the same name.
+
+### The key travels twice
+
+Every request the MCP server sends carries the credential in `X-Respira-Authorization: Bearer <key>` next to `X-Respira-API-Key`, and so do `--setup` and `--doctor`. Plugin 9.1.0 and later use that copy when a request arrives with no credential at all, which is what a host that strips the Authorization header, or a firewall that drops `X-*-API-Key` headers by name, leaves behind. It never overwrites a real Authorization header, so a staging password configured as `httpAuth` keeps working. It accepts only `Bearer` followed by a Respira key or access token, so it cannot log anyone in through application passwords or another plugin's scheme. Turn it off on the site with `define( 'RESPIRA_DISABLE_AUTH_FALLBACK', true );` in wp-config.php. See [Troubleshooting](/troubleshooting#the-host-strips-the-authorization-header).
+
+### Errors say what to do
+
+Errors on the connection, sign-in and approval paths carry two fields in their data, and the error envelope the agent sees shows both:
+
+- `cause`, one of `credential`, `capability`, `licence`, `security_gate`, `approval`, `host_environment`, `invalid_input`, `not_found`, `conflict`, `rate_limited` or `server_error`
+- `retry_ok`, whether sending the same call again can work
+
+A revoked key says `credential` and no retry. A rate limit, or a site token that could not be checked because respira.press was out of reach, says retry. On the site's own MCP endpoint a failed tool call adds one sentence to the message and the pair in `_meta["respira/error"]`.
+
+### Plan mode
+
+`respira_begin_session` with `mode: "plan"` makes every write answer a proposed step instead of changing the site, and `respira_apply_plan` runs the steps once the person has said yes. It works in every client because it lives in tool results. See [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients).
+
 ## Related guides
 
 - [Getting Started](/getting-started)

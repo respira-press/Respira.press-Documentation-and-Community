@@ -1,0 +1,78 @@
+---
+title: "respira_search_abilities"
+description: "Search the WordPress abilities registered on the site right now, from every active plugin, ranked, with whether Respira can invoke each one and, when it cannot, why not."
+---
+
+# respira_search_abilities
+
+Search the WordPress abilities registered on this site right now, from every active plugin, ranked by how well they match. Each result carries the plugin's own label, description, category and read-only and destructive annotations, whether Respira can invoke it now, and when it cannot, `why_not`: what the site owner has to change. Results also name a safer Respira replacement tool when one exists.
+
+Until 9.1.0 this searched a list bundled with Respira. It now reads the site's own Abilities API at the moment of the call; the bundled list is still used where WordPress has no Abilities API.
+
+## Parameters
+
+5 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `q` | string | no | Free-text capability search. |
+| `plugin` | string | no | Exact plugin slug or name. |
+| `category` | string | no | Exact ability category. |
+| `kind` | string | no | Operation kind. One of: `read`, `write`. |
+| `limit` | number | no | Maximum results, 1 to 100. Default 20. |
+
+## Example call
+
+```json
+{
+  "name": "respira_search_abilities",
+  "arguments": {
+    "q": "widget schema"
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "results": [
+    {
+      "name": "elementor/get-widget-schema",
+      "label": "Get widget schema",
+      "description": "…",
+      "plugin": "Elementor",
+      "category": "elementor",
+      "annotations": { "readonly": true, "destructive": false },
+      "can_invoke": true,
+      "why_not": null
+    }
+  ]
+}
+```
+
+Ranking puts a match on the ability's name first, then its label, plugin, category and description.
+
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## Availability
+
+Works on any WordPress site with the Abilities API. Live search needs plugin 9.1.0. On the site's own MCP endpoint the tool is `respira_wordpress_search_abilities`.
+
+## Notes
+
+- `can_invoke` is true when the ability is enabled by name at Respira > Abilities, or when the site owner has turned on "Let Respira run read-only abilities" and the ability's plugin declares it read-only and not destructive
+- Anything that can change the site, or that does not say it is read-only, still has to be enabled by name; `why_not` says which applies
+
+## Example Prompts
+
+- "What can Elementor's own abilities tell you about this page?"
+- "Search the site's abilities for anything about forms"
+
+## Related Tools
+
+- [respira_invoke_ability](/tools/other/invoke-ability)
+- [Inhale: MCP Abilities](/inhale-mcp-abilities/overview)

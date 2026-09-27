@@ -1,0 +1,84 @@
+---
+title: "respira_get_plan"
+description: "Show the plan a plan-mode session collected: each step in order with its tool, arguments, predicted effect, where it lands and its status. Nothing on the site changes."
+---
+
+# respira_get_plan
+
+Show the plan a plan-mode session collected: each step in order with its tool, its arguments (secrets hidden), its predicted effect, whether it lands on a draft copy or the live item, and its status. Nothing on the site changes.
+
+## Parameters
+
+No parameters.
+
+## Example call
+
+```json
+{
+  "name": "respira_get_plan",
+  "arguments": {}
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "plan_mode": true,
+  "mode": "plan",
+  "session_id": "sess_2f1a…",
+  "expires_in": 13980,
+  "pending_steps": 2,
+  "steps": [
+    {
+      "step_id": "step_7c0d3e",
+      "position": 1,
+      "status": "planned",
+      "tool": "respira_update_page",
+      "arguments": { "id": 42, "title": "Our story" },
+      "predicted_effect": "Update page 42 (About): title.",
+      "lands_on": { "where": "copy", "post_id": 42, "copy_id": null, "note": "This lands on a new draft copy of item 42, made when the step runs. The live item stays as it is until a person approves the copy." },
+      "approval_required": false
+    },
+    {
+      "step_id": "step_a91f22",
+      "position": 2,
+      "status": "planned",
+      "tool": "respira_delete_page",
+      "arguments": { "id": 311 },
+      "predicted_effect": "Move page 311 (Team, draft) to the trash.",
+      "lands_on": { "where": "live", "post_id": 311, "note": "…" },
+      "approval_required": true
+    }
+  ],
+  "message": "2 steps are waiting for the person's yes. Nothing in them has touched the site."
+}
+```
+
+A step's `status` is `planned`, `applying`, `applied` or `failed`. A step left in `applying` started and never reported back, so whether it changed the site is unknown; the step carries a note saying to read the site before running it again. An applied or failed step carries its `outcome`.
+
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## Availability
+
+Plugin 9.1.0 and MCP server 8.4.0. On the site's own MCP endpoint the tool is `respira_wordpress_get_plan`.
+
+## Notes
+
+- Show the person this plan in plain words before calling `respira_apply_plan`
+- `mode` is `plan` for a session begun with `mode: "plan"` and `call` when only single writes sent with `_respira_plan: true` are in the plan
+
+## Example Prompts
+
+- "Show me the plan so far"
+- "What would you change if I said yes?"
+
+## Related Tools
+
+- [respira_begin_session](/tools/other/begin-session)
+- [respira_apply_plan](/tools/other/apply-plan)
+- [respira_discard_plan](/tools/other/discard-plan)
+- [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients)

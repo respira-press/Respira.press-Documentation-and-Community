@@ -226,6 +226,20 @@ Use this checklist to keep Divi 5 work safe:
 
 ---
 
+## New in 9.1.0: native attributes by default
+
+From a customer field test: the build was fast and faithful, but the handover lost, because an agent could fall back to inline `style=""` HTML and to code modules, and the client then found styling the Visual Builder cannot show or edit. Plugin 9.1.0 and MCP server 8.4.0 close that path by default.
+
+Every agent write to a Divi 5 page (`build_page`, `inject_builder_content`, `update_element`, `update_module`, `batch_update`, `apply_builder_patch` and the `add_*` shortcuts) takes two options, `allow_inline_styles` and `allow_code_modules`, both false by default.
+
+- **A style Divi 5 has a design setting for is written as that attribute**, whether it arrives as a settings key, as a CSS name (`text-transform`, `border`) or as a `style=""` on the element that wraps the module's whole content. New native routes include text transform, italic, underline and strike-through, border width, style and colour (all sides or one), opacity, height, min and max height, z-index, overflow, and alignment.
+- **A style with no native place is not written** and comes back in the write result as `unmapped_styles`, one entry per style with the element (type, path, node id, text), the property, the value and the reason: a colour on a `<span>` inside a sentence, a `<style>` block in a text module, a CSS variable other than a Divi global colour, a property Divi has no setting for. The MCP server summarises a non-empty `unmapped_styles` at the top of the result message. Do not retry the same write; everything else landed.
+- **A write that adds a `divi/code` module is refused** with `respira_divi5_code_module_refused` (422, nothing written) and names the native module to use: `divi/video` for a video embed, `divi/map`, `divi/contact-form`, `divi/heading`, `divi/image`, `divi/button` or `divi/text`. A script or an embed the user asked for goes through with `allow_code_modules: true`.
+- **What a page already stores is left as it is.** An existing code module can be edited, and inline styles already on the page (the Visual Builder's own rich-text colouring) stay.
+- **Both options true is the previous behaviour.** Divi 4 does not change. The HTML converter keeps its code modules and its carried stylesheet in fidelity mode.
+
+Also in 9.1.0: `update_element` on Divi 5 writes what `build_page` writes. Letter spacing, line height, border radius and box shadow were dropped on update although a build wrote them, and padding shorthand was stored as a string Divi never compiles; with the new default both are native spacing and radius attributes.
+
 ## FAQ
 
 <ExpandableGroup>

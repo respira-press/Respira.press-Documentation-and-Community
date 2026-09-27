@@ -93,6 +93,32 @@ What 8.0 adds there is a confirmation handshake: the first attempt to rewrite a 
 
 That is a confirmation, not an approval. Approval means a human reviews a staged change before it exists on the live site. Confirmation means the agent is told what it is about to touch and has to say yes on purpose. The write is still snapshotted and reversible. See [Divi](/builders/divi).
 
+## Deletes, options, uploads and the audit log (9.1.0)
+
+Plugin 9.1.0 closes the places where an agent's action still had no way back, or reached past content.
+
+### A delete goes to the trash, with a snapshot
+
+`delete_page`, `delete_post`, `delete_custom_post` and `delete_media` used to remove the item for good with no snapshot. They now move it to the trash where WordPress keeps one for that type, take a snapshot first, and answer with `snapshot_uuid` and an `undo` block: `respira_restore_snapshot` takes it back out of the trash with its old status and slug. `permanent: true` still deletes for good where the live-edit guards allow it, and so does a site with the trash turned off, but only after a snapshot that can recreate the post under the same ID with its row, every field, its terms, its comments and its child pages; if that snapshot cannot be taken, nothing is deleted. Media has no trash unless `MEDIA_TRASH` is on, so a media delete moves the files into a protected folder under uploads and a restore puts them back byte for byte. Media whose file is not on the server (offloaded to cloud storage) is refused rather than deleted beyond recovery.
+
+A theme file write is covered the same way: `write_theme_file` and `append_theme_file` store the file's current bytes in a snapshot first and answer with `snapshot_uuid`. If the copy cannot be saved, nothing is written.
+
+### Protected options
+
+An agent can no longer change the options that lock people out of a site. `update_option` and `delete_option` refuse `siteurl`, `home`, `admin_email`, `users_can_register`, `default_role`, `active_plugins`, `uninstall_plugins`, `template`, `stylesheet`, `db_version`, `cron`, the roles option under any table prefix, every WordPress key and salt, and Respira's own safety, governance, connection and licence settings, with `respira_option_protected` and a sentence on where to make the change instead. Names are matched the way the database matches them, so `SiteURL` or `siteurl ` is refused too, and the refusal comes before the snapshot so nothing is left behind. The `respira_protected_options` filter adds names to the list; it cannot take any away. `list_options` shows values that look like keys, salts, tokens or passwords as `[redacted]`, and `get_option` never returns WordPress's salts or Respira's own licence key and tokens.
+
+### Every SVG is cleaned first
+
+An SVG is a document a browser runs. On a site where another plugin allows SVG uploads, `upload_media`, `sideload_image`, every tool that sideloads a remote image, stock images and the workspace logo now clean an SVG before storing it, recognised by its name or by its bytes (`.svgz` too): scripts, event handlers, `foreignObject`, `javascript:` and `data:` links and every reference to outside content are removed, and the result is read back and checked. An SVG that cannot be parsed, or still carries anything dangerous, is refused with `respira_svg_unsafe`. Respira never changes which file types a site accepts, and uploads made in wp-admin or by other plugins are untouched.
+
+### The site's audit log has a window
+
+The plugin's own audit table no longer grows forever. Entries older than 180 days are removed once a day. The window is set in Respira > Settings under Audit & approvals (0 keeps everything, otherwise 7 to 3650 days), and a `respira_audit_retention_days` filter can decide for the site instead, which the screen then says. Only the oldest entries go, as one unbroken run, so the tamper seal on the log keeps verifying; they go in batches by id, so a site with millions of rows never has its audit table locked for long. An agent cannot change the window, because it is one of the protected options above.
+
+### Plan mode
+
+For an MCP client that wants to see every write before any of it runs, `respira_begin_session` with `mode: "plan"` turns each write into a proposed step and `respira_apply_plan` runs them once a person has said yes. See [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients).
+
 ## How this compares to other safety strategies
 
 Many teams already use safety strategies like staging sites, git-based rollbacks, or careful admin-side editing. Respira’s approach is different: it builds safety into each AI operation instead of relying on environment-level safeguards.

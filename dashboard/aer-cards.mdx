@@ -1,0 +1,59 @@
+---
+title: "Cards in Respira AER"
+description: "The five cards in Respira AER: updates, security, approvals, backups and reviews. Each lists what the site said, one row per item, and the press is the approval. What each card does and what a site needs for it."
+---
+
+# Cards in Respira AER
+
+[Respira AER](https://www.respira.press/aer) is Respira's own console for working on connected sites with an agent. Five of its commands do not hand the work to a model at all. Each one asks the site (or every site of the thread) for a list, shows it as a card with one row per item, and lets the person tick rows and press one button. The press is the approval. Nothing on the card is written by a model: every title, version, date and message is what the site said, copied as it came.
+
+Why not a prompt: a roster of updates, a list of advisories or a table of backup plugins is data. A model would spend tokens turning it into prose and back, and could tick the wrong thing. The card is the whole interface.
+
+## How every card behaves
+
+- **The tick** selects rows or sites. Nothing runs on a tick.
+- **The press** sends the selection back to the site. That press is the approval: the write runs with the site's own approval token answered once, the way Auto mode answers it. There is no second confirmation unless the site has something to say first (a missing restore point, for instance).
+- **One receipt per site.** Each site's outcome appears on the card as the site reported it. One row or one site failing never stops the next.
+- **A long run keeps going.** When a batch outgrows the window it started in, the remaining rows are handed to a fresh window with the same message and the same card, and nothing is appended twice. The site's own job keeps running meanwhile and the row says so.
+- **What a site needs.** Every card reads the site's own tool list first. A site whose plugin predates the card's tools gets a note on its row: which version it runs and which the card needs. Respira AER itself needs plugin 8.9.0 or later.
+
+## The five cards
+
+### /updates
+
+Plugins, themes and WordPress, ticked and run from one card. The card asks every site of the thread for its updates roster, a read, and lists what is waiting: plugin, theme or core, the installed and the offered version, whether it is a major. Ticking sites and pressing Update runs each site's batch as one write, with `stop_on_unhealthy` set so a site that stops answering ends its own batch. The receipt per site lists what landed. Needs plugin 9.0.13.
+
+### /security
+
+Known vulnerabilities an update closes, with a restore point first. The card asks every site for its security audit (the known vulnerabilities block) and its updates roster, both reads, and lists one row per known vulnerability that an available update closes: the plugin, the CVE, the installed version, the version that closes it and the version the site is offered. On a site at 9.1.0 or later each plugin row is also put through `check_guarded_update`, a read, so the row can say what restore point the site has before anyone presses anything. Pressing runs a [guarded plugin update](/security/guarded-plugin-update) per row: a restore point before, four health checks after, and the previous version put back from wordpress.org when a check fails. The receipt per row is the update's receipt. Listing needs plugin 9.0.0; updating from the card needs 9.1.0. A premium plugin with no wordpress.org archive gets no button.
+
+### /approvals
+
+Staged copies waiting for a yes, decided from one card. The card asks every site for its pages and posts, reads, and keeps the Respira-created copies still waiting for a decision, with the original each would replace. A share link for a row is minted only when the person ticks or expands that row, never for every row. Per row the person chooses approve, reject or send: approve merges the copy into its original under a snapshot, reject runs the site's reject on the copy, send creates an approval link for the number of days typed and shows it on the row, so someone else can decide. The card decides nothing for them. Needs plugin 8.8.34; sending a copy for approval needs 9.0.19.
+
+### /backups
+
+Backup plugin per site, when it last ran, one press to take one. The card asks every site which backup plugin it has and whether Respira can drive it. On a site at 9.1.0 or later that is the site's own restore point block: tier, provider, when it last ran, and whether the provider's abilities are registered. On an older site the active plugins are matched against the same provider table, which knows the tier but not the last run. A site with no provider gets the "No backup detected" finding. Ticking sites and pressing takes a backup on each through `take_backup`, the same path the guarded update uses for its restore point, queued on the site and polled to finished. The receipt names the provider, the id or file it gave back, and how long it took. Taking a backup from the card needs plugin 9.1.0.
+
+### /reviews
+
+Open review comments, page by page, answered from one card. The card asks every site for its open Murmur review comments, a read, and groups them by page: title, address, count, each comment quoted as the reviewer typed it, who and when as the site reports. Per page the person chooses resolve, reply or apply on a copy. Resolve closes every comment of the page; reply posts the text typed in the row. Apply on a copy is the one action that needs a model: it hands the page to a normal turn, scoped to that site, with a prompt that names the page and not the comments, and that run appears in the chat right after the card with its own receipt. Needs plugin 8.9.0.
+
+## What a site needs, in one table
+
+| Card | Reads | Writes on press | Plugin version |
+|---|---|---|---|
+| `/updates` | `list_updates` | `run_updates` | 9.0.13 |
+| `/security` | security audit, `list_updates`, `check_guarded_update` | `guarded_plugin_update` | 9.0.0 to list, 9.1.0 to update |
+| `/approvals` | `list_pages`, `list_posts` | `approve_duplicate`, `reject_duplicate`, `create_approval_link` | 8.8.34, 9.0.19 to send |
+| `/backups` | `check_guarded_update` or `list_plugins` | `take_backup` | 9.1.0 to take a backup |
+| `/reviews` | `list_review_comments` | `resolve_review_comment`, `reply_to_review_comment` | 8.9.0 |
+
+A site below the version shows its rows, where it can, and a note on why the press is not offered: update the plugin in wp-admin (Plugins).
+
+## Related pages
+
+- [Guarded plugin update](/security/guarded-plugin-update)
+- [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients), the same contract for agents that talk MCP
+- [Share Preview Links](/share-preview-links)
+- [Dashboard Overview](/dashboard/overview)

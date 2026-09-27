@@ -52,6 +52,57 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-09-27" description="Respira for WordPress v9.1.0 + MCP Server 8.4.0: plan mode, the guarded plugin update, cards in Respira AER, site skills" tags={["release", "plan-mode", "security", "skills", "safety"]}>
+
+### What's New in v9.1.0
+
+**Plan mode for every MCP client**
+- `respira_begin_session` with `mode: "plan"` makes every write answer a `respira_plan_step` instead of changing the site: the tool, its arguments with secrets hidden, the predicted effect, and whether it would land on a draft copy or the live item. Reads run as usual.
+- `respira_apply_plan` runs the steps in order, each through the same checks as a direct call, and returns one receipt with snapshot ids and preview links. The apply call is the person's approval for a step whose tool asks for one, and the receipt names those steps.
+- `respira_get_plan` shows the plan, `respira_discard_plan` empties it, and `respira_end_session` turns plan mode off and says how many steps never ran. One write can be planned without a session by sending `_respira_plan: true`.
+- Guide: [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients).
+
+**Guarded plugin update**
+- `guarded_plugin_update` updates one wordpress.org plugin to the exact version offered, with a restore point before and four health checks after, and puts the previous version back from wordpress.org when a check fails. Duplicator and BackWPup take a fresh backup through their abilities and the run waits for it; UpdraftPlus is started and watched; any other provider, or none, closes the one-click path unless the caller says that no restore point is accepted.
+- `take_backup` is the restore point step on its own. `check_guarded_update` is the same preflight as a read. `get_guarded_update` reads a run's progress and its receipt.
+- The REST route takes `_respira_async` and refuses to run inside the request unless asked.
+- Guide: [Guarded plugin update](/security/guarded-plugin-update). Cards: [Cards in Respira AER](/dashboard/aer-cards).
+
+**Site skills**
+- Respira > AI Skills holds short Markdown pages that tell every agent how a thing is done on this site, each with an on/off switch and an "agents may edit" switch. Every save is a revision. `respira_list_skills`, `respira_get_skill`, `respira_write_skill` and `respira_delete_skill` read and write them; the enabled skills ride in `respira_get_site_context` under `site_skills`.
+- A new screen, What your AI is told, shows in order what an agent receives from this site.
+- Guide: [Site skills](/site-skills).
+
+**Connecting**
+- A host that strips the Authorization header no longer ends the connection: Respira's clients send the credential a second time in `X-Respira-Authorization`, and the plugin uses that copy when a request arrives with no credential at all.
+- Respira > Troubleshoot runs the connection checks from the site's own server, shows each as pass or fail with one next step, and produces a plain-text report for a hosting support team.
+- Setup's "connect your agent" step has a prompt to paste into an agent so it connects itself.
+- Errors on the connection, sign-in and approval paths carry `cause` and `retry_ok`.
+
+**Divi 5: native attributes by default**
+- Every agent write to a Divi 5 page takes `allow_inline_styles` and `allow_code_modules`, both false by default. A style with no native place comes back in the write result as `unmapped_styles`; a write that adds a `divi/code` module is refused with the native module to use. See [Divi 5 Support](/builders/divi-5).
+
+**Block editor writes are render-checked**
+- After a write to a block editor page, Respira parses and renders the saved markup and reports `render_validator_pass`, `validator_warnings` and the `snapshot_uuid` that undoes the write. See [Gutenberg](/builders/gutenberg).
+
+**Abilities from other plugins**
+- `search_abilities` searches every ability registered on the site at the moment of the call and says for each whether Respira can invoke it now and, when it cannot, why not.
+- Respira > Abilities has a new setting, off unless the site owner turns it on: "Let Respira run read-only abilities".
+
+**Safety**
+- A delete through Respira can be undone: pages, posts, custom posts and media go to the trash with a snapshot first, and the answer carries `snapshot_uuid`.
+- An agent can no longer change the options that lock people out of a site (`siteurl`, `home`, `active_plugins`, the roles option, every key and salt, Respira's own settings and more): refused with `respira_option_protected`.
+- Every SVG uploaded through Respira is cleaned first; one that cannot be made safe is refused with `respira_svg_unsafe`.
+- A theme file write stores the file's current bytes in a snapshot first.
+- The audit log keeps entries for 180 days by default, set under Respira > Settings > Audit & approvals.
+- Tool switches and profiles now bind on the site's own MCP endpoint too, not only over REST and the npm server.
+- Background writes sent with `_respira_async` start right away, and every job record is signed.
+- `update_comment` takes `status` as `approve`, `hold`, `spam` or `trash`.
+
+Full details in the [GitHub release notes](https://github.com/webmyc/respira-wordpress/releases/tag/v9.1.0).
+
+</Update>
+
 <Update label="2026-08-30" description="Respira for WordPress v8.8.0 + v8.8.1 + MCP Server 8.3.15-8.3.17: the field report, answered" tags={["release", "divi", "presets", "library", "safety"]}>
 
 ### The field-report releases
@@ -625,6 +676,25 @@ Complete WooCommerce agent coverage: 56 tools.
 </Update>
 
 ## MCP Server Releases
+
+<Update label="2026-09-27" description="MCP Server v8.4.0: plan mode, site skills, Divi 5 native-write options, the key travels twice" tags={["release", "mcp", "plan-mode", "skills", "divi"]}>
+
+### What's New in MCP Server v8.4.0
+
+Pairs with plugin 9.1.0. Each item below needs the plugin at 9.1.0 or later on the site; an older plugin ignores the new flags and behaves as before.
+
+- **Plan mode.** `respira_begin_session` passes `mode: "plan"` to the plugin, after which every write answers `respira_plan_step` instead of changing the site. The step reaches the client as the plugin sent it, with `isError: false`; a tool that makes several writes returns every step, and says so when it had to stop because it needed a write's result. `respira_get_plan` shows the plan, `respira_apply_plan` runs the accepted steps and returns one receipt with snapshot ids and preview links, `respira_discard_plan` empties it. SOUL.md's approval rule now covers a plan step too: show the person, apply only after they say yes. See [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients).
+- **Site skills.** `respira_list_skills`, `respira_get_skill`, `respira_write_skill` and `respira_delete_skill`. The enabled skills arrive in `respira_get_site_context` under `site_skills` as name and description, in the compact projection too; the body is read on demand. Writing follows the `respira_remember` rule (only when the user asked) and is refused on a skill the owner marked as not editable by agents. See [Site skills](/site-skills).
+- **Divi 5 native-write options.** `allow_inline_styles` and `allow_code_modules`, both default false, on `inject_builder_content`, `update_module`, `apply_builder_patch`, `update_element`, `batch_update`, `build_page` and every `add_*` shortcut. A non-empty `unmapped_styles` is summarised at the top of the result message. The dropped-styling hint no longer suggests a `divi/code` block.
+- **The key travels twice.** Every request to the site carries `X-Respira-Authorization: Bearer <key>` next to `X-Respira-API-Key`, and so do `--setup` and `--doctor`. A staging password configured as `httpAuth` stays in Authorization, untouched.
+- **Errors carry `cause` and `retry_ok`.** The error envelope an agent sees shows both, so it can tell a key problem from a host problem and knows when a retry is worth sending.
+- **The active design direction** reaches the compact site context under `active_design_direction`: the direction's name and tokens, one line on how page writes use it, and the tool for the full direction.
+- **Respira Exhale, the HTML to WordPress converter, is the route for a finished HTML page.** `convert_html_to_builder` says what it does, `build_page` points there when a complete HTML file already exists, and SOUL.md tells the agent to take that route and to say why in one sentence.
+- `respira_update_comment` takes `status` as one of `approve`, `hold`, `spam`, `trash`.
+- `respira_delete_page`, `respira_delete_post`, `respira_delete_custom_post` and `respira_delete_media` take `permanent`. With plugin 9.1.0 a delete goes to the trash unless it is true, and the answer carries `snapshot_uuid` for `respira_restore_snapshot`.
+- `respira_search_abilities` and `respira_invoke_ability` describe live ability search and the read-only reach setting.
+
+</Update>
 
 <Update label="2026-07-26" description="MCP Server v8.0.0 'Canopy': Site Editor tools and the mutation-result contract" tags={["release", "mcp", "fse", "site-editor"]}>
 

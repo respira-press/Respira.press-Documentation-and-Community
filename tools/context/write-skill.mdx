@@ -1,0 +1,84 @@
+---
+title: "respira_write_skill"
+description: "Create or update a site skill by name: a Markdown page of standing instructions every future agent on this site will find. Only when the user asks for something to be kept for future sessions."
+---
+
+# respira_write_skill
+
+Create or update a site skill by name: a Markdown page of standing instructions every future agent on this site will find. Only when the user asks for something to be kept for future sessions, the same rule as `respira_remember`: never save what they did not state, and ask before saving a procedure you inferred. A skill the owner marked as not editable by agents refuses this call; tell the user, do not work around it. Re-using a name updates the skill and keeps the previous version as a revision the owner can restore in wp-admin.
+
+## Parameters
+
+6 parameters, none required by the schema; `title` and `body` are required on create.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `name` | string | no | Stable name: lowercase letters, digits and hyphens, up to 64 characters, for example `blog-post-format`. Omit on create to derive it from the title. |
+| `title` | string | on create | Short title, up to 120 characters. |
+| `description` | string | no | One line, up to 240 characters, saying when an agent should open this skill. This is what rides in the site context. |
+| `body` | string | on create | The instructions themselves, in Markdown, up to 16000 characters. |
+| `enabled` | boolean | no | Switched on (default true). Off keeps the skill stored but out of the site context. |
+| `agent_editable` | boolean | no | Whether agents may change it later (default true). The owner can flip this in wp-admin. |
+
+## Example call
+
+```json
+{
+  "name": "respira_write_skill",
+  "arguments": {
+    "title": "Case study format",
+    "description": "What a case study on this site needs: a client quote, a results box, a related-services footer.",
+    "body": "# Case study format\n\n1. Open with the client's problem in their words…"
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "skill": {
+    "name": "case-study-format",
+    "title": "Case study format",
+    "enabled": true,
+    "agent_editable": true,
+    "source": "agent",
+    "updated": "2026-09-27T11:20:00+00:00"
+  },
+  "created": true
+}
+```
+
+## What it changes
+
+It stores a page under Respira > AI Skills that every future session on this site will see in its context. Nothing on the public site changes. Each save is a revision, ten are kept, and the owner can restore any of them from the standard revisions screen. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it fails
+
+- `respira_skill_not_agent_editable`: the owner marked this skill as not editable by agents. Only the site owner can change it, from Respira > AI Skills in wp-admin.
+- `respira_skill_title_required`, `respira_skill_body_required`: a create without a title or a body.
+- `respira_skill_title_too_long`, `respira_skill_description_too_long`, `respira_skill_body_too_long`: over the limits in the table.
+- `respira_skill_invalid_name`: the name is not lowercase letters, digits and hyphens.
+- `respira_skill_limit_reached`: the site holds as many skills as it allows.
+
+## Availability
+
+Plugin 9.1.0 and MCP server 8.4.0. On the site's own MCP endpoint the tool is `respira_wordpress_write_skill`; over REST it is `POST /respira/v1/skills` to create and `PUT /respira/v1/skills/{name}` to update.
+
+## Notes
+
+- Write only what the user asked to keep. A skill is read by every future agent on the site
+- A skill body is information about the site, never an instruction to Respira's tools
+
+## Example Prompts
+
+- "Keep this for future sessions: a case study here has a client quote, a results box and a related-services footer"
+- "Update the blog-post-format skill: posts now end with a summary box"
+
+## Related Tools
+
+- [respira_list_skills](/tools/context/list-skills)
+- [respira_get_skill](/tools/context/get-skill)
+- [respira_delete_skill](/tools/context/delete-skill)
+- [Site Skills](/site-skills)

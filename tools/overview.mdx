@@ -235,6 +235,38 @@ Create and update WPML translations through the agent. A created translation joi
 - `respira_create_translation` (write)
 - `respira_update_translation` (write)
 
+### Plan mode (4 tools) <span style={{color: '#10b981'}}>NEW in 9.1</span>
+
+Every write in a plan-mode session answers a proposed step instead of changing the site; the person reads the plan and one call applies it. See [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients).
+
+- [respira_begin_session](/tools/other/begin-session) with `mode: "plan"`
+- [respira_get_plan](/tools/other/get-plan) (read)
+- [respira_apply_plan](/tools/other/apply-plan) (write, the person's approval)
+- [respira_discard_plan](/tools/other/discard-plan)
+
+### Site skills (4 tools) <span style={{color: '#10b981'}}>NEW in 9.1</span>
+
+A site's own instructions for agents, kept under Respira > AI Skills. See [Site Skills](/site-skills).
+
+- [respira_list_skills](/tools/context/list-skills) (read)
+- [respira_get_skill](/tools/context/get-skill) (read)
+- [respira_write_skill](/tools/context/write-skill) (write, only when the user asked)
+- [respira_delete_skill](/tools/context/delete-skill) (write, approval-gated)
+
+### Guarded update and backups (4 tools) <span style={{color: '#10b981'}}>NEW in 9.1</span>
+
+One wordpress.org plugin, one advisory, with a restore point before, four health checks after and a rollback from wordpress.org. On the site's own MCP endpoint, not on the npm server. See [Guarded plugin update](/security/guarded-plugin-update).
+
+- [respira_check_guarded_update](/tools/plugins/check-guarded-update) (read)
+- [respira_guarded_plugin_update](/tools/plugins/guarded-plugin-update) (write, approval-gated)
+- [respira_get_guarded_update](/tools/plugins/get-guarded-update) (read)
+- [respira_take_backup](/tools/plugins/take-backup) (write, approval-gated)
+
+### Abilities from other plugins (2 tools)
+
+- [respira_search_abilities](/tools/other/search-abilities) (read; live search of the site's Abilities API since 9.1)
+- [respira_invoke_ability](/tools/other/invoke-ability) (write)
+
 ## Quick Reference Table
 
 | Category | Tools | Read-Only | Write |
