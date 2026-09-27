@@ -98,6 +98,30 @@ The `respira_site_...` value people paste there is the **site token** from the d
 
 </details>
 
+### Respira > Troubleshoot in wp-admin (plugin 9.1.0)
+
+When an agent will not connect, the site can check itself. **Respira > Troubleshoot** runs the connection checks from the site's own server and shows each one as pass or fail, with the cause and one next step:
+
+- the REST API, and the `?rest_route=` address
+- a web page where JSON belongs: a Cloudflare challenge, a firewall's block page, a maintenance plugin or the site's own front page, each named
+- the Authorization header, and Respira's backup header (`X-Respira-Authorization`)
+- the MCP address, and sign-in discovery at `/.well-known/oauth-protected-resource`
+- a bot filter that refuses the user agents claude.ai's and ChatGPT's connectors send, asked twice before it is called a rule
+- the security plugins and CDNs in front of the site
+- whether the site can reach respira.press
+
+**Copy report for your host** produces a plain-text report for a hosting support team: what failed, what to allow, and the id of every test request (each carries an `X-Respira-Probe-Id` header, so the host can find it in its logs). It contains no passwords, cookies, keys or page contents. Setup links to the screen when linking fails or an agent will not connect.
+
+### The host strips the Authorization header
+
+Apache running PHP as CGI or FastCGI, some LiteSpeed setups and a few managed-host edges drop the `Authorization` header before PHP runs. Every client that authenticates with `Authorization: Bearer` then gets a 401 it cannot explain, and an OAuth client reads that 401 as an expired token and re-runs sign-in forever.
+
+From plugin 9.1.0 and MCP server 8.4.0, Respira's clients send the credential a second time in `X-Respira-Authorization`, and the plugin uses that copy when a REST request arrives with no credential at all. Nothing to configure. The fallback never overwrites a real Authorization header (a staging site's HTTP password keeps working), it stands aside when `X-Respira-API-Key` is present, and it accepts only `Bearer` followed by a Respira key or access token, so it cannot log anyone in through application passwords or another plugin.
+
+- The Authorization self-test in Respira > Troubleshoot reports whether the copy arrives, with the status `stripped_fallback_ok` for a server that eats Authorization but passes Respira's header.
+- To turn the fallback off: `define( 'RESPIRA_DISABLE_AUTH_FALLBACK', true );` in wp-config.php, or the `respira_allow_auth_fallback` filter from a must-use plugin.
+- On a plugin older than 9.1.0 the answer is still the `.htaccess` rule that passes Authorization through, or the `?rest_route=` address; see [rest_route fallback](/guides/rest-route-fallback).
+
 ### MCP update hints appear in tool responses (`respira_mcp_update`)
 
 This is informational, not a runtime failure.

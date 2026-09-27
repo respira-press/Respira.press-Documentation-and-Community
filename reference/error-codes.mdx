@@ -46,6 +46,29 @@ Common error codes and how to resolve them.
 | `ETIMEDOUT` | Connection timed out | Check hosting/network; retry |
 | `CERT_ERROR` | SSL certificate issue | Verify SSL is valid |
 
+## `cause` and `retry_ok` (plugin 9.1.0)
+
+Errors on the connection, sign-in and approval paths carry two more fields in their data, so an agent can tell a key problem from a host problem and knows when a retry is worth sending:
+
+| Field | Values | Meaning |
+|------|--------|---------|
+| `cause` | `credential`, `capability`, `licence`, `security_gate`, `approval`, `host_environment`, `invalid_input`, `not_found`, `conflict`, `rate_limited`, `server_error` | What kind of thing went wrong |
+| `retry_ok` | `true` or `false` | Whether sending the same call again can work |
+
+Examples: `respira_key_revoked` says `credential` and no retry. `respira_site_token_validation_failed` (respira.press was out of reach) says `host_environment` and retry. `respira_mcp_authorization_header_stripped` says `host_environment` and no retry; see [the host strips the Authorization header](/troubleshooting#the-host-strips-the-authorization-header). On the site's own MCP endpoint a failed tool call also carries the pair in `_meta["respira/error"]`.
+
+## Plan mode and skills (plugin 9.1.0)
+
+| Code | Message | Solution |
+|------|---------|----------|
+| `respira_plan_step` | Not an error: the write was planned, nothing was written | Show the person the plan; call [respira_apply_plan](/tools/other/apply-plan) after they say yes |
+| `respira_plan_needs_key` | Plan mode needs a connection with its own Respira key | Connect with an API key or a site token |
+| `respira_plan_step_not_pending` | The named step is not waiting | Call [respira_get_plan](/tools/other/get-plan) for the current ids |
+| `respira_skill_not_agent_editable` | The owner marked the skill as not editable by agents | Tell the user; the owner changes it under Respira > AI Skills |
+| `respira_option_protected` | The option is one an agent may never write | Make the change in wp-admin; the message says where |
+| `respira_svg_unsafe` | The SVG could not be made safe | Fix the file or upload a raster image |
+| `respira_divi5_code_module_refused` | The write would add a `divi/code` module | Use the native module the message names, or send `allow_code_modules: true` if the user asked for a code module |
+
 ## See Also
 
 - [Troubleshooting](/troubleshooting)

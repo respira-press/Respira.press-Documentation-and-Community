@@ -157,6 +157,11 @@ See [Site Editor (Full Site Editing)](/builders/site-editor) for the tools, the 
 - **SEO and readability workflows** - Batch-fix heading hierarchy or missing alt text
 - **Programmatic content** - Update dates, years, or repeated content across pages
 
+## Recent capabilities (9.1.0)
+
+- **Block editor writes are render-checked, like every other builder's.** After a write to a block editor page (`update_page`, `update_post`, `inject_builder_content`, the `add_*` tools, `convert_html_to_builder`, and Kadence, Spectra, GenerateBlocks and GreenShift pages), Respira reads the saved markup the way WordPress's block parser does and renders every block in process, so a draft or a duplicate is checked too; a published page is also fetched. The response's `trace` carries `render_validator_pass`, `validator_warnings` naming each problem with its block and path, and the `snapshot_uuid` that undoes the write in one `respira_restore_snapshot` call.
+- **What it catches.** A closing comment with no opener (WordPress stops reading blocks there), a closer under the wrong name, a block never closed, attribute JSON that does not parse, a comment the parser does not read as a block, a heading or paragraph whose text sits only in its attributes and renders as nothing, and a block whose render throws. It warns on an unregistered block type, an attribute WordPress will drop, and PHP warnings raised while rendering. Before this, a broken write of any of these kinds answered success with nothing said.
+
 ## Recent capabilities (8.0 "Canopy")
 
 - **The Site Editor is a first-class target.** Block templates, template parts, synced and unsynced patterns, block navigation and global styles are addressable, with structural writes behind a fingerprint, a snapshot, a read-back and a server-render check. See [Site Editor](/builders/site-editor).
