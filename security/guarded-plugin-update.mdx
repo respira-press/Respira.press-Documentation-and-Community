@@ -107,7 +107,7 @@ The shape above is from a real run on 2026-09-27: Advanced Custom Fields 6.8.9 t
 
 ### From the dashboard's security page
 
-On [respira.press/dashboard/security](https://www.respira.press/dashboard/security), each known vulnerability that an offered update closes shows a button: "Update <plugin> to <version> and close <CVE>". Before it is enabled, the dashboard runs `check_guarded_update` on the site, and the line under the button says what the site allows: the restore point it has, or the reason the button stays off. Pressing it is the approval. The page shows the run's steps as they happen (checking, taking a restore point, updating the plugin, checking the site) and then the receipt. Premium plugins with no wordpress.org archive get no button.
+On [respira.press/dashboard/security](https://www.respira.press/dashboard/security), each known vulnerability that an offered update closes shows a button: "Update `<plugin>` to `<version>` and close `<CVE>`". Before it is enabled, the dashboard runs `check_guarded_update` on the site, and the line under the button says what the site allows: the restore point it has, or the reason the button stays off. Pressing it is the approval. The page shows the run's steps as they happen (checking, taking a restore point, updating the plugin, checking the site) and then the receipt. Premium plugins with no wordpress.org archive get no button.
 
 A site on a plugin older than 9.1.0 sees the reason on the button instead of a call that answers "tool not found".
 
