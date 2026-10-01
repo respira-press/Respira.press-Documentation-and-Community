@@ -52,6 +52,27 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-10-02" description="Respira for WordPress v9.1.11 + MCP Server 8.4.10: find_in_page, JSON-LD blocks with their values, find_element by content on every builder" tags={["release", "analysis", "seo", "builders", "bugfix"]}>
+
+### What's New in v9.1.11
+
+**find_in_page: text that is not in the page content**
+- `respira_find_in_page` is a new read tool for schema, tracking tags, verification tags and anything pasted into a header or footer code setting. Give it a post ID or an address on the site and the text. It reads the published HTML, head included, and returns each match with the tag around it and 200 characters either side, or every JSON-LD block with `kind: "jsonld"`.
+- `sources` checks the places head code lives on the site (Elementor Custom Code, WPCode snippets, the WPCode header and footer options, Perfmatters, the Divi, Avada and Bricks code settings, GeneratePress hook elements, the theme's Customizer code settings) and says which one holds the text, with its id or option name, a short context and the length, never the whole body.
+- Options Respira protects are skipped, addresses on other sites are refused, and a redirect is followed only while it stays on the site.
+- Tool page: [respira_find_in_page](/tools/analysis/find-in-page).
+
+**check_structured_data shows the values**
+- `blocks` lists every JSON-LD block on the published page: head or body, every `@type`, size, the plugin that printed it (`emitter`), whether it is valid JSON, and the decoded JSON up to 4,000 characters.
+- `contains` keeps the blocks that hold a value, each with 200 characters of context, and `where_to_edit` says where each one is changed.
+- The tool reads the published page on every call. See [wordpress_check_structured_data](/tools/analysis/check-structured-data).
+
+**Fixes**
+- `find_element` by content, text or class works on every builder Respira reads. Each match names its field with a snippet, at most 20 with `truncated`. A search that finds nothing is a normal answer with `found: 0` and where to look next, where it used to answer HTTP 404. A class search on Elementor now reads the custom class setting. See [respira_find_element](/tools/builders/find-element).
+- A published page that dies while rendering is no longer read as empty. When PHP printed a fatal error with HTTP 200, the analyzers searched the error text; the page now counts as unreadable, with the reason.
+
+</Update>
+
 <Update label="2026-09-27" description="Respira for WordPress v9.1.0 + MCP Server 8.4.0: plan mode, the guarded plugin update, cards in Respira AER, site skills" tags={["release", "plan-mode", "security", "skills", "safety"]}>
 
 ### What's New in v9.1.0
@@ -676,6 +697,18 @@ Complete WooCommerce agent coverage: 56 tools.
 </Update>
 
 ## MCP Server Releases
+
+<Update label="2026-10-02" description="MCP Server v8.4.10: find_in_page, check_structured_data takes contains, find_element searches every builder" tags={["release", "mcp", "analysis", "seo"]}>
+
+### What's New in MCP Server v8.4.10
+
+Pairs with plugin 9.1.11. Each item below needs the plugin at 9.1.11 or later on the site.
+
+- **`respira_find_in_page`.** Finds text in the HTML a visitor gets for a page, head included, and names the snippet or setting on the site that holds it. Takes `post_id` or `url` (this site only), `contains`, `kind` (`any`, `head` or `jsonld`) and `limit`. Read only. See [respira_find_in_page](/tools/analysis/find-in-page).
+- **`check_structured_data` takes `contains`.** The answer lists every JSON-LD block with its values, location and the plugin that printed it, and `contains` keeps the blocks that hold a value. See [wordpress_check_structured_data](/tools/analysis/check-structured-data).
+- **`find_element` searches content, text and class on every builder.** The description says each match names its field with a snippet and that no match is a normal answer with `found: 0`. `apply_builder_patch` points at it for pages other than Divi 4. See [respira_find_element](/tools/builders/find-element).
+
+</Update>
 
 <Update label="2026-09-27" description="MCP Server v8.4.0: plan mode, site skills, Divi 5 native-write options, the key travels twice" tags={["release", "mcp", "plan-mode", "skills", "divi"]}>
 

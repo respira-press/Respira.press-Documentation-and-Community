@@ -74,7 +74,7 @@ Works on any WordPress site, whichever page builder it uses. Available since Res
 
 - Use **get_page_outline** first when you want the shape of a page: how many rows, what each one is, what it contains. It is the cheapest way to orient before an edit.
 - Use [wordpress_extract_builder_content](/tools/builders/extract-content) when you need the full builder-native JSON to modify and pass back into `inject_builder_content`.
-- For a targeted search by text or class, use `find_element` instead.
+- For a targeted search by text or class, use [respira_find_element](/tools/builders/find-element) instead.
 
 If `extract_builder_content` runs into the response-size cap on a large page, the truncation hint points you back here: get the outline first, then extract just the subtree you care about.
 

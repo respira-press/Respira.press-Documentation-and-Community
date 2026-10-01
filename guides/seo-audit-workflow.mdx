@@ -59,6 +59,14 @@ Re-run analysis to confirm improvements:
 Analyze SEO on the homepage again
 ```
 
+## When the Agent Cannot Find a Schema Block, a Pixel or a Meta Tag
+
+Schema, tracking pixels and verification meta tags are usually printed in the page's head by an SEO plugin or a header code setting, so they are not in the page content and a search of the page's elements comes back empty. [respira_find_in_page](/tools/analysis/find-in-page) searches the published HTML, head included, and names the snippet or setting that holds the text.
+
+```text
+Find where the Product schema on page 42 comes from and tell me which setting holds it
+```
+
 ## Batch Audit Prompt
 
 ```text
@@ -74,5 +82,7 @@ Run SEO analysis on these pages and give me the top 5 issues across all of them:
 - [wordpress_analyze_seo](/tools/analysis/analyze-seo)
 - [wordpress_check_seo_issues](/tools/analysis/check-seo-issues)
 - [wordpress_analyze_aeo](/tools/analysis/analyze-aeo)
+- [wordpress_check_structured_data](/tools/analysis/check-structured-data)
+- [respira_find_in_page](/tools/analysis/find-in-page)
 
 
