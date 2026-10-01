@@ -64,6 +64,11 @@
                 "icon": "settings"
               },
               {
+                "title": "Automatic Updates",
+                "path": "automatic-updates",
+                "icon": "refresh-cw"
+              },
+              {
                 "title": "MCP Install Link Generator",
                 "path": "mcp-install",
                 "icon": "link"

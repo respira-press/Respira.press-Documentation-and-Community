@@ -1,0 +1,107 @@
+---
+title: Automatic Updates
+description: Respira for WordPress can update itself. One switch per site, off until you turn it on, in the plugin's settings or on the respira.press dashboard. It updates Respira only, waits while a job is running, and never installs a new major version by itself.
+---
+
+## What it does
+
+Respira ships often. With automatic updates on, a site installs each new Respira release by itself, so nobody has to download a zip or press Update on every site.
+
+- It updates Respira only. Other plugins, themes and WordPress itself are not touched.
+- It runs on WordPress's own update schedule, twice a day, through WordPress's own updater.
+- It is off until you turn it on.
+- A new major version (for example 9 to 10) always waits for you.
+- An update waits while a Respira job is running on the site: an async job, a guarded update, or a plan being applied. WordPress tries again on its next run.
+
+Plugin 9.1.12 or later.
+
+## Turn it on in WordPress
+
+Open Respira > Settings > Safety controls. The **Updates** card has one switch, **Automatic updates for Respira**.
+
+It is the same switch as WordPress's own **Enable auto-updates** link next to Respira on the Plugins screen. Turn either one and the other follows.
+
+After your next manual update, Respira asks once whether to turn automatic updates on. Answer either way and it does not ask again.
+
+## Turn it on from the dashboard
+
+The [Sites page](https://www.respira.press/dashboard/sites) shows an **Automatic updates** switch on each site, and one action above the list for every site at once: **Turn on for every site** and **Turn off for every site**.
+
+The dashboard asks the site directly each time, so the switch shows what the site says, not a copy. Each row reads one of:
+
+| The row says | What it means |
+|---|---|
+| On | The site updates Respira by itself. The line under it shows the last automatic update, or why an update is waiting. |
+| Off | The site waits for a manual update. |
+| On, kept on by white label | White label keeps Respira's updates on for this site, so the switch does not move. |
+| Switched off on this server | The server stops WordPress's updater, and the row names what stops it. See below. |
+| Needs Respira 9.1.12 | The site runs an older version. Update it once from its Plugins screen and the switch appears. |
+| Not allowed on this site | The site's key belongs to a WordPress user who cannot update plugins, or the site refused the key. |
+| Could not reach the site | The site did not answer. Try again in a minute. |
+
+The account owner can change the switch. The site's key must belong to a WordPress user who can update plugins.
+
+## What you see after an update
+
+Respira's screens in wp-admin say that Respira updated itself from one version to the next, with a link to the release notes. The note appears once the version on disk reads the new one.
+
+If an update does not finish, the screens say so and say why. On WordPress 6.6 and later, WordPress puts the previous version back when a new version causes a fatal error, and the note says the site runs the previous version as before.
+
+Both outcomes land in the activity log.
+
+## When the server stops it
+
+Some servers switch off WordPress's updater. Respira does not work around that. The switch stays off and cannot be moved, and the row names the reason:
+
+| Reason | Where it comes from |
+|---|---|
+| `DISALLOW_FILE_MODS` | wp-config.php stops WordPress from changing plugin files. |
+| `AUTOMATIC_UPDATER_DISABLED` | wp-config.php switches off WordPress automatic updates. Some managed hosts set this. |
+| `automatic_updater_disabled` or `file_mod_allowed` filter | A plugin or theme on the site switches the updater off. |
+| Version control | WordPress found a version control folder, such as `.git`, above the plugins folder, and it does not update a checkout by itself. |
+
+On such a site, update Respira from the Plugins screen as before, or ask the host whether the updater can be allowed.
+
+## Switch it off for good
+
+To make sure Respira never updates itself on a site, whatever the switch says, add this to wp-config.php:
+
+```php
+define( 'RESPIRA_DISABLE_AUTO_UPDATE', true );
+```
+
+Or use the filter, for example in a must-use plugin:
+
+```php
+add_filter( 'respira_allow_auto_update', '__return_false' );
+```
+
+## Agents cannot change it
+
+The switch is a decision for the site owner. It is not an agent tool, and the options behind it (Respira's own and WordPress's `auto_update_plugins` and `auto_update_themes`) are protected from `respira_update_option` and `respira_delete_option`.
+
+## For developers
+
+`GET` and `POST /wp-json/respira/v1/settings/auto-update`, with a Respira key whose WordPress user can update plugins. `POST` takes `{ "enabled": true }` or `{ "enabled": false }`.
+
+```json
+{
+  "success": true,
+  "plugin_version": "9.1.12",
+  "auto_update": {
+    "enabled": true,
+    "last": { "from": "9.1.12", "to": "9.1.13", "at": "2026-10-09T03:12:44Z" },
+    "held": null,
+    "held_version": null,
+    "blocked_by": null,
+    "forced_by": null
+  }
+}
+```
+
+- `held` is `job_running` or `major` when an offered update is waiting, with the waiting version in `held_version`.
+- `blocked_by` names what stops the updater on this server. Turning the switch on then answers `409` with `respira_auto_update_blocked`.
+- `forced_by` is `white_label` when white label keeps updates on.
+- A key whose user cannot update plugins gets `403` with `respira_auto_update_forbidden`.
+
+The readiness manifest carries the same `auto_update` block.
