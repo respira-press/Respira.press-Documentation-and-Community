@@ -167,6 +167,10 @@ Recent fixes include safer handling for link-control array payloads, stricter pa
 - Confirm that content validation is passing
 - If drafts are not updating, clear any server-level or plugin caching
 
+### The agent cannot find a schema block, a tracking pixel or a meta tag
+
+That text is usually not in the page builder content: an SEO plugin or a header code setting prints it when the page renders, so a search of the page's elements finds nothing. With plugin 9.1.11 or newer, ask the agent to use [respira_find_in_page](/tools/analysis/find-in-page), which searches the published HTML, head included, and names the snippet or setting that holds the text.
+
 ### Setup page is read-only after upgrade
 
 This is expected in the 4.0 admin IA refresh.

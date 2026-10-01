@@ -653,11 +653,33 @@ GET /analyze/aeo/{page_id}
 
 ### Check structured data
 
-Check schema markup and structured data (JSON-LD, microdata) for AI parsing.
+Check schema markup and structured data (JSON-LD, microdata) for AI parsing. Since plugin 9.1.11 the answer lists every JSON-LD block with its values and the plugin that printed it.
 
 ```
 GET /analyze/structured-data/{page_id}
 ```
+
+Query parameters:
+- `contains` - Optional. Keep only the JSON-LD blocks whose text contains this
+
+See [wordpress_check_structured_data](/tools/analysis/check-structured-data).
+
+### Find in page
+
+Find text in the published HTML of a page, head included, and name the snippet or setting on the site that holds it. Read only. Plugin 9.1.11 or newer.
+
+```
+GET /analyze/find-in-page
+```
+
+Query parameters:
+- `post_id` - Page or post ID. Give this or `url`
+- `url` - Address on the same site. Give this or `post_id`
+- `contains` - Text to find. Required unless `kind` is `jsonld`
+- `kind` - `any` (default), `head` or `jsonld`
+- `limit` - Most matches to return, default 8, at most 20
+
+See [respira_find_in_page](/tools/analysis/find-in-page).
 
 ## Security
 
