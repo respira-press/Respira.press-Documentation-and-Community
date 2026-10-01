@@ -1,0 +1,149 @@
+---
+title: "respira_find_element"
+description: "Find an element in a page builder page by text, CSS class, type, ID, admin label or path. Each match names the field that matched and carries a snippet, and a search with no match is a normal answer."
+---
+
+# respira_find_element
+
+Find an element in a page by its text, CSS class, type, ID, admin label or path. This is the tool for locating the thing to edit: the answer carries the element's id and `path_string`, which [respira_update_element](/tools/overview) and the other element tools take as they are.
+
+Since plugin 9.1.11, a search by `content`, `text` or `class` works on every page builder Respira reads. `content` and `text` search the text of each element (headings, text editors, HTML and code widgets, buttons), case-insensitive, and `class` searches the element's custom class setting. Each match names the field that matched and carries a snippet. A search that finds nothing is a normal answer with `found: 0`, not an error, and it points to [respira_find_in_page](/tools/analysis/find-in-page) for text that lives outside the page builder.
+
+## Parameters
+
+5 parameters, 3 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `post_id` | number | yes | Page or post ID |
+| `identifier_type` | string | yes | How to find the element. One of: `id`, `type`, `admin_label`, `class`, `content`, `text`, `path`, `uncode_shortcode_id`. `path` takes an index path such as `1.0.1` (the `path_string` this tool returns) and names exactly one element. |
+| `identifier_value` | string | yes | Value to search for |
+| `match_content` | string | no | Text to narrow the result to elements whose own text or attribute values contain it. It separates siblings; it cannot separate an element from an ancestor that contains it, so use `path` when you need certainty. |
+| `include` | string | no | Comma-separated optional sections. Pass `content` (or `full`) for the element's stored body: settings, attributes and children, as the builder saved them. Without it the answer is a compact summary with a one-line preview. |
+
+## Example call
+
+Find the element that holds a piece of visible text:
+
+```json
+{
+  "name": "respira_find_element",
+  "arguments": {
+    "post_id": 42,
+    "identifier_type": "content",
+    "identifier_value": "Free shipping"
+  }
+}
+```
+
+## Response
+
+The keys are the ones the plugin returns for a `content`, `text` or `class` search. Every value below is an example.
+
+```json
+{
+  "success": true,
+  "post_id": 42,
+  "identifier_type": "content",
+  "identifier_value": "Free shipping",
+  "found": 1,
+  "count": 1,
+  "supported": true,
+  "builder": "Elementor",
+  "element": {
+    "id": "7a3f2c1",
+    "type": "heading",
+    "preview": "Free shipping on every order",
+    "child_count": 0,
+    "_path": [0, 1, 0],
+    "path_string": "0.1.0"
+  },
+  "matches": [
+    {
+      "id": "7a3f2c1",
+      "type": "heading",
+      "preview": "Free shipping on every order",
+      "child_count": 0,
+      "_path": [0, 1, 0],
+      "path_string": "0.1.0",
+      "field": "settings.title",
+      "snippet": "Free shipping on every order"
+    }
+  ],
+  "truncated": false
+}
+```
+
+- `found` is the number of elements that matched. `matches` holds at most 20 of them, and `truncated` is true when there are more.
+- Each entry in `matches` carries `field`, the setting that matched, and `snippet`, up to 160 characters around the match, so one of several elements can be picked without a second read.
+- `element` is the element a write with the same identifier would touch. With more than one match, pass a `path_string` with `identifier_type: "path"` to name one exactly.
+- `in_other_settings` lists, apart and not counted in `found`, elements that hold the text only in a setting that is not text, such as a link, an image or a style value.
+- Without `include`, each element is a compact summary and `_note_include` says that `include: "content"` returns the full element body.
+
+A search by `id`, `type`, `admin_label`, `path` or `uncode_shortcode_id` answers with `element` and `count`, and with `matches` when more than one element fits.
+
+### No match
+
+A `content`, `text` or `class` search that finds nothing answers HTTP 200:
+
+```json
+{
+  "success": true,
+  "post_id": 42,
+  "identifier_type": "content",
+  "identifier_value": "productontology.org/doc/Bicycle",
+  "found": 0,
+  "count": 0,
+  "supported": true,
+  "builder": "Elementor",
+  "element": null,
+  "matches": [],
+  "truncated": false,
+  "message": "No element on this page has text matching \"productontology.org/doc/Bicycle\". The text may live outside the builder content: in the theme, a widget, a header or footer code snippet, or an SEO plugin.",
+  "next_steps": {
+    "find_in_page": "respira_find_in_page with this post_id and contains set to the same text searches the published HTML, head included, and names the snippet or setting that holds it.",
+    "check_structured_data": "For schema (JSON-LD), respira_check_structured_data with contains shows every block that holds the text and which plugin printed it.",
+    "shorter_text": "Try a shorter part of the text, one or two words.",
+    "list_targets": "respira_find_builder_targets lists every editable element on the page."
+  }
+}
+```
+
+Schema, tracking tags, verification tags and other head code are not page builder content. [respira_find_in_page](/tools/analysis/find-in-page) searches the published HTML for them and names the setting that holds the text.
+
+A page with no builder elements to search answers `supported: false` with `use_instead`, the tools that work there.
+
+## What it changes
+
+Nothing. It only reads, so there is nothing to approve and nothing to undo.
+
+## When it fails
+
+- `respira_element_not_found`: a search by `id`, `type`, `admin_label`, `path` or `uncode_shortcode_id` matched nothing. The answer carries instructions: list the page's targets with `respira_find_builder_targets`, or read its shape with [wordpress_get_page_outline](/tools/builders/get-page-outline), before trying another value.
+- `respira_post_not_found`: No post or page has that ID. List the pages or posts and take the ID from the result.
+- `respira_no_builder`: a search by `id`, `type`, `admin_label`, `path` or `uncode_shortcode_id` ran on a post with no page builder content. The answer says how to read the stored content instead.
+
+A `content`, `text` or `class` search with no match is not a failure. Before plugin 9.1.11 it answered HTTP 404.
+
+## Availability
+
+Works on every page builder Respira reads. Searching by `content`, `text` and `class` on every builder, the `field` and `snippet` on each match, and the `found: 0` answer need plugin 9.1.11 or newer. Divi 4 pages resolve the same element as before. The older name `wordpress_find_element` still answers.
+
+## Notes
+
+- Read-only tool. It never changes the page
+- For text that is not in the page builder content, use [respira_find_in_page](/tools/analysis/find-in-page); for schema, [wordpress_check_structured_data](/tools/analysis/check-structured-data) with `contains`
+- On a page too large to extract whole, `include: "content"` reads one element's stored body
+
+## Example Prompts
+
+- "Find the heading that says 2025 on the footer page"
+- "Which element on page 42 has the class hero-cta?"
+- "Find the button that says Book a call on the home page"
+
+## Related Tools
+
+- [respira_find_in_page](/tools/analysis/find-in-page) - Find text in the published HTML, head included, and the setting that holds it
+- [wordpress_get_page_outline](/tools/builders/get-page-outline) - Row-level outline of a page
+- [wordpress_extract_builder_content](/tools/builders/extract-content) - Full structured builder JSON
+- [wordpress_update_module](/tools/builders/update-module) - Update a specific module
