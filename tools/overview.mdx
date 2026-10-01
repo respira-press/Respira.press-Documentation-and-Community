@@ -55,9 +55,9 @@ Safer comparison, rollback, and patch workflows on v2-capable sites.
 - `wordpress_restore_snapshot`
 - `wordpress_apply_builder_patch`
 
-### Analysis Tools (8 tools)
+### Analysis Tools (9 tools)
 
-Read-only analysis of SEO, performance, images, and AI Engine Optimization (AEO).
+Read-only analysis of SEO, performance, images, and AI Engine Optimization (AEO), plus a search of the published HTML for text that is not in page content.
 
 - [wordpress_analyze_seo](/tools/analysis/analyze-seo)
 - [wordpress_check_seo_issues](/tools/analysis/check-seo-issues)
@@ -67,6 +67,7 @@ Read-only analysis of SEO, performance, images, and AI Engine Optimization (AEO)
 - [wordpress_analyze_images](/tools/analysis/analyze-images)
 - [wordpress_analyze_aeo](/tools/analysis/analyze-aeo)
 - [wordpress_check_structured_data](/tools/analysis/check-structured-data)
+- [respira_find_in_page](/tools/analysis/find-in-page) <span style={{color: '#10b981'}}>NEW in 9.1.11</span>: finds text in the published HTML, head included, and names the snippet or setting that holds it
 
 ### Menu Tools (13 tools)
 
@@ -171,7 +172,7 @@ Miscellaneous utilities.
 
 Find, update, move, duplicate, and remove individual elements within any page builder.
 
-- `respira_find_element`
+- [respira_find_element](/tools/builders/find-element)
 - `respira_update_element`
 - `respira_move_element`
 - `respira_duplicate_element`
