@@ -1,6 +1,6 @@
 # Support
 
-This community is best-effort support for Respira for WordPress.
+This is the community space for Respira for WordPress. Every Respira licence also includes direct support by email: write to word@respira.press and Mihai, the founder, answers himself, typically within 24 hours.
 
 If you're posting because something is broken, help us help you. The better the report, the faster the fix.
 
@@ -41,6 +41,6 @@ If you accidentally post something sensitive, edit or delete the post immediatel
 
 ## Response expectations
 
-- Community replies are best effort.
-- Maintainer replies are not guaranteed in real time.
-- If you need priority support, use your paid support channel (if applicable) or hire a professional.
+- Community replies come from other users and are best effort.
+- For an answer from the founder, email word@respira.press. Support is included with every licence, and a reply typically arrives within 24 hours.
+- A confirmed bug can also be filed from your AI chat: ask the agent to use `respira_report_issue`, and the report reaches the founder at once.
