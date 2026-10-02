@@ -52,6 +52,24 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-10-02" description="Respira for WordPress v9.1.12: Respira can update itself, one switch per site and one for every site" tags={["release", "updates", "dashboard"]}>
+
+### What's New in v9.1.12
+
+**Automatic updates for Respira**
+- One switch under Respira > Settings > Safety controls, in the Updates card. It is off until you turn it on, and it is the same switch as WordPress's own Enable auto-updates link on the Plugins screen.
+- It updates Respira only, on WordPress's own schedule, twice a day. A new major version always waits for you, and an update waits while a Respira job is running.
+- Afterwards Respira's screens say which version it moved to, or why it could not, and both land in the activity log. On WordPress 6.6 and later, WordPress puts the previous version back if an update causes a fatal error.
+- Where the server stops WordPress's updater, the switch stays off and says what stops it.
+
+**The same switch on the dashboard**
+- The [Sites page](https://www.respira.press/dashboard/sites) shows the switch on each site, and one action for every site at once.
+- Agents cannot change it. It is not a tool, and the options behind it are protected.
+
+Full page: [Automatic Updates](/automatic-updates). No MCP server release is needed.
+
+</Update>
+
 <Update label="2026-10-02" description="Respira for WordPress v9.1.11 + MCP Server 8.4.10: find_in_page, JSON-LD blocks with their values, find_element by content on every builder" tags={["release", "analysis", "seo", "builders", "bugfix"]}>
 
 ### What's New in v9.1.11
