@@ -1,0 +1,62 @@
+---
+title: Murmur: Review and Request Links
+description: Murmur links let a client open a page or the whole site with no WordPress login and leave notes on the spot they mean. A review link is for work in progress and ends on a date. A request link is the one a client keeps to ask for changes on the live site.
+---
+
+## What Murmur is
+
+A Murmur link is a signed address to a WordPress site. The person who opens it needs no login. A small bar appears on the page, they click the spot they mean and write a note. The note reaches you, and your AI app can read it and act on it.
+
+Nobody who opens a Murmur link can change the site. A note is a note: it changes nothing until you or your agent apply it on a draft and you approve the draft.
+
+Murmur is part of the Builder plan and up.
+
+## Two kinds of link
+
+| | Review link | Request link |
+|---|---|---|
+| For | Work in progress: a page or a staging site you want comments on | The live site after launch: a link your client keeps |
+| Covers | One page, several pages, or the whole site | The whole site |
+| Ends | After 14 days by default, 90 at most | Never, until you revoke it |
+| The bar says | leave a comment | request a change |
+| Needs | Any plugin version with Murmur | Respira plugin 9.1.16 and MCP server 8.4.14 |
+
+## Make a request link
+
+Ask your AI app:
+
+> Make a Murmur request link for this site, labelled "Atelier Popescu, changes".
+
+The agent calls `respira_create_review_link` with `kind: "request"` and gives you the address. Send it to your client. One link per label: asking again with the same label returns the same link, unless you revoked it.
+
+In Respira AER, type the same sentence in the chat.
+
+## What your client sees
+
+1. They open the link. The site looks as it always does, with a small bar at the bottom that says **request a change**.
+2. They press it and click the spot the request is about.
+3. They write what should change, with their name and, if they want a reply, an email.
+4. After sending, the bar says the request reached the people who look after the site.
+
+They can also see the requests already made on that page and whether each one is done.
+
+## What you get
+
+- The request appears in your dashboard under [Feedback](https://www.respira.press/dashboard/feedback), marked as a request, with the page and the spot.
+- The first request on a link sends you an email. Later ones on the same link arrive in an hourly digest.
+- In Respira AER, the `/reviews` card lists open notes and requests by page.
+- Your agent reads them with `respira_list_review_comments` (pass `kind: "request"` to list only requests), applies each one on a draft of the page, and marks it resolved. You approve the draft before anything is live.
+
+## Limits and safety
+
+- A request link shows published pages only. No drafts, no editor, no settings.
+- One person can send up to 10 requests in 10 minutes, and one link accepts up to 30 an hour from everyone together.
+- A request holds up to 2,000 characters.
+- Revoke a link at any time: ask your agent to revoke it, or use the Feedback screen in wp-admin. A revoked link stops working at once.
+- Someone logged in as an editor of the site is never treated as a reviewer.
+
+## Related
+
+- [Share Preview Links](/share-preview-links)
+- [Duplicate Before Edit](/duplicate-before-edit-workflow)
+- [Cards in Respira AER](/dashboard/aer-cards)
