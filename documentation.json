@@ -217,6 +217,11 @@
                 "icon": "graduation-cap"
               },
               {
+                "title": "Murmur: Review and Request Links",
+                "path": "murmur",
+                "icon": "message-square"
+              },
+              {
                 "title": "Team Accounts",
                 "path": "team-accounts",
                 "icon": "users"
