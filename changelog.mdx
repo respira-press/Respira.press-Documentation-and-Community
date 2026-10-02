@@ -52,6 +52,27 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-10-02" description="Respira for WordPress v9.1.14 + MCP Server 8.4.12: a door for people with no AI app, and your AI app can tell you what this site has not tried" tags={["release", "onboarding", "aer", "skills"]}>
+
+### What's New in v9.1.14
+
+**No app to install? Chat here.**
+- The setup step that asks you to connect an AI assistant now also offers Respira AER, a chat in your browser that works on this site with nothing to install.
+- You bring a key for the AI model. One line on the door and on the Overview card links to the steps: [Start without a terminal](/dashboard/aer-model-key).
+- Once Respira AER has called the site, setup says so and stops waiting for an app key.
+
+**Features this site has not tried yet**
+- When a site has never used review links, Respira AER, plan mode, guarded updates, site skills or site memory, your AI app now knows it and offers one, once, when it fits what you asked. It never opens with it and never lists them.
+- Once a feature is used on the site, it is never offered again.
+- The "Respira updated itself" notice names one of them too, each feature in one update only.
+- To switch it off, set the `respira_feature_hints` option to `off`, or add `define( 'RESPIRA_DISABLE_FEATURE_HINTS', true );` to wp-config.php. An AI app cannot change that option. It is off under white label.
+
+**MCP Server 8.4.12**
+- The compact site context keeps the `not_tried_yet` block, next to `site_skills`.
+- A skill counts when it is opened: the server records the skill's name, the active site's address and the client's name when it serves a skill prompt, nothing from the request or the conversation. `RESPIRA_USAGE_OPT_OUT=1` switches it off, as it does for tool usage.
+
+</Update>
+
 <Update label="2026-10-02" description="Respira for WordPress v9.1.13 + MCP Server 8.4.11: reading an option no longer hands another plugin's keys to the AI" tags={["release", "security", "options", "safety"]}>
 
 ### What's New in v9.1.13
