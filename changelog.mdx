@@ -52,6 +52,24 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-10-02" description="Respira for WordPress v9.1.15 + MCP Server 8.4.13: build a Divi global footer, show it, publish that one, and change one setting without touching the rest" tags={["release", "divi", "options", "builders"]}>
+
+### What's New in v9.1.15
+
+**Build a Divi global header or footer, show it, then publish that same layout**
+- `respira_create_theme_builder_template` takes `layout_id`: an agent builds the layout unassigned, shows it to you, then assigns that same layout, with your confirmation before it reaches every page.
+- `respira_list_theme_builder_templates` returns `unassigned_layouts`, so an agent can find a layout that was built and not published.
+- Works on Divi 4 and Divi 5. See [Divi 5](/builders/divi-5).
+
+**Change one setting inside a settings option**
+- `path` on `wordpress_update_option` and `wordpress_get_option` reads or changes one key and leaves every other key as it was, with a snapshot for undo. Made for theme settings such as Divi's `et_divi`. See [wordpress_update_option](/tools/options/update-option).
+- `respira_find_in_page` names the Divi footer bar credit setting as the place to change the footer bar text.
+
+**MCP Server 8.4.13**
+- Both new parameters are sent only to a site running plugin 9.1.15 or later. On an older plugin nothing is sent and the answer says to update Respira.
+
+</Update>
+
 <Update label="2026-10-02" description="Respira for WordPress v9.1.14 + MCP Server 8.4.12: a door for people with no AI app, and your AI app can tell you what this site has not tried" tags={["release", "onboarding", "aer", "skills"]}>
 
 ### What's New in v9.1.14

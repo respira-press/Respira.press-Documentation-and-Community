@@ -11,11 +11,12 @@ Since plugin 9.1.13, values that look like keys, tokens or passwords come back a
 
 ## Parameters
 
-3 parameters, 1 required.
+4 parameters, 1 required.
 
 | Name | Type | Required | What it is |
 |---|---|---|---|
 | `option` | string | yes | Option name |
+| `path` | string or list | no | Read one key inside an option that holds many settings: a dot path such as `custom_footer_credits` or `social.facebook_url`, or a list of keys. Up to 6 levels. A key that is not there answers `exists: false`, not an error. Plugin 9.1.15 and MCP server 8.4.13. |
 | `reveal_secrets` | boolean | no | Return keys, tokens and passwords in full instead of `[redacted]`. Approval-gated when the option holds any. Default false. Plugin 9.1.13 and MCP server 8.4.11. |
 | `approval_token` | string | no | Approval token from the first `reveal_secrets` call's `respira_approval_required` answer. Send it back unchanged with the same arguments. |
 
