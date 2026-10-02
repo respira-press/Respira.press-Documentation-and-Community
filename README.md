@@ -29,7 +29,8 @@ This is the **Respira for WordPress GitHub Community** — the public community 
 
 ## Where to get help
 
-- Community support: GitHub Discussions (best effort)
+- Community support: GitHub Discussions (answers from other users, best effort)
+- Direct support: included with every licence at word@respira.press, answered by the founder, typically within 24 hours
 - Bug reports: GitHub Issues (use the templates)
 - Security issues: see [SECURITY.md](./SECURITY.md)
 
