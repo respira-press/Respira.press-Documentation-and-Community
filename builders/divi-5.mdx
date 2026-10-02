@@ -226,6 +226,24 @@ Use this checklist to keep Divi 5 work safe:
 
 ---
 
+## New in 9.1.15: build a global footer, show it, then publish that one
+
+A Divi global header, footer or body is a Theme Builder layout. An agent can now do this in three steps, on Divi 4 and Divi 5:
+
+1. **Build it unassigned.** `respira_create_theme_builder_template` with `kind` and `structure` and no `assignments` creates the layout and shows it nowhere.
+2. **Show it.** The agent gives you a preview. `respira_list_theme_builder_templates` lists layouts that are built and not assigned yet under `unassigned_layouts`.
+3. **Publish that same layout.** `respira_create_theme_builder_template` again, with `layout_id`, `kind` and `assignments` (for every page: `{"all_pages": true}`), and without `structure`.
+
+When the layout would fill an empty slot on the site's default template, the first call is refused with `respira_tb_default_slot_confirmation_required`, because every page starts showing it at once. The agent tells you what is about to change and sends `confirm_live_edit: true` only after you agree. The answer carries `rollback.snapshot_uuid`; restoring it takes the layout off the pages and keeps the layout.
+
+What is refused, and why:
+
+- `structure` together with `layout_id`: one call either assigns a layout or creates one. To change a layout's content use `respira_update_theme_builder_template`.
+- A slot that already holds another layout (`respira_tb_default_slot_occupied`): nothing is replaced silently.
+- A layout another template already uses (`respira_tb_layout_already_assigned`): the answer names that template.
+
+The footer bar credit ("Designed by Elegant Themes | Powered by WordPress") is not a Theme Builder layout. It is a Divi theme setting: change it with [wordpress_update_option](/tools/options/update-option) and `path`, option `et_divi`, key `custom_footer_credits`.
+
 ## New in 9.1.0: native attributes by default
 
 From a customer field test: the build was fast and faithful, but the handover lost, because an agent could fall back to inline `style=""` HTML and to code modules, and the client then found styling the Visual Builder cannot show or edit. Plugin 9.1.0 and MCP server 8.4.0 close that path by default.

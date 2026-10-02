@@ -9,12 +9,13 @@ Update an option value.
 
 ## Parameters
 
-4 parameters, 2 required.
+5 parameters, 2 required.
 
 | Name | Type | Required | What it is |
 |---|---|---|---|
 | `option` | string | yes | Option name |
 | `value` | any | yes | Option value, in the type get_option returns for this option. Text stays text (JSON-encode it if needed). Objects or arrays only for options that already hold them, such as theme_mods. |
+| `path` | string or list | no | Change one key inside an option that holds many settings, without sending the rest. A dot path such as `custom_footer_credits`, or a list of keys. With `path`, `value` is the new value for that key only. Up to 6 levels. Plugin 9.1.15 and MCP server 8.4.13. |
 | `allow_type_change` | boolean | no | Set true only to really replace an option that holds text with an object or array. Without it that write is refused, because a plugin that decodes its own text option can crash on every page load. |
 | `allow_object_overwrite` | boolean | no | Set true only to replace an option that stores a PHP object, and only when the new value keeps the same shape. Without it that write is refused. |
 
@@ -41,6 +42,32 @@ The smallest valid call, with the required parameters only:
   "option": "blogname"
 }
 ```
+
+## Change one key and leave the rest
+
+Themes and plugins often keep many settings in one option. Divi keeps about a hundred in `et_divi`, the footer bar credit among them. Sending the whole value back to change one setting risks the others, and it is refused when the option holds a key or password that was shown as `[redacted]`.
+
+With `path`, Respira reads the stored option, sets that one key and writes it back. Every other key stays as it was, including ones the agent never saw.
+
+```json
+{
+  "name": "wordpress_update_option",
+  "arguments": {
+    "option": "et_divi",
+    "path": "custom_footer_credits",
+    "value": "Built by Example Studio"
+  }
+}
+```
+
+The answer carries `previous` (the old value of that key), `value`, `existed` and a `snapshot_uuid` for undo.
+
+- The option must already exist and hold an array. A path cannot create an option.
+- A new last key is allowed. A missing key in the middle of the path is refused with `respira_option_path_not_found`, and a path that runs into text or an object with `respira_option_path_not_array`.
+- The rules for a whole write apply to the one key: protected options, the type-change rule, and the `[redacted]` refusal.
+- On a site whose plugin is older than 9.1.15 the MCP server sends nothing and says to update Respira, because an older plugin would store the one value as the whole option.
+
+To find where a setting lives, use [respira_find_in_page](/tools/analysis/find-in-page): for the Divi footer bar credit it names `et_divi` and `custom_footer_credits`.
 
 ## What it changes
 
