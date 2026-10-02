@@ -51,6 +51,7 @@ It removes or overwrites something on the site, so treat it as the careful kind 
 The failures seen most often on real sites in the last 30 days, most common first:
 
 - `respira_site_id_not_found`: No connected site has that ID. Call `respira_list_sites` and use an ID from the result.
+- `respira_redacted_value_in_write`: The value contains `[redacted]`, the placeholder shown in place of a key, token or password when an option is read or listed. Writing it would replace the real secret with that text, so nothing is written. Read the option with `reveal_secrets: true`, which a person approves, then send the full value back. Plugin 9.1.13.
 
 ## How long it takes
 

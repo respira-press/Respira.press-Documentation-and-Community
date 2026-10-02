@@ -1,19 +1,23 @@
 ---
 title: "wordpress_get_option"
-description: "Get a WordPress option value by option name."
+description: "Get a WordPress option value by name. Keys, tokens and passwords come back as [redacted]; a full read asks a person first."
 ---
 
 # wordpress_get_option
 
 Get option value by name.
 
+Since plugin 9.1.13, values that look like keys, tokens or passwords come back as `[redacted]`, the way a listing has shown them since 9.1.0. That covers an option that is itself a key and a key stored inside a plugin's settings array. Everything else in the option reads as it is stored, and an empty key reads as empty, so "is it set" still has an answer.
+
 ## Parameters
 
-1 parameter, 1 required.
+3 parameters, 1 required.
 
 | Name | Type | Required | What it is |
 |---|---|---|---|
 | `option` | string | yes | Option name |
+| `reveal_secrets` | boolean | no | Return keys, tokens and passwords in full instead of `[redacted]`. Approval-gated when the option holds any. Default false. Plugin 9.1.13 and MCP server 8.4.11. |
+| `approval_token` | string | no | Approval token from the first `reveal_secrets` call's `respira_approval_required` answer. Send it back unchanged with the same arguments. |
 
 ## Example call
 
@@ -30,17 +34,48 @@ The smallest valid call, with the required parameters only:
 
 ## Response
 
+An option with nothing to hide:
+
 ```json
 {
-  "success": true,
-  "option": "blogname",
+  "name": "blogname",
   "value": "My Site"
 }
 ```
 
+A settings array that holds a key:
+
+```json
+{
+  "name": "example_gateway_settings",
+  "value": {
+    "enabled": "yes",
+    "title": "Card",
+    "api_key": "[redacted]",
+    "webhook": { "url": "https://example.com/hook", "secret": "[redacted]" }
+  },
+  "redacted": true,
+  "redacted_fields": ["api_key", "webhook.secret"]
+}
+```
+
+`redacted_fields` names each hidden value by its path. The answer also carries a `note` saying how to read them.
+
+## Reading a secret in full
+
+Send `reveal_secrets: true`. When the option holds a secret, the first call answers `respira_approval_required` with an approval token and a predicted effect that names the option and says its keys leave the site and reach the AI assistant. A person confirms, and the second call carries the token and returns the full value with `secrets_revealed`, the number of fields shown. The token works for ten minutes, for that option and that connection.
+
+An option with nothing to hide never asks: `reveal_secrets` on `blogname` answers at once.
+
+WordPress salts and Respira's own licence key and tokens are never returned, with or without `reveal_secrets`.
+
+## Do not write the placeholder back
+
+`[redacted]` is a placeholder, not the value. `wordpress_update_option` refuses a value that carries it with `respira_redacted_value_in_write`, because writing it would replace the real key with that text. To change another field of an option that holds a key, read it with `reveal_secrets: true` first and send the full value back.
+
 ## What it changes
 
-Nothing. It only reads, so there is nothing to approve and nothing to undo.
+Nothing. It only reads, so there is nothing to undo. A plain read needs no approval. A read with `reveal_secrets` is written to the site's activity log as a read that revealed secrets.
 
 ## When it fails
 
