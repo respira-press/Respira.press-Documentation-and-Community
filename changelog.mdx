@@ -73,6 +73,30 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 </Update>
 
+<Update label="2026-10-01" description="Respira for WordPress v9.1.10 + MCP Server 8.4.9: the security scan finds what wp-admin does not show, quarantine for a plugin that should not be there" tags={["release", "security", "plugins", "safety"]}>
+
+### What's New in v9.1.10
+
+**The security scan reads what the admin screens do not show**
+- A plugin that is active and filtered out of the plugin list is reported as `hidden-active-plugin`, and an active file with no plugin header as `active-file-without-plugin-header`.
+- A rewrite rule that answers the site's page addresses before WordPress's own page rule is reported as `rewrite-rule-shadows-pages`, with the pages it takes over.
+- The scan also names which plugin, theme or loose file serves each REST namespace, where each plugin comes from, and any stored list of search-engine crawler addresses.
+- Page: [Security scan](/security/security-scan).
+
+**Quarantine, restore, rebuild**
+- `wordpress_quarantine_plugin` stops a plugin without running any of its code and keeps every file, with a manifest. It also reaches an active file with no header and a must-use plugin file. See [wordpress_quarantine_plugin](/tools/plugins/quarantine-plugin).
+- `wordpress_restore_quarantined_plugin` moves it back, inactive. See [wordpress_restore_quarantined_plugin](/tools/plugins/restore-quarantined-plugin).
+- `wordpress_flush_rewrites` rebuilds the rewrite rules from what is installed now and lists the rules that went. See [wordpress_flush_rewrites](/tools/other/flush-rewrites).
+
+**Owner approval, opt-in**
+- With `RESPIRA_OWNER_APPROVAL` on, installing, deleting, quarantining or restoring a plugin, deleting a user and deleting an option wait for an administrator to press Approve in wp-admin. See [Owner approval](/security/owner-approval).
+
+**Fixes**
+- Deleting an option that does not exist answers `already_absent: true` instead of an error.
+- Plugin install, activate, deactivate, update, delete, quarantine and restore are written to the activity log, and so is a refused write to a protected option. Activity rows for options carry the option name.
+
+</Update>
+
 <Update label="2026-09-27" description="Respira for WordPress v9.1.0 + MCP Server 8.4.0: plan mode, the guarded plugin update, cards in Respira AER, site skills" tags={["release", "plan-mode", "security", "skills", "safety"]}>
 
 ### What's New in v9.1.0

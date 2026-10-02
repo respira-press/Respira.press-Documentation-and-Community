@@ -1,0 +1,56 @@
+---
+title: "Owner approval"
+description: "An approval a person gives in wp-admin, which the agent that asked for it cannot give itself. Opt-in, for sites where removing a plugin, a user or a setting should never be one agent's call."
+---
+
+# Owner approval
+
+Some Respira tools are approval-gated: the first call answers `respira_approval_required` with an approval token and a sentence telling the agent to ask the person before sending the token back. That works when the agent follows it. The token is in the agent's hands, so nothing in the mechanism makes it wait.
+
+Owner approval closes that gap for the tools that remove something or put code on a site. With it on, the token does nothing until an administrator has pressed **Approve** on a notice in wp-admin. That press needs a logged-in browser session, which an API key does not have, so the decision is made by a person or it is not made. Plugin 9.1.10 or later.
+
+## Which tools wait for the owner
+
+| Tool | What it does |
+|---|---|
+| `wordpress_install_plugin` | Installs a plugin |
+| `wordpress_delete_plugin` | Deletes a plugin |
+| `wordpress_quarantine_plugin` | Stops a plugin and moves its files to quarantine |
+| `wordpress_restore_quarantined_plugin` | Moves a quarantined plugin back |
+| `wordpress_delete_user` | Deletes a user |
+| `wordpress_delete_option` | Deletes a setting |
+
+The list can be changed on the site with the `respira_owner_approval_tools` filter, in PHP.
+
+## Switching it on
+
+It is off by default. Either of these turns it on, and both are out of an agent's reach:
+
+```php
+// wp-config.php
+define( 'RESPIRA_OWNER_APPROVAL', true );
+```
+
+```bash
+wp option update respira_owner_approval 1
+```
+
+The option is on Respira's protected list, so no tool can write it.
+
+## What the person sees
+
+1. The agent calls a tool on the list. The answer is `respira_approval_required` with the predicted effect, and it says the request is waiting for the site owner in wp-admin.
+2. Any administrator who opens wp-admin sees a notice saying what the action will do, which tool asked and how many minutes the request has left, with **Approve** and **Deny**. Nothing happens unless it is approved.
+3. After Approve, the agent's retry with the same token goes through. Before it, the retry is refused with `respira_owner_approval_pending`.
+
+A request waits 30 minutes. After that it expires and the agent has to ask again.
+
+## When to leave it off
+
+An approval that needs wp-admin is the wrong default for someone working in a chat window who never opens wp-admin, and Respira AER takes its approvals from a button of its own. Owner approval is for sites where removing a plugin, a user or a setting should be a decision made in wp-admin every time: client sites, sites with several people's agents connected, or a site that has just been cleaned after an incident.
+
+## Related pages
+
+- [Security scan](/security/security-scan)
+- [How It Works](/security/how-it-works)
+- [Audit Logging](/security/audit-logging)

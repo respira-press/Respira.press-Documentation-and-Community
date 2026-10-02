@@ -1,0 +1,107 @@
+---
+title: "Security scan"
+description: "What the Respira security scan reads on a WordPress site, what each result means, how to run it from the dashboard, Respira AER or an MCP client, and what it cannot see."
+---
+
+# Security scan
+
+The security scan reads a WordPress site and reports what it finds. It changes nothing on the site. It answers three questions: is any installed software known to be vulnerable, are there traces that someone was already in, and is the site running anything its own admin screens do not show.
+
+A scan that finds nothing is evidence, not a guarantee. Respira sees what WordPress can see, not the server.
+
+## What one scan checks
+
+| Check | What it reads |
+|---|---|
+| Known vulnerabilities | WordPress, every plugin and every theme, matched by name and version against the Wordfence Intelligence database, refreshed every six hours. Only the records that apply to an installed version are shown, each with the version that fixes it. |
+| Reviewed advisories | The incidents in the news, each with its own traces: the WordPress core security releases, and plugin advisories such as backdoored builds. |
+| Core files | Every WordPress core file against the official checksums. Changed, unexpected and symlinked files are reported separately from missing ones. |
+| Administrators and access | Administrators added recently, administrators that share a creation time, application passwords, and whether usernames can be listed without logging in. |
+| Executable files | With `deep_scan`, PHP files in uploads and must-use plugin paths, within strict file and time limits. |
+| What wp-admin does not show | Plugin 9.1.10 or later. See the next section. |
+
+## What wp-admin does not show
+
+A plugin can remove itself from the Plugins screen and keep running. Since plugin 9.1.10 the scan compares what WordPress is actually loading with what its own screens list.
+
+| Indicator | Severity | What it means |
+|---|---|---|
+| `hidden-active-plugin` | critical | A plugin is in the active list in the database and is filtered out of the plugin list. Legitimate plugins do not hide themselves. |
+| `hidden-inactive-plugin` | medium | A plugin folder is on disk and is filtered out of the plugin list, but is not active. |
+| `active-file-without-plugin-header` | critical | WordPress loads a file on every request that carries no plugin header, so no list shows it. |
+| `rewrite-rule-shadows-pages` | high or medium | A rewrite rule answers some of the site's page addresses before WordPress's own page rule does. High when those pages now return "not found". |
+| `rewrite-rule-orphan-query-var` | low | A stored rewrite rule points at a query variable nothing registers, usually left behind by a removed plugin. |
+| `rest-namespace-outside-plugins` | medium | A REST route is served by code that is not in a plugin, a theme or WordPress itself. |
+| `crawler-ip-list-stored` | low | The site stores a list of search-engine crawler addresses. Harmless in a caching or SEO plugin, and also what a cloaking plugin keeps. |
+
+The scan also reports where each plugin comes from (`origin`), which plugin, theme or loose file serves each REST namespace, and what is in quarantine.
+
+## What a result means on the dashboard
+
+On [respira.press/dashboard/security](https://www.respira.press/dashboard/security) each site is one row with a status and a short line of what it needs.
+
+| Status | Meaning |
+|---|---|
+| Needs a look | A trace worth confirming by eye: a hidden plugin, a changed core file, an administrator nobody created. Rare, and the only status shown in red. |
+| Update needed | An installed version has a known vulnerability and a newer version closes it. |
+| Something to check | The site is patched, and one look remains at what a version number cannot show, such as application passwords. Mark it reviewed and it is closed. |
+| All clear | Nothing known matches what is installed, core files match, and nothing is waiting. |
+
+Advice about the server, such as PHP being allowed to run from the uploads folder, is labelled advice and never turns a site red. When the vulnerability database cannot be reached the result is reported as unknown, never as clean.
+
+## Running it
+
+### From the dashboard
+
+Open the Security page and press **Scan all sites**, or **Scan site** on one row. Scans run three sites at a time. Each row fills in as its scan finishes, and sites that need something sort to the top after a reload. The page is part of every paid plan.
+
+### From Respira AER
+
+`/security` lists the known vulnerabilities on one site or a fleet that an available update closes, with the restore point each site has. See [Cards in Respira AER](/dashboard/aer-cards).
+
+### From an MCP client
+
+```json
+{
+  "name": "wordpress_run_security_audit",
+  "arguments": {
+    "deep_scan": true
+  }
+}
+```
+
+| Parameter | Default | What it does |
+|---|---|---|
+| `deep_scan` | false | Also inspects uploads and must-use plugin paths for executable files. Reads only on plugin 9.0 and later. |
+| `probe_uploads_execution` | false | The one flag that writes: it puts one inert PHP file into uploads, requests it to learn whether PHP runs there, then deletes it. A file-change monitor may report the file. |
+| `known_vulnerabilities` | true | Matches installed software against the vulnerability database. `false` skips that round trip. |
+| `advisory_ids` | none | Recorded on the receipt as the scope audited. It does not change what the scan looks for. |
+
+A prompt that works in any connected assistant:
+
+```text
+Run the security audit on my site with a deep scan. Tell me in plain words
+whether anything is active that the plugin list does not show. Change nothing.
+```
+
+## Acting on a result
+
+- **A known vulnerability with an update available:** the [guarded plugin update](/security/guarded-plugin-update) updates one plugin with a restore point before and health checks after.
+- **A plugin that should not be on the site:** [wordpress_quarantine_plugin](/tools/plugins/quarantine-plugin) stops it without running any of its code and keeps every file, then [wordpress_flush_rewrites](/tools/other/flush-rewrites) rebuilds the rewrite rules. Do not deactivate and delete a plugin that may be hostile: both run the plugin's own code one last time.
+- **Sites where removal should never be one agent's call:** switch on [owner approval](/security/owner-approval).
+
+## What it cannot see
+
+- Host cron jobs and web server access logs. They sit outside WordPress.
+- Vulnerabilities nobody has published yet.
+- Whether an unfamiliar administrator is legitimate. Respira shows the account and asks.
+- Password, salt and third-party secret rotation, which happens outside Respira.
+
+When a scan is cut short by its file or time limit, coverage is reported as partial. An unmeasured result and a clean result are different facts.
+
+## Related pages
+
+- [Guarded plugin update](/security/guarded-plugin-update)
+- [Owner approval](/security/owner-approval)
+- [wordpress_quarantine_plugin](/tools/plugins/quarantine-plugin), [wordpress_restore_quarantined_plugin](/tools/plugins/restore-quarantined-plugin), [wordpress_flush_rewrites](/tools/other/flush-rewrites)
+- [Audit Logging](/security/audit-logging)

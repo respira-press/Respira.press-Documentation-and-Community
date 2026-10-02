@@ -54,6 +54,8 @@ Works on any WordPress site, whichever page builder it uses. Available since Res
 ## Notes
 
 - Deleting options can break plugins/themes; use caution
+- Since plugin 9.1.10, deleting an option that does not exist answers `success: true` with `already_absent: true` instead of an error, so a cleanup that runs twice reads the same both times
+- With [owner approval](/security/owner-approval) on, the approval is given in wp-admin
 
 ## Example Prompts
 

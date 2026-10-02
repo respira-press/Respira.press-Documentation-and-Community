@@ -648,6 +648,16 @@
                 "icon": "trash-2"
               },
               {
+                "title": "wordpress_quarantine_plugin",
+                "path": "tools/plugins/quarantine-plugin",
+                "icon": "shield-off"
+              },
+              {
+                "title": "wordpress_restore_quarantined_plugin",
+                "path": "tools/plugins/restore-quarantined-plugin",
+                "icon": "undo-2"
+              },
+              {
                 "title": "respira_check_guarded_update",
                 "path": "tools/plugins/check-guarded-update",
                 "icon": "search-check"
@@ -774,6 +784,11 @@
                 "title": "respira_invoke_ability",
                 "path": "tools/other/invoke-ability",
                 "icon": "zap"
+              },
+              {
+                "title": "wordpress_flush_rewrites",
+                "path": "tools/other/flush-rewrites",
+                "icon": "refresh-cw"
               }
             ]
           },
@@ -864,9 +879,19 @@
                 "icon": "eye-off"
               },
               {
+                "title": "Security scan",
+                "path": "security/security-scan",
+                "icon": "radar"
+              },
+              {
                 "title": "Guarded plugin update",
                 "path": "security/guarded-plugin-update",
                 "icon": "shield-check"
+              },
+              {
+                "title": "Owner approval",
+                "path": "security/owner-approval",
+                "icon": "user-check"
               }
             ]
           },

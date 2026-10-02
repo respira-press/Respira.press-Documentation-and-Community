@@ -1,0 +1,62 @@
+---
+title: "wordpress_restore_quarantined_plugin"
+description: "Move a quarantined plugin back into the plugins folder with its original file names. It returns inactive."
+---
+
+# wordpress_restore_quarantined_plugin
+
+Move a quarantined plugin back into the plugins folder with its original file names. It returns inactive, so a person decides whether to activate it. A must-use plugin file is the exception: it starts running again as soon as it is back, because WordPress loads every file in that folder.
+
+## Parameters
+
+2 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `quarantine_id` | string | yes | The id of the quarantine to undo. It comes from `wordpress_quarantine_plugin`, or from `checks.quarantine` in the security audit. |
+| `approval_token` | string | no | Approval token from the first call's `respira_approval_required` answer. Send it back unchanged with the same quarantine id. |
+
+## Example call
+
+```json
+{
+  "name": "wordpress_restore_quarantined_plugin",
+  "arguments": {
+    "quarantine_id": "example-plugin-20261001-174512-a1b2c3"
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "plugin": "example-plugin/example-plugin.php",
+  "quarantine_id": "example-plugin-20261001-174512-a1b2c3",
+  "files_renamed": 9,
+  "message": "The plugin is back in the plugins folder, inactive. Activate it with respira_activate_plugin if you want it running."
+}
+```
+
+## What it changes
+
+It moves the folder back and gives every file its original name. It does not activate the plugin. Approval-gated, like the quarantine itself, and written to the site's activity log.
+
+## When it is refused
+
+- No quarantine has that id. The answer lists the ids that exist.
+- The plugin was already restored.
+- Something already exists where the plugin was (`destination_exists`). Remove or rename it first.
+- The quarantined files or the record of their original names are missing from the quarantine folder.
+
+Nothing is changed when a restore is refused.
+
+## Availability
+
+Plugin 9.1.10 and MCP server 8.4.9. Requires plugin management to be enabled in Respira settings.
+
+## Related Tools
+
+- [wordpress_quarantine_plugin](/tools/plugins/quarantine-plugin)
+- [Security scan](/security/security-scan)

@@ -1,0 +1,76 @@
+---
+title: "wordpress_flush_rewrites"
+description: "Rebuild the rewrite rules, the table that maps addresses to pages, from WordPress and the plugins that are active now. The same thing saving Settings, Permalinks does."
+---
+
+# wordpress_flush_rewrites
+
+Rebuild the rewrite rules, the table that maps addresses to pages, from WordPress and the plugins that are active now. It is the same thing saving Settings, Permalinks does in wp-admin.
+
+Use it after removing or quarantining a plugin, when the security audit reports `rewrite-rule-orphan-query-var` or `rewrite-rule-shadows-pages`, or when pages answer "not found" although they exist. Do not edit the `rewrite_rules` option by hand instead.
+
+## Parameters
+
+1 parameter, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `hard` | boolean | no | Also rewrite `.htaccess`. Default false. A snapshot cannot give that file back, so leave it off unless the site owner asks. |
+
+## Example call
+
+```json
+{
+  "name": "wordpress_flush_rewrites",
+  "arguments": {}
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "rebuilt": true,
+  "hard": false,
+  "rules_before": 142,
+  "rules_after": 141,
+  "removed": [
+    { "rule": "^([^/]+)/?$", "target": "index.php?v_post=$matches[1]" }
+  ],
+  "removed_total": 1,
+  "added": [],
+  "added_total": 0,
+  "rewrite_check": { "shadows_pages": [] },
+  "recovery_snapshot_uuid": "…",
+  "recoverable": true
+}
+```
+
+`removed` and `added` list the rules that went and the rules that came, up to 50 each. `rewrite_check` says whether any rule still answers before WordPress's own page rule.
+
+## What it changes
+
+It replaces the stored rewrite table. The previous table is kept as a snapshot first, so it can be put back. Caches are purged afterwards and the action is written to the site's activity log.
+
+A rule whose plugin is still active comes straight back, because that plugin adds it again on the rebuild. When that happens the answer carries a warning and `rewrite_check.shadows_pages` names the rule. Deal with the plugin first, then rebuild.
+
+On a site with plain permalinks there is no rewrite table, and the answer says nothing was changed.
+
+## When it is refused
+
+The connection acts as a WordPress user who cannot manage options (`respira_flush_rewrites_forbidden`). On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## Availability
+
+Plugin 9.1.10 and MCP server 8.4.9.
+
+## Example Prompts
+
+- "My pages return not found but they are still in WordPress. Check the rewrite rules and rebuild them."
+- "Rebuild the rewrite rules after the quarantine and tell me which rules went."
+
+## Related Tools
+
+- [wordpress_quarantine_plugin](/tools/plugins/quarantine-plugin)
+- [Security scan](/security/security-scan)

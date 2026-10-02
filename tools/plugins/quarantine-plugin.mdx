@@ -1,0 +1,82 @@
+---
+title: "wordpress_quarantine_plugin"
+description: "Stop a plugin and keep its files, without running any of its code. For a plugin that may be hostile or that the site owner did not install."
+---
+
+# wordpress_quarantine_plugin
+
+Stop a plugin and keep its files, without running any of its code. Use it instead of deactivate and delete when a plugin may be hostile or was not installed by the site owner: deactivating and deleting both run the plugin's own code one last time, and deleting destroys the evidence.
+
+The plugin is taken out of the active list without its deactivation or uninstall hooks firing. Its folder is moved out of the plugins directory to `wp-content/respira-quarantine`, where no file keeps a name the web server would run. A manifest of every file (path, size, modified time, hash) is kept beside it. Nothing is deleted.
+
+It also reaches what the other plugin tools cannot name: an active file with no plugin header, and a must-use plugin file.
+
+## Parameters
+
+2 parameters, 1 required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `slug` | string | yes | Plugin folder name, or the exact plugin file as the security audit or `wordpress_list_plugins` reports it. For a must-use plugin file pass `mu-plugins/` followed by the file name. Do not sanitize the name yourself. |
+| `approval_token` | string | no | Approval token from the first call's `respira_approval_required` answer. Send it back unchanged with the same slug. |
+
+## Example call
+
+```json
+{
+  "name": "wordpress_quarantine_plugin",
+  "arguments": {
+    "slug": "example-plugin"
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "message": "Plugin quarantined. It no longer loads, its own deactivation and uninstall code did not run, and every file was kept.",
+  "plugin": "example-plugin/example-plugin.php",
+  "quarantine_id": "example-plugin-20261001-174512-a1b2c3",
+  "was_active": true,
+  "file_count": 14,
+  "files_renamed": 9,
+  "rename_failures": [],
+  "kept_in": "wp-content/respira-quarantine/example-plugin-20261001-174512-a1b2c3",
+  "health": { "verdict": "healthy", "summary": "…" }
+}
+```
+
+The answer also carries `next_steps`. `quarantine_id` is what `wordpress_restore_quarantined_plugin` takes. The id is the plugin's folder name, the UTC date and time, and a random suffix. `health` is the same check the plugin update tools run afterwards: `healthy`, `unhealthy` or `unknown`, with a one-line summary.
+
+## What it changes
+
+It removes the plugin from the active list and moves its folder. The options, users, cron events and rewrite rules the plugin created are left alone on purpose: they are evidence, and the plugin's own cleanup code was not run. Afterwards rebuild the rewrite rules with `wordpress_flush_rewrites` and run the security audit again.
+
+Approval-gated: the first call returns `respira_approval_required` with an approval token and changes nothing; a person confirms; the retry carries the token. With [owner approval](/security/owner-approval) on, the confirmation happens in wp-admin. The action is written to the site's activity log. On a connection set to read-only it is refused with `respira_scope_denied`.
+
+## When it is refused
+
+- Plugin management is off in Respira settings.
+- The slug names nothing on the site.
+- The slug names Respira itself (`respira_cannot_quarantine_self`).
+- The files could not be moved, for example because the content folder is not writable. The plugin is still taken out of the active list, and the answer says the files were not moved.
+
+If the site does not answer normally afterwards, the answer carries a warning: something on the site depended on the plugin. Restore it with the `quarantine_id` if the site needs to be back up before the cause is understood.
+
+## Availability
+
+Plugin 9.1.10 and MCP server 8.4.9. Requires plugin management to be enabled in Respira settings.
+
+## Example Prompts
+
+- "The security audit found a plugin that hides from the plugin list. Quarantine it, rebuild the rewrite rules, and scan again."
+- "Stop this plugin without running any of its code, and keep the files."
+
+## Related Tools
+
+- [wordpress_restore_quarantined_plugin](/tools/plugins/restore-quarantined-plugin)
+- [wordpress_flush_rewrites](/tools/other/flush-rewrites)
+- [wordpress_delete_plugin](/tools/plugins/delete-plugin), for a plugin the site owner installed and no longer wants
+- [Security scan](/security/security-scan)
