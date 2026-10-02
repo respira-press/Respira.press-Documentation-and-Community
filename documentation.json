@@ -133,6 +133,11 @@
                 "title": "Cards in Respira AER",
                 "path": "dashboard/aer-cards",
                 "icon": "layout-grid"
+              },
+              {
+                "title": "Start without a terminal",
+                "path": "dashboard/aer-model-key",
+                "icon": "play"
               }
             ]
           },

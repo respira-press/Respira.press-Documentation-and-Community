@@ -1,0 +1,69 @@
+---
+title: "Start without a terminal"
+description: "Respira AER is a chat in your browser that works on your WordPress site with nothing to install. How to open it, add a model key, and what to try first."
+---
+
+# Start without a terminal
+
+[Respira AER](https://www.respira.press/aer) is a chat in your browser for the WordPress sites connected to your respira.press account. You type what you want changed, and it works on the site through the Respira plugin, so there is no app to install and no terminal to open.
+
+It is included in every paid plan and trial. The one thing you bring is a key from an AI model provider, and this page shows where to get it.
+
+## Open Respira AER
+
+### From wp-admin
+
+1. In the WordPress admin sidebar, click **Respira**.
+2. On the Overview screen, find the **Respira AER** card and click **Open this site in Respira AER**.
+
+Respira AER opens in a new tab on this site.
+
+The card shows to a WordPress administrator, on a site whose plan includes Respira AER and that is not white-labelled. It needs Respira plugin 9.0 or later. When you are looking at a single page or post, the Respira menu in the admin bar also has **Ask Respira AER about this page**.
+
+### From respira.press
+
+1. Sign in at [respira.press](https://www.respira.press).
+2. Open [respira.press/dashboard/aer](https://www.respira.press/dashboard/aer).
+3. Type `/sites` in the message box to choose which connected site the chat works on.
+
+A site has to be linked to your account before it appears there. See [Connecting Your Site](/dashboard/connecting-your-site).
+
+## Add a model key
+
+Respira AER does not come with an AI model. It runs on your own key from one of four providers: Anthropic, OpenAI, Google or OpenRouter.
+
+The first time you open Respira AER with no key saved, it shows a card titled **Connect an AI account to Respira AER.**
+
+1. Click a provider: **Anthropic**, **OpenAI**, **Google** or **OpenRouter**. The card then lists three steps for that provider.
+2. Click the link under the steps, for example **Open Anthropic keys**. It opens the provider's key page in a new tab. Create a key there and copy it.
+3. Paste the key into the field on the card and click the button, for example **Connect Anthropic**.
+
+Respira AER makes one test call to the provider before it saves the key. If the provider rejects the key, the card says so and nothing is saved. When the key is accepted, a model from that provider is selected and the message box is ready.
+
+When you pick OpenRouter, the card can also show a **Connect with OpenRouter** button. OpenRouter asks you once and hands the key back, with nothing to paste.
+
+### Change or remove a key later
+
+Type `/settings` in the message box, or open [respira.press/dashboard/settings/aer](https://www.respira.press/dashboard/settings/aer). Under **AI API providers** each provider has **Add a key**, and once a key is saved, **Replace** and **Remove**.
+
+In wp-admin, the link **Provider keys live on respira.press** on the Respira AER card opens the same page.
+
+### Where the key is kept, and who bills you
+
+- The key is yours, made in your own account at the provider. The provider bills you for model usage. A Claude or ChatGPT subscription does not include API usage.
+- Set a monthly spend limit at the provider before you paste the key. The card's advice: make a workspace or project at your provider, set the limit on it, then create the key inside it.
+- The key is stored on respira.press, sealed with AES-256-GCM, and opened only inside the request that sends your message to the provider. Only its last four characters are ever shown.
+- The key is not stored in WordPress. No screen in the plugin asks for it.
+
+## Three things to try first
+
+1. **`/run tour`** reads the site and tells you what it is built with, which pages matter most and which plugins it runs. It changes nothing.
+2. **`/security`** lists the known vulnerabilities on the site that an available update closes, one row each. Nothing runs until you tick rows and press the button. See [Cards in Respira AER](/dashboard/aer-cards).
+3. **A small page edit.** Ask in plain words, for example "change the headline on the About page to Baked fresh every morning". By default every write waits for your approval. On a published page the edit lands on a copy, not on the live page, unless direct editing was switched on for the site. The copy comes with a preview link that opens it with no WordPress login for 14 days. When the copy looks right, type `/approvals` to approve it.
+
+## Related pages
+
+- [Cards in Respira AER](/dashboard/aer-cards)
+- [Connecting Your Site](/dashboard/connecting-your-site)
+- [Duplicate Before Edit](/duplicate-before-edit-workflow)
+- [Share Preview Links](/share-preview-links)
