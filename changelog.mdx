@@ -52,6 +52,18 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-10-03" description="Respira for WordPress v9.1.19: the grok.com connector completes its sign-in" tags={["release", "grok", "fix"]}>
+
+### What's New in v9.1.19
+
+**Grok**
+- The grok.com connector completes its sign-in. 9.1.17 sent Grok's connector the sign-in challenge, but Grok asks a site twice: once as the connector, and once as a checker that sends no browser name. That second request still got a tool list, so Grok reported "connected successfully" and never opened the sign-in. Both requests are refused now. Checked on a live site: Grok registered with respira.press, showed the consent page, took its token and listed the site's pages, within ten seconds of adding the connector. ChatGPT, Grok Build and every other app are unchanged.
+- The setup is on [respira.press/integrations/grok](https://www.respira.press/integrations/grok) and in the dashboard under Grok.
+
+Plugin only. The MCP server stays at 8.4.14.
+
+</Update>
+
 <Update label="2026-10-02" description="Respira for WordPress v9.1.18: three Murmur fixes on the approve bar, the note labels and the name a client sees" tags={["release", "murmur", "fix"]}>
 
 ### What's New in v9.1.18
