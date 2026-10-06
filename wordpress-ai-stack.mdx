@@ -5,7 +5,9 @@ description: How Respira fits into the official WordPress Abilities API and MCP 
 
 ## Overview
 
-Respira works with the official WordPress AI stack instead of fighting it.
+Respira works with the WordPress MCP Adapter plugin when it is installed.
+
+From Respira 9.1.24, the adapter is optional and installed separately. Install and activate [MCP Adapter from WordPress.org](https://wordpress.org/plugins/mcp-adapter/) to use the official transport. Respira's own MCP endpoint, REST API, standalone desktop server and browser WebMCP tools work without the adapter.
 
 Today there are three WordPress-native building blocks to understand:
 
@@ -24,7 +26,7 @@ Use this framing throughout the docs:
 2. **Official WordPress MCP Adapter default/public server**
    Auto-discovers the safe read-only Respira abilities marked `mcp.public=true`.
 3. **Dedicated Respira MCP Adapter server**
-   Exposes the broader Respira registry through the official adapter.
+   Exposes the broader Respira registry through the separately installed official adapter at `/wp-json/respira/v1/adapter-mcp`, using WordPress authentication.
 4. **Browser surfaces**
    Includes built-in Browser AI/WebMCP plus the curated [Elementor](https://www.respira.press/elementor-mcp) Angie bridge.
 
@@ -37,6 +39,18 @@ When the WordPress Abilities API is available, Respira registers its tools as Wo
 - `meta.mcp.public` for the safe default/public subset
 
 Respira keeps the dedicated adapter server for the full registry, while the official default server can still discover the safe read-only subset automatically.
+
+## Endpoint and authentication
+
+The dedicated adapter server is available only while the official MCP Adapter plugin is active:
+
+```text
+https://your-site.com/wp-json/respira/v1/adapter-mcp
+```
+
+Use the adapter's WordPress authentication, such as an administrator's application password. Administrators can discover Respira's adapter tools by default; each ability still checks its execution permissions.
+
+Respira's own endpoint remains `/wp-json/respira/v1/mcp`, using a Respira API key or the Respira OAuth connection flow. Deactivating the adapter removes the adapter server while Respira's own connections keep working.
 
 ## Which path should you use?
 
