@@ -95,17 +95,59 @@ A structural write can be **staged for human approval instead of applied**. The 
 
 - `respira_list_activity`, `respira_get_activity`
 
-## Beta gate: structural writes are off by default
+## Turning on structural writes
 
 <Callout kind="alert">
 
-**Structural writes to site-level objects (templates, template parts, patterns, navigation, global styles) are beta-gated per site and OFF by default.**
+**Structural writes to site-level objects (templates, template parts, patterns, navigation, global styles) are off by default on every site.**
 
-Read-only discovery works everywhere with no gate. If you want structural writes on a given site, they have to be turned on for that site.
+Read-only discovery works everywhere with no switch. To let an agent change these objects, the site owner turns writes on for that site.
 
 </Callout>
 
-This is deliberate. A bad page edit costs you one page. A bad template edit costs you every page that uses the template. The gate stays on until the write path has more live mileage.
+This is deliberate. A bad page edit costs you one page. A bad template edit costs you every page that uses the template. So the switch belongs to the site owner, and an AI connection cannot turn it on by itself.
+
+The same switch also turns on the WooCommerce storefront writers.
+
+### Respira 9.1.26 and later
+
+In wp-admin, go to **Respira > Settings > Safety controls** and turn on **Site Editor writes**. Ask the agent to try again; it takes effect on the next call.
+
+If the switch is greyed out, a line in `wp-config.php` or a filter on the site already decides it, and the screen says which.
+
+### Earlier versions, or a site you manage in code
+
+Any one of these works:
+
+<Tabs>
+<Tab title="wp-config.php">
+
+Add this line above the one that says "That's all, stop editing":
+
+```php
+define( 'RESPIRA_FSE_WRITER_ENABLED', true );
+```
+
+</Tab>
+<Tab title="WP-CLI">
+
+```bash
+wp option update respira_fse_writer_enabled 1
+```
+
+</Tab>
+<Tab title="Code snippet">
+
+In a code snippets plugin or a must-use plugin:
+
+```php
+add_filter( 'respira_fse_writer_enabled', '__return_true' );
+```
+
+</Tab>
+</Tabs>
+
+**Respira > Abilities is a different switch.** It controls which abilities from other plugins agents can use. Turning abilities on there does not turn on Site Editor writes.
 
 ## What to ask for
 
@@ -142,7 +184,7 @@ I want to approve it before it goes live.
 - Registered theme and plugin patterns cannot be edited. They are code. Copy one into a user pattern if you want to change it.
 - A navigation write needs a real block path. Asking an agent to "fix the menu" without reading it first will get a refusal, not a guess.
 - `stored_unverified` means the render check did not confirm. Check it by hand.
-- The beta gate is per site. Turning it on for one site does not turn it on for the rest.
+- The switch is per site. Turning it on for one site does not turn it on for the rest.
 
 ## See also
 

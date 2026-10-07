@@ -35,7 +35,7 @@ Plus the native WordPress Site Editor:
 
 | Target | Objects | Data Format | Editing |
 |--------|---------|-------------|---------|
-| [Site Editor (FSE)](/builders/site-editor) | Templates, template parts, patterns, navigation, global styles | Block markup / `theme.json` | Read everywhere. Structural writes beta-gated per site |
+| [Site Editor (FSE)](/builders/site-editor) | Templates, template parts, patterns, navigation, global styles | Block markup / `theme.json` | Read everywhere. Structural writes are an owner switch per site |
 
 > Divi covers Divi 4 and Divi 5; [Oxygen](https://www.respira.press/oxygen-mcp) covers Oxygen Classic and Oxygen 6. With those variants, that is **17 builders** with full read and write. SeedProd is audit-only (agents read and report on landing pages). Brizy and Visual Composer moved from read to write in Respira 7.4.0 "Clearing". The native Site Editor became a first-class target in Respira 8.0 "Canopy" and is counted separately from the 17 builders.
 
@@ -43,7 +43,7 @@ Plus the native WordPress Site Editor:
 
 Block themes used to be a partial read. In 8.0 the Site Editor is addressable: block templates and template parts with hierarchy and source discovery, synced and unsynced patterns, block navigation edited by exact block path, and Gutenberg design tokens.
 
-Structural writes to those site-level objects are beta-gated per site and off by default. Read-only discovery works everywhere. See [Site Editor (Full Site Editing)](/builders/site-editor).
+Structural writes to those site-level objects are off by default; the site owner turns them on per site. Read-only discovery works everywhere. See [Site Editor (Full Site Editing)](/builders/site-editor).
 
 ### New in v6.0: Flatsome UX Builder
 

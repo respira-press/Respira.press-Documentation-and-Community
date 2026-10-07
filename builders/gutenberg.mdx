@@ -140,7 +140,7 @@ Every structural write is fingerprint-guarded against a stale base, snapshotted,
 
 <Callout kind="alert">
 
-**Structural writes to site-level objects are beta-gated per site and OFF by default.** Read-only discovery of templates, patterns, navigation and global styles works everywhere. Structural writes have to be enabled for the specific site.
+**Structural writes to site-level objects are OFF by default.** Read-only discovery of templates, patterns, navigation and global styles works everywhere. The site owner turns writes on per site, in Respira > Settings > Safety controls.
 
 </Callout>
 
@@ -148,7 +148,7 @@ Example: "Show me the header template part and the navigation inside it, and do 
 
 The FSE work exists because of a published field study by [Dale Smith of revWorx](https://revworx.ai/), who builds exclusively on FSE block themes and documented, live-verified, where Respira went inert on that stack.
 
-See [Site Editor (Full Site Editing)](/builders/site-editor) for the tools, the mutation-result contract, and the beta gate.
+See [Site Editor (Full Site Editing)](/builders/site-editor) for the tools, the mutation-result contract, and how to turn on structural writes.
 
 ## Best Use Cases
 
@@ -176,7 +176,7 @@ See [Site Editor (Full Site Editing)](/builders/site-editor) for the tools, the 
 - **Registered theme and plugin patterns are read-only**: they live in code, not the database. Copy one into a user pattern to change it
 - **Third-party blocks**: Respira reads all registered blocks dynamically from the block registry, including core and third-party blocks
 - **Interactive blocks**: Blocks with complex interactivity (forms, carousels) may need manual editing
-- **Site-level structural writes are beta-gated per site and off by default**: read-only discovery of templates, patterns, navigation and global styles is available everywhere
+- **Site-level structural writes are off by default, an owner switch per site**: read-only discovery of templates, patterns, navigation and global styles is available everywhere
 
 ## When to Use This Tool
 
