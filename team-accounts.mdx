@@ -1,52 +1,94 @@
 ---
 title: "Team Accounts"
-description: "Put more than one person on a single Respira account, with a per-member access level enforced at token introspection."
+description: "Put more than one person on a single Respira account: which plans include Teams, the three permissions, the 30 free days per person, and how a seat in use is billed at €10 a month."
 ---
 
 # Team Accounts
 
-A team account lets more than one person work under a single Respira account. The team owns the licenses, and therefore the sites and packs. Members connect their own agents to those sites without needing their own separate subscription.
+A team account lets more than one person work under a single Respira account. The team owns the licences, and therefore the sites and packs. Members connect their own agents to those sites without needing their own separate subscription.
 
-Every existing account is already a team of one. Team features only surface once a second member is invited, and a single-user account behaves exactly as it did before.
+Every existing account is already a team of one. Team features only surface once a second person is invited, and a single-user account behaves exactly as it did before.
 
-## How access works
+## Which plans include Teams
 
-Each member has an access level. From the dashboard dropdown you pick one of three:
+| Plan | Included | Further seats |
+| --- | --- | --- |
+| Maker, and legacy Starter | The owner only. These are single-user plans without Teams. | Not available |
+| Builder (including Builder 5), and legacy Agency | The owner | Unlimited invitations, €10 for each seat in use per month |
+| Studio | The owner and one additional seat, with any permission | Unlimited invitations, €10 for each further seat in use per month |
+| Founder and Founder Studio Plus | The owner and unlimited seats | Included |
 
-- **read-only** — the member's agent is capped to read. It can inspect sites but not write.
-- **editor** — full read and write on the sites the member is granted.
-- **admin** — account-grade capabilities, with editor-level access to sites.
+The owner is always included and never counts as a seat. Legacy Starter keeps its one-site allowance.
 
-The access level is enforced at token introspection. When a member's agent connects, Respira checks the member's live access level for the team that owns the site and hands the plugin the matching scope. The plugin only honors the scope introspection returns, so lowering someone to read-only takes effect on their next connection without any change to the plugin or the site keys. Changes land within the plugin's roughly one-minute introspection cache.
+## Permissions
+
+Each person gets one of three permissions, chosen on the Team page of the dashboard:
+
+- **View only**: the person's agent is capped to read. It can inspect sites but not write.
+- **Edit**: read and write on the sites the person is granted.
+- **Administrator**: edit access to sites, plus managing team access.
+
+All three cost the same. The permission changes what someone can do, not the price. Use the team's site access settings to choose which sites each person sees.
+
+An administrator can manage team access. Only the owner sets up seat payments and changes the billing email.
+
+The permission is enforced at token introspection. When a member's agent connects, Respira checks that member's live permission for the team that owns the site and hands the plugin the matching scope. The plugin only honours the scope introspection returns, so moving someone to view only takes effect on their next connection without any change to the plugin or the site keys. Changes land within the plugin's roughly one-minute introspection cache.
 
 ## Per-member tokens
 
-A member's token keeps that member's own user id for revocation and audit, while pointing at the team's existing site and license. Two consequences follow from that:
+A member's token keeps that member's own user id for revocation and audit, while pointing at the team's existing site and licence. Two consequences follow from that:
 
 - Removing a member revokes only that member's tokens. The team's site-connection keys never rotate, so other members and the connected sites are unaffected.
 - Each member's MCP setup codes carry the team's sites through that member's own token. A member gets working setup codes for the team sites without the owner having to reshare a site key.
 
 ## Inviting people
 
-Invites are sent from the dashboard team page by email. Someone you invited who has not accepted yet is never billed. Each member's edits appear in the team audit log under their own identity, so you can see who changed what across every connected site.
+Invitations are sent by email from the Team page of the dashboard. Each member's edits appear in the team audit log under their own identity, so you can see who changed what across every connected site.
 
-## Seats and fair billing
+## 30 free days for each person
 
-A plan buys your sites; a seat is what you add when another person works alongside you. Full detail at [respira.press/fair-billing](https://www.respira.press/fair-billing); the short version:
+Each invited person gets 30 calendar days free, counted from the day they first activate their account.
 
-- **Owner: always free.** You are also the team's first admin, free.
-- **First member: free, on every plan.** A two person team costs nothing beyond the plan.
-- **Extra members: €5 a month each**, flat at any team size. **A second admin and beyond: €10 a month each.**
-- **Seats bill only in months they are active.** A seat is active when that person ran at least one agent command or made at least one change through the team. Signing in, viewing sites, or reading the audit log is watching, and watching is free. Billing is monthly, in arrears, prorated by active days.
-- **Client seats are free.** A client seat sees exactly one group of sites and nothing else, never billed. Available on Builder and above.
-- **On Maker, your team is you plus one, free forever.** That free plus-one doubles as the client handoff seat. Paid member and client seats start on Builder.
-- **Every new team gets 30 days with unlimited free seats** (Builder and above). The clock starts on your first invite, recorded once. When the window ends, nothing bills until you choose how billing should work: auto-bill active seats, ask before each new person starts billing, or, if you choose nothing, everyone past you plus one pauses with dashboard access intact and nothing deleted.
-- **Founding members stay free.** Anyone holding a seat when team accounts launched is free for life, recorded on the seat itself.
+- A pending invitation starts no clock and creates no charge.
+- Resending an invitation, changing a permission, removing someone and inviting them again never restarts the 30 days.
 
-Every consent, mode change and pause is written to the team audit log.
+## When a seat costs €10
+
+After a person's 30 free days end, a seat counts as in use for a month when that person views, edits or administers anything in the workspace during that calendar month (UTC).
+
+- A seat in use costs a flat €10 for the month, including a view-only seat. There is no proration by days.
+- A seat nobody uses that month is dormant and costs €0.
+- A person who used the workspace earlier in a month still counts for that month after they are removed.
+
+On Studio, the included seat covers one seat that would otherwise be billed. Dormant seats, exempt seats and seats still inside their 30 free days do not use it up.
+
+Existing comped arrangements are honoured.
+
+## Setting up seat payments
+
+The owner sets up seat payments in Billing, as a separate step. Seats are billed through their own Polar seat subscription. Your website licence and its price stay the same, and so does its renewal.
+
+A legacy Agency licence bought through Lemon Squeezy stays in Lemon Squeezy. The owner sets up the separate seat subscription in Polar for team seats only.
+
+Until payments are set up, a seat that would be billed pauses when its 30 free days end. Included seats, on Studio and Founder, keep working.
+
+## Billing email
+
+You can add an optional billing email in Settings or Billing, for example your finance contact. It receives copies of invoices and payment notices. It does not need a team seat, does not change your sign-in email, and does not receive marketing or sign-in mail.
+
+## Client feedback
+
+There is no separate client seat or client price any more. For comments on a page, share an expiring [Murmur](https://www.respira.press/murmur) link: your client opens the page and leaves notes without a Respira account or a team seat. If a client needs their own Respira account, invite them as a normal seat with the permission they need.
+
+## Existing teams
+
+Every existing team gets 30 days' notice before these rules apply, and nothing is charged retroactively.
+
+On Maker and legacy Starter, existing collaborators keep their access during the 30-day notice. After that, the owner can move to Builder or above to keep a team, or share [Murmur](/murmur) links for page feedback. Murmur is part of Builder and up, and of legacy Starter.
 
 ## Related
 
-- [Multi-Site Management](/guides/multi-site-management) — working across the team's sites
-- [Team Workflows](/guides/team-workflows) — safe review patterns for teams
-- [API key management](/security/api-key-management) — how tokens and revocation work
+- [Murmur](/murmur): review links for client feedback, no account needed
+- [Multi-Site Management](/guides/multi-site-management): working across the team's sites
+- [Team Workflows](/guides/team-workflows): safe review patterns for teams
+- [API key management](/security/api-key-management): how tokens and revocation work
