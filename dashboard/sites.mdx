@@ -1,73 +1,47 @@
 ---
 title: "Sites"
-description: "Manage every WordPress site connected to your Respira account: status, one-click installs, audit log, token rotation, and removal."
+description: "Manage every WordPress site connected to your Respira account: connecting, status, automatic updates, keys and removal."
 ---
 
 # Sites
 
-The [Sites page](https://www.respira.press/dashboard/sites) at `dashboard/sites` is your inventory of every WordPress install bridged to your Respira account. Anything you can do to a site — connect it, install it into an AI assistant, audit its activity, rotate its token, disconnect it — happens here.
+The [Sites page](https://www.respira.press/dashboard/sites) at `dashboard/sites` is your inventory of every WordPress install bridged to your Respira account. Connecting a site, renaming it, switching its automatic updates and removing it all happen here; agent keys live in MCP Setup.
 
-## Anatomy of the table
+## What each row shows
 
-Each row is one connected WordPress site, with five columns:
+Each row is one connected WordPress site:
 
-| Column | What it shows |
-| --- | --- |
-| **Site** | The site's display name and URL. The display name is editable; the URL is canonical. |
-| **ID** | The site's stable internal identifier. Used by the CLI and direct API calls. Click to copy. |
-| **Status** | `Token ready` (green) or `Pending` (amber). Token-ready sites can receive AI edits. Pending sites are queued for first verification. |
-| **One-click install** | Four buttons to install the site into Claude Desktop, Cursor, Codex, or Claude Code — scoped to *just that site*. |
-| **Actions** | The three-dot menu: rotate token, edit display name, disconnect site. |
+- **The site's name and URL.** Click the name, or the pencil, to rename it. The name is only for you; the URL is the site itself.
+- **Status.** *Token ready* means agents can reach the site. A site that has not checked in for 14 days shows as dormant. *Needs MCP setup* means the site is linked but no agent key has been made for it yet; open MCP Setup to make one.
+- **Plugin version and automatic updates.** The *Automatic updates* card above the table switches Respira's own updates on or off for each site, or for every site at once.
+- **Row actions:** open the site's WP admin, manage it in MCP Setup, see what the AI remembers about the site (site memory), share access with a developer, edit the site URL, and remove the site.
 
-Below the table, an **Excluded sites** disclosure lists sites that are deliberately omitted from the multi-site config bundle. Excluded sites still receive edits if you point an AI assistant at them directly; they just don't auto-mount in the bundle.
+Sites that belong to a team you are a member of are marked *Team site*. Only the team owner can rename or remove them.
 
 ## Adding a site
 
-Two paths:
+1. On the [Sites page](https://www.respira.press/dashboard/sites), press **Connect a site**.
+2. Download the Respira plugin there and install it on the new site: in wp-admin go to **Plugins → Add New → Upload Plugin**, choose the file, then **Activate**.
+3. In wp-admin open **Respira → Setup** and press **link this site to respira.press**. You sign in on respira.press, confirm, and land back in wp-admin with the site linked.
 
-**Auto-connect** (recommended). Install the plugin in WordPress, click *Connect to Respira* on the plugin's Overview tab, approve the handshake. The site shows up here in seconds. Full walkthrough: [Connecting Your Site](/dashboard/connecting-your-site).
+The Connect a site page watches for the new site and takes you back to Sites a few seconds after step 3.
 
-**Manual.** Click *Add site manually* on this page. Enter the site URL and paste the site token from the plugin's Settings tab. The dashboard verifies the token and adds the site.
+If the sign-in page does not load (a firewall, a locked-down wp-admin), choose **paste a license key** in Respira → Setup instead, and paste the key from the Connect a site page (the **Copy key** button).
 
-## Per-site one-click installs
+When every site slot on your plan is in use, the button reads **Upgrade to add a site**. Remove a site you no longer use to free a slot, or move to a larger plan under [Billing](https://www.respira.press/dashboard/billing). Full walkthrough: [Connecting Your Site](/dashboard/connecting-your-site).
 
-Each row's One-click install column has four buttons. Each one mints a config that knows about *only that one site* — different from the account-wide setup at [MCP Setup](https://www.respira.press/dashboard/mcp), which bundles every connected site.
+## Setting up an AI app for one site
 
-When to use which:
+Agent keys and app setup live on [MCP Setup](https://www.respira.press/dashboard/mcp), not on this page; each row's **Manage in MCP setup** action opens it for that site.
 
-- **Account-wide config** (`/dashboard/mcp`) — the default. Your AI assistant can address any of your sites by name. Use this when you regularly switch between sites.
-- **Per-site config** (the buttons here) — scope-limited. Use this when you're handing a specific site over to a contractor, or when you want to demo the workflow on one site without exposing the others.
+- **Every site at once** is the default: your AI app can reach any of your sites by name. Use it when you move between sites.
+- **One site only** limits an app to that site. Use it when you hand a single site to a contractor, or show the workflow on one site without the others.
 
-Each button generates a different artifact:
+## Activity on a site
 
-- **Claude Desktop** — downloads a `.mcpb` bundle. Double-click on macOS / Windows to install.
-- **Cursor** — opens a deep link (`cursor://...`) that drops the MCP server config straight into Cursor's settings.
-- **Codex** — copies a TOML block to your clipboard. Paste it into Codex's MCP config file.
-- **Claude Code** — copies a single shell command to your clipboard. Run it in any terminal where Claude Code is installed.
+Every change an agent makes is logged on the site itself. In that site's wp-admin open **Respira → Activity** for the list of changes, and **Respira → Audit Log** for every call with its agent, time and outcome. Changes with a snapshot can be undone from **Respira → Approvals & Undo**. An agent can read the same history with the activity tools.
 
-The same buttons exist on the [MCP Setup](https://www.respira.press/dashboard/mcp) page in the *Connected Sites* table at the bottom — they're equivalent.
-
-## Per-site audit log
-
-Click the site's display name in the Site column to open its detail page. The audit log shows every write operation Respira has run against that site:
-
-- Tool name (e.g. `respira_update_element`)
-- Agent that called it (Claude Code, Cursor, Codex, Claude Desktop, Browser AI)
-- Timestamp
-- Affected resource (page slug, post ID, element ID)
-- Snapshot ID (for restorable writes)
-- Outcome (success / error)
-
-Click any row's snapshot ID to restore the page to its pre-write state.
-
-**Audit log retention:**
-
-| Plan | Retention |
-| --- | --- |
-| Anonymous reads | none — no login, no log |
-| Lite | 30 days |
-| Maker / Builder / Studio | unlimited |
-| Founder | unlimited + extended export to S3 |
+How long the audit log is kept is a setting on each site: **Respira → Settings → Safety controls → Keep the audit log for (days)**. The default is 180 days; 0 keeps everything.
 
 ## Automatic updates
 
@@ -75,33 +49,25 @@ Each site has an **Automatic updates** switch, and above the list one action for
 
 ## Status states explained
 
-**Token ready** (green). The site responded successfully to a signed validation request. AI edits will route through cleanly. Most sites are in this state most of the time.
+**Token ready.** The site is linked and has an agent key; AI apps can reach it.
 
-**Pending** (amber). The site hasn't responded to a validation request yet. Common reasons:
+**Dormant.** The site has not checked in with respira.press for more than 14 days. It may be offline, the plugin may be deactivated, or a firewall may block its outbound requests. Open its wp-admin and check that Respira is active and up to date.
 
-- The site was just connected and the verification hasn't completed yet (resolves in seconds; refresh)
-- The site is behind a firewall or VPN that's blocking outbound requests
-- The plugin was deactivated on the WordPress side
-- The token was rotated on one side but not the other
+**Needs MCP setup.** The site is linked but has no agent key yet. Open MCP Setup and make one.
 
-Click the row's *Rotate token* action to mint a fresh token if the pending state persists past a few minutes.
+The filters above the table show each group on its own.
 
-## Rotating tokens
+## Rotating a site's key
 
-Tokens are rotated for two reasons:
+An agent reaches a site with that site's key. If a key may have been exposed (committed to a repository, pasted in a chat, shared with a contractor who has left the project), make a new one: open [MCP Setup](https://www.respira.press/dashboard/mcp), open the site's menu and choose **Regenerate key**. The old key stops working at once. **Revoke key** removes it without making a new one.
 
-- **Routine hygiene.** If a token may have been exposed (committed to a repo, pasted in a chat, shared with a contractor who's no longer on the project), rotate it.
-- **Forced rotation by Respira.** Rare. If we detect anomalous activity tied to a token, we'll rotate it on your behalf and email you.
+The configs MCP Setup gives you pick up the new key. If you wrote your own MCP config with the raw key in it, update that config by hand.
 
-Rotation is one click: *Actions → Rotate token*. The old token is invalidated immediately. The plugin on the WordPress side picks up the new token on its next handshake (typically within 60 seconds, or you can click *Refresh token* on the plugin's Overview tab).
+## Removing a site
 
-If you embedded the old token in a non-Respira config (e.g. you wrote your own MCP setup that references the raw token), you'll need to update that config manually. The Respira-generated configs at MCP Setup or per-site refresh automatically.
+Press the bin icon on the site's row. The site leaves your account, its agent key is revoked, and its slot is free again. Any AI app that used that site's key can no longer reach it.
 
-## Disconnecting a site
-
-*Actions → Disconnect site*. The token is invalidated, the site is removed from your account inventory, and any AI configs pointing at it stop working.
-
-The plugin remains installed and active on the WordPress side. You can re-connect the same site to the same (or a different) Respira account at any time using the auto-connect flow.
+Nothing changes on the WordPress side: the plugin stays installed and the site's content is untouched. To bring the site back, open **Respira → Setup** in its wp-admin and link it again.
 
 ## Site limits per plan
 
