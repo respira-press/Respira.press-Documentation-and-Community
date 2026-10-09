@@ -879,6 +879,21 @@
                 "icon": "key"
               },
               {
+                "title": "OAuth sign-in",
+                "path": "security/oauth-sign-in",
+                "icon": "log-in"
+              },
+              {
+                "title": "Undo and verifying a restore",
+                "path": "security/verified-undo",
+                "icon": "rotate-ccw"
+              },
+              {
+                "title": "Usage limits",
+                "path": "security/usage-limits",
+                "icon": "gauge"
+              },
+              {
                 "title": "Audit Logging",
                 "path": "security/audit-logging",
                 "icon": "clipboard-list"

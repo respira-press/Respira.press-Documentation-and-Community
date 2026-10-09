@@ -1,0 +1,45 @@
+---
+title: "OAuth sign-in"
+description: "How Claude, ChatGPT and other AI apps sign in to a Respira site with OAuth 2.1 and PKCE, what each token can do, when it expires, and how to disconnect an app."
+---
+
+# OAuth sign-in
+
+Apps that connect by URL, such as Claude and ChatGPT custom connectors, sign in to your site with OAuth instead of an API key. You approve the app once in your browser. There is no key to paste.
+
+## What the sign-in uses
+
+- **OAuth 2.1 with PKCE.** Every sign-in uses the authorization code flow with a `S256` code challenge, so an intercepted code is useless without the app's own verifier.
+- **Client ID Metadata Documents (CIMD) first, dynamic registration second.** An app that publishes a metadata document is identified by it; an app that does not registers itself the standard way.
+- **Discovery.** The authorization server metadata is published at `https://www.respira.press/.well-known/oauth-authorization-server`.
+
+## What a token can do
+
+You see the requested access on the consent screen before you approve. There are two scopes:
+
+| Scope | Allows |
+| --- | --- |
+| `mcp:read` | Reading the site through Respira's tools |
+| `mcp:write` | Changing the site through Respira's tools |
+
+An app that asks for nothing gets both. Each token is bound to the one site you approved it for; it cannot be used against another site.
+
+## When tokens expire
+
+| Credential | Lifetime |
+| --- | --- |
+| Sign-in code | 10 minutes, single use |
+| Access token | 8 hours |
+| Refresh token | 30 days, replaced on every use |
+
+Refresh tokens rotate: each use issues a new one. If an old refresh token is ever used again, Respira treats it as stolen and revokes that whole chain of tokens.
+
+## Disconnect an app
+
+Open **Dashboard → Settings → Connected apps**. Each app is listed with the sites it can reach and when it was last used. Disconnect one app and only that app loses access; every other connection keeps working. Apps can also revoke their own tokens through the standard revocation endpoint.
+
+## See also
+
+- [API key management](/security/api-key-management)
+- [Usage limits](/security/usage-limits)
+- [How Respira security works](/security/how-it-works)

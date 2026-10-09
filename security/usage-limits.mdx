@@ -1,0 +1,69 @@
+---
+title: "Usage limits"
+description: "Every limit Respira applies, with the numbers: requests per key, browser agents, Respira Exhale conversions, Respira AER cloud runs and Respira Lite edits."
+---
+
+# Usage limits
+
+Respira's limits exist to stop a runaway agent, not to charge for normal work. These are the numbers.
+
+## Requests per API key
+
+| Limit | Default | Where to change it |
+| --- | --- | --- |
+| Requests per key, per hour | 1,000 | **Respira → Settings → Rate limit**, or `wp option update respira_rate_limit <number>` |
+
+An active session rarely passes 200 calls an hour. A key that reaches the limit gets a clear "rate limited" error and works again as the hour rolls on.
+
+## Browser agents (WebMCP)
+
+| Limit | Default |
+| --- | --- |
+| Runs of one ability, per person, per minute | 30 |
+| Runs of all abilities, per person, per minute | 60 |
+
+Site owners can change both with the `wmcp_rate_limit` and `wmcp_rate_limit_global_ceiling` filters.
+
+## Respira Exhale (HTML to WordPress)
+
+Two page conversions a month for every site your plan allows, counted per account across the dashboard, Respira AER and MCP:
+
+| Plan | Pages a month |
+| --- | --- |
+| Maker (1 site) | 2 |
+| Builder 5 | 10 |
+| Builder 10 | 20 |
+| Studio 25 | 50 |
+| Studio 50 | 100 |
+| Studio 100 | 200 |
+| Studio 250 | 500 |
+| Trial | 10 for the whole trial |
+
+Annual plans get fifteen months of pages up front, to spend whenever. When the allowance runs out, the refusal names the plan that includes more.
+
+## Respira AER cloud and fleet runs
+
+Jobs that run unattended in the cloud, or across more than one site at once, count against a monthly allowance. Attended single-site work and approval decisions do not count.
+
+| Plan | Cloud and fleet jobs a month |
+| --- | --- |
+| Maker | Not included |
+| Builder 5 | 20 |
+| Builder 10 | 40 |
+| Studio (any size) | 150 |
+
+Annual plans get one and a half times these numbers. A trial gets the Builder allowance. The allowance resets on the first of each month, UTC.
+
+## Respira Lite
+
+The free plugin includes 30 edits a month, plus 10 grace edits, and warns you at 80% of the allowance.
+
+## What is not limited
+
+On a paid plan, edits, reads, snapshots and restores through your assistant have no monthly cap. The only ceiling is the hourly request limit per key above.
+
+## See also
+
+- [API key management](/security/api-key-management)
+- [OAuth sign-in](/security/oauth-sign-in)
+- Plans and prices: [respira.press/pricing](https://www.respira.press/pricing)

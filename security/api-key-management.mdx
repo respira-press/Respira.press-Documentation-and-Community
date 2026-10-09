@@ -13,6 +13,29 @@ API keys authenticate your AI assistant (via the MCP server) to your WordPress s
 2. Click **Generate API Key**
 3. Copy the key and store it securely (you won’t see it again)
 
+## Access profiles and scopes
+
+Every key carries an access profile, chosen when you create it. The profile decides which tools the key can call:
+
+| Profile | What the key can do |
+| --- | --- |
+| Full access | Every tool, within the site's governance rules |
+| Builder | Content editing plus every page builder operation; no plugins or users |
+| Content editor | Read and write pages, posts and media; no plugins, users or settings |
+| Read only | Read pages, posts, site context and analysis; no writes |
+
+Underneath the profile, each key holds scopes: `read_basic`, `read_fidelity` and `write` for every profile that writes, plus `read_meta_all` and `admin` for Full access only. A request outside the key's profile or scopes is refused, and the refusal names the key that was checked. If you narrow a key, the narrower scope applies to the next call, including calls already queued.
+
+Give each assistant, contractor or automation its own key with the smallest profile that does the job.
+
+## Expiry
+
+A key keeps working until you revoke or rotate it, or until the site's licence ends, which switches off every key on that site. Keys do not yet take an expiry date you choose. For short-lived access, use [OAuth sign-in](/security/oauth-sign-in): its tokens expire on their own.
+
+## Rate limit
+
+Each key can make 1,000 requests an hour by default. The limit exists to stop a runaway agent, not to meter normal work; an active session rarely passes 200 calls an hour. Change it in **Respira → Settings → Rate limit**, or with `wp option update respira_rate_limit 2000`. See [Usage limits](/security/usage-limits) for the rest.
+
 ## Store Keys Safely
 
 - Treat the key like a password
@@ -34,6 +57,9 @@ Revoke any key you no longer need in **Respira → API Keys**.
 ## See Also
 
 - [How Respira Security Works](/security/how-it-works)
+- [OAuth sign-in](/security/oauth-sign-in)
+- [Undo and verifying a restore](/security/verified-undo)
+- [Usage limits](/security/usage-limits)
 - [Data Privacy](/security/data-privacy)
 
 

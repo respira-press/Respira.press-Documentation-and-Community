@@ -1,0 +1,45 @@
+---
+title: "Undo and verifying a restore"
+description: "How Respira snapshots every change, how long snapshots are kept, how to undo one change or a whole session, and how to check that a restore really put the page back."
+---
+
+# Undo and verifying a restore
+
+Respira takes a snapshot of a page or post before every change it makes. Any change is one restore away.
+
+## What a snapshot holds
+
+Each snapshot records the content, the page builder data and the protected settings of that post, along with three fingerprints:
+
+- **Builder data fingerprint**: the page builder's own stored layout
+- **Rendered fingerprint**: the page as visitors see it
+- **Settings fingerprint**: the protected page settings Respira restores with it
+
+Snapshots are kept for 90 days by default. Pinned snapshots are kept until you unpin them.
+
+## Undo one change
+
+Ask your assistant to run `respira_restore_snapshot`, or restore it from Respira in wp-admin. Before restoring, Respira takes one more snapshot of the page as it is now, so the restore itself can be undone.
+
+## Undo a whole session
+
+Changes made in one working session are grouped. `respira_restore_session` puts every page touched in that session back together, so a set of related edits is never half undone.
+
+## Verify that a restore matched
+
+A restore returns two snapshots: the page just before the restore, and the page just after it. To prove the page is back where it was, compare the after-restore snapshot with the snapshot you restored:
+
+1. Ask your assistant to run `respira_diff_snapshots` with the snapshot you restored and the after-restore snapshot.
+2. The result compares the three fingerprints and reports whether anything still differs.
+
+If the builder data, rendered and settings fingerprints all match, the page is back exactly as it was in that snapshot. If one still differs, the result says which.
+
+<Callout kind="info">
+Respira refuses a restore that provably cannot change the page, for example a snapshot that recorded no builder content while the page keeps its content in a page builder. You get a clear refusal instead of a success that changed nothing.
+</Callout>
+
+## See also
+
+- [Owner approval](/security/owner-approval)
+- [Audit logging](/security/audit-logging)
+- [API key management](/security/api-key-management)
