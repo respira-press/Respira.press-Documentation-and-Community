@@ -1093,6 +1093,11 @@
                 "icon": "layout"
               },
               {
+                "title": "YOOtheme Pro",
+                "path": "builders/yootheme",
+                "icon": "layout"
+              },
+              {
                 "title": "Spectra",
                 "path": "builders/spectra",
                 "icon": "layout"

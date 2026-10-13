@@ -1,0 +1,96 @@
+---
+title: 'YOOtheme Pro'
+description: 'How Respira reads and writes YOOtheme Pro pages, site templates and HTML conversions as native YOOtheme layouts.'
+---
+
+# YOOtheme Pro
+
+YOOtheme Pro is a WordPress theme with its own page builder. Respira supports it from plugin 9.1.35: pages are read and written as YOOtheme builder layouts, site templates can be read and changed, and Respira Exhale converts HTML into YOOtheme elements. For an overview, see the [YOOtheme Pro integration](https://www.respira.press/integrations/yootheme) page.
+
+## How YOOtheme stores a page
+
+A YOOtheme page keeps its layout in `post_content`, in three parts:
+
+```
+{static HTML for search and excerpts}
+<!--more-->
+<!-- {"type":"layout","version":"5.0.50","children":[ ... ]} -->
+```
+
+The front end renders the JSON. The HTML before `<!--more-->` is what WordPress search, excerpts and a site without YOOtheme see. Respira writes both on every change, through YOOtheme's own builder, the same way the YOOtheme customizer saves. A page Respira writes opens in the customizer like a page you built there.
+
+Every node in the layout has the same shape:
+
+```json
+{ "type": "headline", "props": { "content": "Fresh bread", "title_element": "h1" }, "children": [] }
+```
+
+- `type` is the YOOtheme element: `section`, `row`, `column`, `headline`, `text`, `button`, `image`, `grid`, `list` and the rest.
+- `props` holds the element's settings. Respira also accepts `settings` and moves it into `props`.
+- `name` (optional) is the label shown in the YOOtheme builder.
+- Nodes have no ids. Address an element by its path (`0.0.0.1`) or by type plus text with `match_content`. `props.id` is the element's HTML id from its Advanced tab, and `find_element` matches it.
+
+## Structure rules
+
+YOOtheme nests **section > row > column > element**. A column can also hold a nested row. Respira adds the levels a payload leaves out and reports each repair as a `structure_wrapped` warning.
+
+**Column widths live on each column**, in `props.width_medium` (`1-2`, `1-3`, `2-3`, `1-4`, `3-4`, `expand`, `auto`; also `width_default`, `width_small`, `width_large`, `width_xlarge`). A row's `layout` prop (`1-2,1-2`) only labels the choice in the editor. Columns sent without a width would stack, so Respira splits the row evenly, or takes the widths from the row's `layout`, and reports `column_widths_set`.
+
+**Multiple-items elements render only their items.** A `button` shows its `button_item` children, a `list` its `list_item` children, and the same for grid, accordion, slideshow, switcher, gallery, nav, social and table. When a button arrives with its text and link on itself, Respira moves them into one `button_item` and reports `item_created`.
+
+**Colours come from the YOOtheme style.** Elements take named styles (`primary`, `muted`, `large`), not hex values. A section can have its own `background_color`, which YOOtheme draws only when the section has no predefined style; Respira clears the style when a colour is set.
+
+**A setting an element does not have** is stored by YOOtheme and never rendered. Respira names it in the response as `unknown_setting` instead.
+
+## The element catalog
+
+`get_builder_info` returns every element's fields, with the allowed values of every select, from the running YOOtheme. Custom elements from a child theme or a YOOtheme extension are included. When the theme runtime is not loaded, Respira falls back to a catalog of the 75 elements of YOOtheme Pro 5.0.50.
+
+Builder info also reports:
+
+- the active YOOtheme style and the style variables the site overrides,
+- every site template with what it is assigned to,
+- the rule for site-wide changes on a YOOtheme site.
+
+## Site templates
+
+A YOOtheme template is a layout the theme renders for a whole view: every single post, the blog index, a category archive, search results or the 404 page. A page with its own YOOtheme layout ignores templates; a page without one renders the first enabled template assigned to its view.
+
+| Tool | What it does |
+|------|--------------|
+| `list_yootheme_templates` | Every template, its assigned view, filter, priority and whether it is enabled, plus the views this site can assign |
+| `get_yootheme_template` | One template with its full layout |
+| `create_yootheme_template` | A new template. It starts disabled, so it shows only in the YOOtheme customizer until someone enables it |
+| `update_yootheme_template` | Replace or extend the layout, rename, reassign, enable, disable or move it first or last |
+
+<Callout kind="alert">
+Changing an enabled template, or enabling one, needs `confirm_live_edit: true`, because the change shows on every page of that type at once. Ask the site owner first.
+</Callout>
+
+Every template write saves a snapshot of all templates first, and the response returns `rollback.snapshot_uuid` for `restore_snapshot`.
+
+Template elements that show dynamic content (the post title, its content, a custom field) carry a `source` key. Keep it as you read it: a template is shared by every page of its type, so static text shows the same words on all of them.
+
+## Supported operations
+
+| Operation | Status |
+|-----------|--------|
+| Extract content | Supported |
+| Inject content | Supported |
+| build_page | Supported |
+| Element-level editing (find, update, move, duplicate, remove) | Supported |
+| add_* shortcuts | Supported, as YOOtheme elements |
+| Site templates | Supported |
+| HTML to YOOtheme (Exhale) | Supported, restyle path |
+| Snapshots | Supported |
+| Style, header and footer | Read only |
+
+## HTML conversion
+
+`convert_html_to_builder` with builder `yootheme` turns a finished HTML page into YOOtheme elements. Headings, text, buttons, images, video and lists become their YOOtheme elements; a grid or flex layout becomes a row of columns; a wrapper's alignment and background colour reach its section or column. Forms, tables and icons stay as an `html` element.
+
+YOOtheme has no fidelity mode: the page takes its look from the YOOtheme style, and the source stylesheet is not carried. The response says so in a `fidelity_unavailable` warning.
+
+## add_* shortcuts
+
+The `add_*` tools write YOOtheme elements: `add_button` a Button with its item, `add_accordion` an Accordion with its items, `add_testimonial` a Quotation, `add_counter` a Panel with a large title. YOOtheme has no spacer, progress bar or form element: the first two become a small `html` element with UIkit markup, and `add_form` is refused with a pointer to a form plugin's shortcode.
