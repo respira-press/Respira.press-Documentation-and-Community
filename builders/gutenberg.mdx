@@ -178,6 +178,40 @@ See [Site Editor (Full Site Editing)](/builders/site-editor) for the tools, the 
 - **Interactive blocks**: Blocks with complex interactivity (forms, carousels) may need manual editing
 - **Site-level structural writes are off by default, an owner switch per site**: read-only discovery of templates, patterns, navigation and global styles is available everywhere
 
+## Write hazards
+
+Reproduced ways a block write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder. These entries also cover the block-vendor builders that inherit this path: [Spectra](/builders/spectra), [Kadence Blocks](/builders/kadence-blocks) and [GenerateBlocks](/builders/generateblocks).
+
+### An `attributes` patch merged onto the block root
+
+**What goes wrong.** A block's attribute bag is called `attrs` in the stored markup. The shared update path treated a payload key named `attributes` as already being in the right place, which is true for the builders whose bucket is literally called that and wrong for the whole block family. `attributes` is also the vocabulary the WordPress block API itself teaches, so it is the natural thing to write. The patch was merged onto the block root, where the serializer never looks.
+
+**What you see.** `write_was_noop: true` on a response that otherwise reads as successful, and a page that comes back byte-identical. Confirmed independently for a Kadence image `alt` (a plain string) and a Rank Math FAQ block's `questions` (an array of objects), so both scalar and structured shapes were affected. Content updates on the same block worked, which is what made it look like a per-block problem. It was never per-block.
+
+**Status.** Fixed in 8.6.28. The same change fixed Oxygen Classic, whose bucket is `options`, and Elementor v3 widgets, whose bucket is `settings`.
+
+**What to do.** Read `write_was_noop`. On any Respira version, that field is the tell that a write reported success and moved nothing. On 8.6.28 or later, `attributes` and `attrs` both land in the right place.
+
+### A paragraph added to a block page written into a different builder entirely
+
+**What goes wrong.** On a page whose last block had just been removed, the content is empty, so the per-page builder check correctly reported nothing and the fallback asked the site instead. The site-level check prefers any other active builder over the block editor. On a site running Bricks alongside blocks, `add_text` then wrote a real, verified Bricks element into Bricks storage.
+
+**What you see.** A successful write with a real element id, and content that is invisible to every block-editor read of that page. The write genuinely persisted, which is exactly why it reported success. It just persisted somewhere you were not looking.
+
+**Status.** Fixed in 8.6.28 for the duplicate case: when the target is a Respira duplicate, the builder is resolved from the original it was copied from, which still has its content, instead of guessing from the site.
+
+**What to do.** On a mixed-builder site, do not write to a page you have just emptied. Put a block back first, so detection has something to read, or check `respira_get_builder_info` for that page before writing.
+
+### A page's template deleted by an edit that only touched its SEO description
+
+**What goes wrong.** A safety check clears a page template the active theme does not recognise, but the lookup it used only sees templates registered through hooks meant for the classic wp-admin screen. A REST call never fires those hooks, so a genuinely valid builder template looked unregistered and was wiped on the very next meta-only edit.
+
+**What you see.** A duplicate that throws "invalid page template" when you try to approve it, after an edit that had nothing to do with templates.
+
+**Status.** Fixed in 8.6.28. The check no longer runs during a REST request.
+
+**What to do.** Re-set the template on any page this happened to. It is a stored value, so once put back it stays.
+
 ## When to Use This Tool
 
 - **Before publishing** - Review and fix content before going live

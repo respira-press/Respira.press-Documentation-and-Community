@@ -68,6 +68,45 @@ Sites running the Newspaper or Newsmag theme with TagDiv Composer are detected a
 3. **Update**: Changes are applied to just that module
 4. **Preserve**: All other content, styling, and settings remain intact
 
+## Write hazards
+
+Respira writes to live sites, and some of those writes have gone wrong. This section says what a write hazard is, how each class is guarded against today, and where the per-builder list lives. Every builder page carries its own **Write hazards** section with the reproduced cases for that builder.
+
+### What a write hazard is
+
+A write hazard is a write that reports success it has not earned. It comes in three shapes:
+
+1. **Silent no-op.** The tool answers success and the stored page is byte-identical. Almost always the value was merged into a key the builder never reads.
+2. **Wrong target.** The write really persists, but into a different element, a different page, or a different builder than the one you meant.
+3. **Damaging write.** The write persists a shape the builder cannot render, and the page breaks.
+
+The first two are worse than an outright error, because nothing tells you to go and look. A hazard with no visible symptom is the one that costs you a week.
+
+### The four guards, and why each exists
+
+<Callout kind="alert">
+
+Every guard below was added after it was found missing. None of them was designed in advance. i would rather write that down than let the list read like a feature tour.
+
+</Callout>
+
+**Duplicate-first.** With direct editing turned off, an edit goes to a duplicate of the page and waits for your approval, so the live page is never the thing being experimented on. In 8.6.28 this was found to be leaking: all 27 `add_*` widget shortcuts wrote straight to the live published page without ever reading the setting, while `update_element` and `inject_builder_content` honoured it correctly. All 27 now route through the same gate.
+
+**Snapshots.** Every write records a before state you can restore from the Changes screen in wp-admin. In 8.6.28 a duplicate's baseline snapshot was found to have been captured before the page meta was copied across, so for every builder that stores its content in post meta the baseline recorded an empty page. Restoring one could never bring the content back, and reported success anyway. The snapshot is now taken after the meta copy, and restoring a snapshot that recorded no builder payload onto a page that currently has content is refused with `respira_snapshot_stale_empty_baseline` instead of quietly doing nothing. Duplicates created before 8.6.28 keep their empty baseline, so re-duplicate anything you rely on for rollback.
+
+**Render validation.** After a write, the page is fetched and checked. Until 8.6.28 that check asked for headers only and passed on any 2xx. WordPress sends the 200 before it renders the body, so a fatal raised part way through rendering leaves the 200 already on the wire and a page reading "There has been a critical error on this website" passed every time. The check now reads the body and looks for the markup WordPress' own error document hardcodes, which is markup rather than translated text, so it holds in any language. A page that cannot be fetched at all is reported as unchecked, not as broken.
+
+**Refusal over guessing.** When a target is genuinely ambiguous, the tool refuses with `respira_ambiguous_target` and lists the candidates rather than picking one. Before 8.6.28, `update_element` and `remove_element` re-resolved the identifier from scratch and acted on the first element of that type on the page, so a search that correctly found the third paragraph was followed by an edit to the first. If you want the old behaviour, `on_ambiguous_match: "first"` asks for it explicitly.
+
+**Write receipts.** Every major write carries a `write_receipt` with `changed`, a before and after fingerprint, and a `covers` field. Read the `covers` field. The fingerprint hashes the post content, the builder payload and an allowlisted set of post meta. It is not total: meta outside that allowlist, taxonomy terms and comment counts are not in it. In 8.6.31 the allowlisted meta was added after an SEO title edit that genuinely persisted came back reported as `changed: false`. A receipt is proof about what it names and silent about the rest.
+
+### What this means for you
+
+- **Keep the plugin current.** Nearly every hazard on these pages is fixed, and a fix only reaches a site that updates. Note that 8.6.27 exists as a tag with no release behind it and never reached a single site, so 8.6.28 is the first build after 8.6.26 the updater could serve.
+- **Read the response, not just the success flag.** `write_was_noop: true`, a `warnings` array, `partial_write: true` and `agent_must_not_retry: true` all mean something did not go the way the word "success" suggests.
+- **Do not blind-retry a write that reported success.** If the page did not change, resending the same payload will not change it either. Extract the page and look at what actually got stored.
+- **Report anything that looks like a silent success.** Almost every entry on these pages exists because somebody noticed their page had not changed and said so. i would rather chase a false alarm than not hear about a real one.
+
 ## Key Tools
 
 - `respira_get_builder_info` — detect active builder, version, module count

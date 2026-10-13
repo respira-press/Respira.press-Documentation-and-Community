@@ -148,6 +148,44 @@ Global layout writes are still snapshotted and reversible. If a confirmed write 
 - Dynamic content tokens are preserved but not directly editable
 - Theme Builder global layouts are written live behind a confirmation handshake, not staged for approval
 
+## Write hazards
+
+Reproduced ways a Divi write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the general picture and the guards that apply to every builder.
+
+### A Divi 4 page on a Divi 5 site read as one opaque block
+
+**What goes wrong.** A Divi 5 site can still hold pages that were never migrated: their `post_content` is plain `[et_pb_*]` shortcodes, often inside a classic block wrapper. Until 8.6.31, every Divi routing decision asked the site's runtime rather than the page in front of it. So a legacy shortcode page on a Divi 5 site was sent down the Divi 5 branch, where block parsing collapses classic content into a single untyped node that surfaces as one `core/freeform` wrapper. The whole page arrived as one opaque block.
+
+**What you see.** Two symptoms from one misroute. `update_module` answers `respira_module_not_found`, "No module found with type et_pb_text", for a text module that is plainly on the page. `update_element` gets as far as the Divi 5 writer, which counts zero layout nodes and refuses with `respira_divi5_empty_inject_blocked`, "Refusing to overwrite existing Divi 5 layout with empty/placeholder-only content". The guard was right. The page was never Divi 5.
+
+**Status.** Fixed in 8.6.31. Routing is decided by the page's own content. The Divi 5 empty-inject guard is untouched and still refuses a genuine Divi 5 page.
+
+**What to do.** Update to 8.6.31 or later. On an older build there is no workaround from the agent side, because nothing in the response tells you the page was misrouted.
+
+### A 16-element page written as one empty section
+
+**What goes wrong.** A payload that describes children with the vocabulary aliases `rows`, `cols`, `columns`, `modules`, `elements` or `innerBlocks` instead of the canonical `children` used to be counted one way and emitted another. The element counter walked the aliases and saw everything; the Divi 4 shortcode emitter read only `children` and dropped the lot.
+
+**What you see.** `success: true` with a full `element_count`, and a page that renders as a single empty `[et_pb_section]`. `update_module` can then never find the modules that were reportedly built.
+
+**Status.** Fixed in 7.5.16. Divi 4 now runs the same deep alias fold Divi 5 has had since 7.0.32, including aliases nested under canonical `children`. A children-dropped write now fails loudly with `respira_children_dropped` and writes nothing, so a caller cannot be told 16 elements were written when zero were.
+
+**What to do.** Nothing, if you are on 7.5.16 or later. If you do see `respira_children_dropped`, that is the guard working: nothing was written, and the response names the counts that disagreed.
+
+### An edit landing on the wrong module
+
+**What goes wrong.** Divi 4 shortcodes carry no stable element IDs unless you set one, so targeting is by type, admin label, path or matched content. Before 8.6.28, `find_element` honoured `match_content` and returned the module you meant, then `update_element` and `remove_element` re-resolved the identifier from scratch without it and acted on the first module of that type on the page.
+
+**What you see.** A search that correctly found the third text module, followed by an edit to the first. The reporter of this one had to restore a snapshot.
+
+**Status.** Fixed in 8.6.28. Both tools now accept and honour `match_content`, and a genuinely ambiguous target is refused with `respira_ambiguous_target` and the list of candidates rather than guessed at. `on_ambiguous_match: "first"` opts back in to the old behaviour explicitly.
+
+**What to do.** Give important modules an admin label. A label is the only stable handle a Divi 4 page has, and it turns an ambiguous target into an exact one.
+
+### An Oxygen-shaped patch landing in a dead key
+
+Not a Divi hazard: Divi's attribute bucket is `attributes`, which is the name the shared update path already treated as correct, so Divi was never affected by the key-fold problem described on the [Gutenberg](/builders/gutenberg#write-hazards) and [Oxygen](/builders/oxygen#write-hazards) pages. Recorded here only so you do not go looking for it.
+
 ## Recent capabilities (8.0 "Canopy")
 
 Two fixes from auditing the safety layer itself, both on the Divi path:

@@ -42,6 +42,30 @@ Prime once at the start of a session so the agent builds and edits in blocks, no
 
 The workflow is the same as core Gutenberg because Kadence blocks are namespaced WordPress blocks. For the shared block workflow, block identification, and prompt patterns, see [Gutenberg (Block Editor)](/builders/gutenberg).
 
+## Write hazards
+
+Kadence Blocks are namespaced WordPress blocks, so every hazard on the [Gutenberg write hazards](/builders/gutenberg#write-hazards) section applies here unchanged. One of them was reported on a Kadence block, so it is worth naming in full.
+
+### An `attributes` patch merged onto the block root
+
+**What goes wrong.** A block's attribute bag is called `attrs` in the stored markup. The shared update path treated a payload key named `attributes` as already being in the right place, which is true only for builders whose bucket is literally called that. The patch was merged onto the block root, where the serializer never looks. `attributes` is the vocabulary the WordPress block API itself teaches, so it is the natural thing to write.
+
+**What you see.** `write_was_noop: true` on a response that otherwise reads as successful, and a page that comes back byte-identical. Confirmed on a `kadence/image` `alt` value, a plain string, and independently on a Rank Math FAQ block's `questions`, an array of objects. Content updates on the same block worked, which is what made it look like a per-block problem. It never was.
+
+**Status.** Fixed in 8.6.28.
+
+**What to do.** Read `write_was_noop` on every write. On any version, that field is the tell that a write reported success and moved nothing.
+
+### A leftover option from another builder claiming your site
+
+**What goes wrong.** Builder detection used to trust a `_fl_builder_version` option that Beaver Builder does not remove when it is uninstalled. A Kadence site that had once had Beaver Builder, or inherited its data through a migration, was reported as a Beaver site.
+
+**What you see.** `respira_get_builder_info` naming the wrong builder, and block tools that do not behave the way a block site should.
+
+**Status.** Fixed in 7.5.31. The detector no longer trusts that leftover option.
+
+**What to do.** If detection names a builder that is not installed, check `respira_get_builder_info` for the page as well as the site.
+
 ## FAQ
 
 ### Does Respira edit Kadence blocks natively or convert them?

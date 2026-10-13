@@ -264,6 +264,60 @@ Bricks global elements and templates are accessible through Respira:
 
 ---
 
+## Write hazards
+
+Reproduced ways a Bricks write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder.
+
+### Patches aimed at an element id changed nothing and reported success
+
+**What goes wrong.** The Bricks adapter never declared which key holds its element data. Bricks nodes carry their editable values under `settings`, but the adapter inherited the interface default of `attributes`, so the shared patcher merged updates into a key Bricks does not read. Every id-targeted `apply_builder_patch` call took that generic route.
+
+**What you see.** Either `respira_patch_not_persisted`, when the round trip happened to be byte-stable, or a plain `success: true` with nothing changed, when an unrelated normalization moved the storage signature and fooled the no-op guard. Path-based targeting worked, which is what made it look like ids specifically were broken.
+
+**Status.** Fixed in 8.6.28. Bricks now declares its real bucket, and the patcher accepts an update wrapped in that key without double-nesting it.
+
+**What to do.** On an older build, target by path instead of by id. On 8.6.28 or later, either works.
+
+### Typography values stored under a name Bricks never reads
+
+**What goes wrong.** Bricks renders from kebab-case typography names such as `font-size`. A camelCase spelling like `fontSize` used to be stored verbatim alongside the canonical one, the canonical one kept winning, and the tool reported success for a change that was never going to show. This applied both at the settings root and nested inside `_typography`.
+
+**What you see.** A successful write, and the front end still at the old size or weight. Nothing in the response points at the key name.
+
+**Status.** Fixed in 8.6.28. Known camelCase names now fold into their canonical form. A name that is neither canonical nor a known alias is refused on a fresh write with `respira_invalid_typography_key` (422), and stripped with a warning on a round trip, rather than being stored where it will never be read.
+
+**What to do.** Prefer the kebab-case names Bricks itself uses. If a write comes back with `respira_invalid_typography_key`, the error names the key it would not store.
+
+### Custom CSS saved, and the front end kept serving the old stylesheet
+
+**What goes wrong.** A per-element style write regenerated the page's CSS file but never told Bricks the file was new. Every global Bricks style write has always bumped the cache markers; the per-element path never did, so visitors kept getting the previous timestamp and the previous inline-CSS transient.
+
+**What you see.** The rules are in the element in the builder, and the browser serves the old stylesheet. Adding the identical rules as an inline `style` block appears instantly, because that route never touches Bricks' CSS pipeline at all. That contrast is the tell.
+
+**Status.** Fixed in 8.6.28. The markers are bumped after a write that actually changed a style, and only then, because the marker is site-wide and a text edit cannot alter generated CSS.
+
+**What to do.** On an older build, save any global Bricks style to force the markers forward. On 8.6.28 or later, nothing.
+
+### An empty rollback baseline on duplicates created before 8.6.28
+
+**What goes wrong.** Bricks stores its page data in post meta (`_bricks_page_content_2`), not in the post body. A duplicate's baseline snapshot used to be captured before that meta was copied onto the new post, so it recorded an empty page.
+
+**What you see.** A restore that reports success and leaves the page exactly as it was.
+
+**Status.** Fixed in 8.6.28. Restoring an empty baseline onto a page that has content is now refused with `respira_snapshot_stale_empty_baseline`.
+
+**What to do.** Re-duplicate anything created before 8.6.28 that you rely on for rollback.
+
+### An element arriving in Bricks that was meant for another builder
+
+**What goes wrong.** On a site running Bricks alongside the block editor, a page whose last block had just been removed reads as having no builder, so the check fell back to asking the site, which prefers any other active builder over Gutenberg. `add_text` then wrote a real, verified Bricks element into Bricks storage on a page that was supposed to be a block page.
+
+**What you see.** A successful write with a real element id, and an element that is invisible to every block-editor read of that page.
+
+**Status.** Fixed in 8.6.28 for the duplicate case: when the target is a Respira duplicate, the builder is resolved from the original it was copied from, which still has its content, instead of guessing from the site. See the [Gutenberg page](/builders/gutenberg#write-hazards) for the full entry.
+
+**What to do.** On a mixed-builder site, avoid writing to a page you have just emptied. Add content back through the builder that owns the page first, so detection has something to read.
+
 ## See Also
 
 - [`respira_find_element`](/tools/builders/find-element) — Find elements by content, type, or class

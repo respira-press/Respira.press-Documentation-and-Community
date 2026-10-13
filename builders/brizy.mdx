@@ -148,6 +148,40 @@ Brizy Pro features and cloud-synced templates work with Respira:
 - **Brizy Cloud**: Cloud-synced templates need the Brizy interface for sync operations
 - **Custom CSS**: Per-element CSS is preserved; complex styling changes may need the builder
 
+## Write hazards
+
+Reproduced ways a Brizy write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder.
+
+### Every Brizy edit reporting `write_was_noop: true`
+
+**What goes wrong.** The no-op detector compares a signature of the builder's storage before and after the write. Brizy's `brizy` meta holds a serialized array, and the signature was reading it as a string, which produces the literal text `Array` on every read. Five bytes, identical every time, so the before and after signatures always matched.
+
+**What you see.** Every Brizy edit reporting `write_was_noop: true` and `bytes_changed: 0`, even though it persisted and rendered correctly. Agents read that as a silent failure and retried in the same session.
+
+**Status.** Fixed in 7.4.25. The signature now serializes Brizy's decoded editor tree, which is the thing writes actually mutate. This was a diagnostics fault only. Brizy writes were never broken.
+
+**What to do.** On 7.4.25 or later, trust the field. If you are seeing it on an older build, check the page before assuming the write failed.
+
+### The front-end compile step depends on a service outside your site
+
+**What goes wrong.** Nothing in Respira. Brizy compiles its front-end output through its own compiler service, so a site with no outbound internet access can hold a correct, editor-openable page that never compiles for visitors.
+
+**What you see.** The Brizy editor opens the page and shows your change. The front end does not.
+
+**Status.** Not a defect, and not fixable from Respira's side. Brizy moved from read to write in 7.4.0 "Clearing" with this caveat stated at the time.
+
+**What to do.** Open and save the page in the Brizy editor once to trigger the compile, and check the site can reach Brizy's service.
+
+### An empty rollback baseline on duplicates created before 8.6.28
+
+**What goes wrong.** Brizy stores its page data in post meta, not in the post body. A duplicate's baseline snapshot used to be captured before that meta was copied onto the new post, so it recorded an empty page.
+
+**What you see.** A restore that reports success and leaves the page exactly as it was.
+
+**Status.** Fixed in 8.6.28. Restoring an empty baseline onto a page that has content is now refused with `respira_snapshot_stale_empty_baseline`.
+
+**What to do.** Re-duplicate anything created before 8.6.28 that you rely on for rollback.
+
 ## When to Use This Tool
 
 - **Quick content updates** - Change text, buttons, and links without the builder

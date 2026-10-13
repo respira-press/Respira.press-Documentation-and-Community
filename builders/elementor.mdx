@@ -133,6 +133,46 @@ Elementor Pro's Theme Builder templates (headers, footers, single post templates
 - **Dynamic tags**: Elementor dynamic content tokens are preserved but not directly editable
 - **Third-party widgets**: Support varies by add-on; core Elementor widgets have full support
 
+## Write hazards
+
+Reproduced ways an Elementor write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder.
+
+### Widgets stored with no type, which took the whole page down
+
+<Callout kind="danger">
+
+This is the worst thing Respira has done to an Elementor site. It broke the front end, and the write reported success with a green render check three times in a row.
+
+</Callout>
+
+**What goes wrong.** A tree that mixed simplified `type: "container"` wrappers at the top with Elementor's native `widgetType` spelling on the widgets underneath skipped the normalizing pass, because that pass only ran when the first top level node was itself in native shape. The emitter then wrote `elType: widget` with no `widgetType` key at all. Elementor cannot instantiate that: the missing key makes its element factory return the whole widget-type map instead of one type, and the next call fatals on an array.
+
+**What you see.** "There has been a critical error on this website" on the front end. Empty containers in the editor. Reading the page back shows `"widget": null` for every widget. Re-injecting identical content changes nothing, and the rendered hash is identical across the blank page and every payload you try, because the fatal always renders the same error page. The same JSON shape works on other pages in the same session, which is what makes it look random. It was never the size or the depth of the tree. It was whether the first top level node happened to be in native shape.
+
+**Status.** Fixed in two halves. 8.6.28 fixed the emitter: it now understands both spellings, and a widget that still resolves to no type aborts the write instead of persisting a page that cannot render. 8.6.31 fixed the validator, which had been standing next to the corruption unable to see it. The shape check asserted only that the data decoded to an array with enough top level entries, so a tree whose every widget had lost its type passed completely. It now walks the persisted tree and fails with `elementor_widget_missing_type`, naming the path and the node. The one Elementor write path that bypasses the emitter, used by `make_responsive`, now refuses the same shape before touching the database, so a page already damaged this way cannot have the damage rewritten by a later edit.
+
+**What to do.** If a page is already in this state, a targeted edit will correctly refuse to touch it. Recover with a fresh replace-mode write of the whole page, or restore a snapshot. Update to 8.6.31 or later first, or the recovery write can reproduce the damage.
+
+### An `attributes` patch merged onto the element root
+
+**What goes wrong.** Elementor's attribute bucket is called `settings`. The shared update path treated a payload key named `attributes` as already being in the right place, which is true only for builders whose bucket is literally called that. On Elementor v3 widgets the patch was merged onto the element root, where the serializer never looks.
+
+**What you see.** `write_was_noop: true` on a response that otherwise reads as successful, and a page that comes back byte-identical. Content updates on the same widget work, which is what makes it look like a per-widget or per-setting problem. It never was.
+
+**Status.** Fixed in 8.6.28. The same change fixed the Gutenberg family and Oxygen Classic, which had the same fault for the same reason.
+
+**What to do.** Read `write_was_noop`. On any Respira version, that field is the tell that a write reported success and moved nothing.
+
+### An empty rollback baseline on duplicates created before 8.6.28
+
+**What goes wrong.** Elementor stores its page data in post meta (`_elementor_data`), not in the post body. A duplicate's baseline snapshot used to be captured before the meta was copied onto the new post, so builder detection looked at a post with no builder data yet, found none, and stored an envelope containing the hash of an empty payload.
+
+**What you see.** A restore that reports success and leaves the page exactly as it was.
+
+**Status.** Fixed in 8.6.28. The snapshot is taken after the meta copy, and restoring an empty baseline onto a page that has content is now refused with `respira_snapshot_stale_empty_baseline`.
+
+**What to do.** Duplicates created before 8.6.28 keep their empty baseline. Re-duplicate anything you rely on for rollback.
+
 ## When to Use This Tool
 
 - **Quick content updates** - Change headlines, button text, or links without opening the builder

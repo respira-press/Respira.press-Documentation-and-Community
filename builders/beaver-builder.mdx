@@ -131,6 +131,60 @@ Beaver Themer layouts (headers, footers, archives) are fully supported:
 - **Field connections**: Beaver Themer field connections are preserved but not directly editable
 - **Third-party modules**: Support varies by add-on; core modules have full support
 
+## Write hazards
+
+Reproduced ways a Beaver Builder write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder.
+
+### A build that reported success and rendered a blank page
+
+**What goes wrong.** Beaver's own front end renderer will not output anything for a row that has no column-group under it. A typed `row` node whose `columns` or `cols` key held column specs, which is the documented shape, skipped the mandatory column-group synthesis. The stored data looked populated and every safety check agreed.
+
+**What you see.** `_fl_builder_data` with row and column nodes, a non-zero element count, a passing render check, and a page that renders nothing at all. Two related faults shipped in the same state: a column's declared `size` was dropped, so multi-column layouts always came out equal-width, and an inject with a top-level `{"rows": [...]}` payload collapsed a whole multi-row layout into one empty node while the response counted the real, unwritten structure. "23 elements written" next to a blank page.
+
+**Status.** All three fixed in 7.5.50 at the shared conversion path.
+
+**What to do.** If a Beaver build came back blank, do not resend the same payload. Extract the page and check whether a column-group exists under each row.
+
+### A multi-row layout collapsing into a single stacked column
+
+**What goes wrong.** The auto-wrap pass decided whether to wrap the top level node list in a synthetic row, column-group and column using one flag for the whole array. An orphaned module, a node whose `parent` points at an id no longer in the tree, is promoted to root during simplification, and its presence flipped that flag for every other top level node too. Every legitimate row got pulled inside one synthetic column alongside it.
+
+**What you see.** A successful write with no bytes dropped, and a page that visually collapses from its real multi-column layout into a single stacked column. It fires on any `update_element` or `update_module` call that resolves by something other than `id`.
+
+**Status.** Fixed in 7.5.29. Root-capable nodes pass through the top level unchanged, and only genuine leaf modules get bundled into their own container.
+
+**What to do.** Restore the snapshot taken before the write. The layout data was never lost, so a restore recovers it exactly.
+
+### An edit that landed in the database and stayed invisible
+
+**What goes wrong.** Two separate cache faults. On hosts with a persistent object cache (Pressable, WP Engine, Redis), a write to a text or HTML element on a large page reached the database while the cached copy the site kept serving stayed stale. Separately, Beaver keeps a static digest of the layout that its own editor refreshes when a human clicks Publish, and Respira's writes bypassed that refresh, so approved content could render partially or stay stale even though the data was correct.
+
+**What you see.** The change is correct in Respira and in the database, and the page keeps showing the old version until you open Beaver and publish by hand.
+
+**Status.** The object cache half fixed in 7.5.34: the generic write paths now force the write and bust the meta cache. The digest half fixed in 7.5.32: every Beaver write path refreshes the digest the way Beaver's own editor does.
+
+**What to do.** On an older build, open the page in Beaver and publish once. No data is at risk in either case.
+
+### Payload wrappers that quietly became empty stub modules
+
+**What goes wrong.** Beaver's normalizer did not recognise every documented wrapper shape. A `{"rows": [...]}` payload nested one level inside a list, which happens naturally on any `mode: "append"` call because the merge step listifies it, and a `{content: [...]}` envelope sent by hosted clients both persisted a row, column-group, column and anonymous module stub.
+
+**What you see.** `success: true` echoing the original element count, and modules whose settings read `{"type":"module"}` with the heading or button text and links gone.
+
+**Status.** Fixed in 7.5.49 and 7.5.56. The normalizer now recursively unwraps every documented content envelope, an unknown non-empty wrapper returns an actionable 422 without touching the page, and injection verifies the exact native node graph after saving so a database or object cache failure cannot produce another false positive.
+
+**What to do.** Nothing on 7.5.56 or later.
+
+### An empty rollback baseline on duplicates created before 8.6.28
+
+**What goes wrong.** Beaver stores its page data in post meta (`_fl_builder_data`), not in the post body. A duplicate's baseline snapshot used to be captured before that meta was copied onto the new post, so it recorded an empty page.
+
+**What you see.** A restore that reports success and leaves the page exactly as it was.
+
+**Status.** Fixed in 8.6.28. Restoring an empty baseline onto a page that has content is now refused with `respira_snapshot_stale_empty_baseline`.
+
+**What to do.** Re-duplicate anything created before 8.6.28 that you rely on for rollback.
+
 ## When to Use This Tool
 
 - **Content updates** - Change text, links, and images without opening the builder

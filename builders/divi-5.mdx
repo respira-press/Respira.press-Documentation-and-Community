@@ -458,6 +458,30 @@ All `divi/*` modules accept a `settings` object with shorthand keys. Respira map
 
 ---
 
+## Write hazards
+
+Reproduced ways a Divi 5 write has gone wrong. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder, and the [Divi page](/builders/divi#write-hazards) for the Divi 4 hazards.
+
+### Divi 5 markup on a post or a custom post type rendered with the Divi 4 renderer
+
+**What goes wrong.** Writing `divi/*` block markup to a post requires flipping the site into Divi 5 mode in the same request, otherwise valid block markup renders through the wrong renderer. 8.6.3 fixed that for pages. Pages, posts and custom post types are three parallel implementations in the plugin, and the fix landed on one of them.
+
+**What you see.** Correct data stored, wrong renderer chosen, and a post or a custom post type entry that cannot be corrected by clearing any cache. Hand-authored Divi 5 markup pushed to a page worked; the identical markup pushed to a post did not.
+
+**Status.** Fixed in 8.6.28. All three paths now flip the mode, and the test asserts all three call sites rather than only that the helper works. Two internal guards that would have let the fix die silently under a rename were removed at the same time.
+
+**What to do.** Update to 8.6.28 or later, then rewrite the affected post. Clearing caches will not help, because the stored data was never the problem.
+
+### The empty-inject guard, and the one case where it fired wrongly
+
+**What goes wrong.** Nothing, usually. `respira_divi5_empty_inject_blocked` is a deliberate refusal: it stops a write that would overwrite an existing Divi 5 layout with empty or placeholder-only content. It has fired wrongly exactly twice, and both times the cause was upstream of the guard.
+
+**What you see.** "Refusing to overwrite existing Divi 5 layout with empty/placeholder-only content" on a write whose payload plainly had content in it.
+
+**Status.** Two causes, both fixed. In 6.6.9 a payload using shorthand type names (`heading`, `section`, `row`, `column` without the `divi/` prefix) was rejected by three pipeline stages that still matched on the raw prefix before the normalizer ran. In 8.6.31 a legacy Divi 4 shortcode page on a Divi 5 site was misrouted into the Divi 5 writer, which then correctly counted zero Divi 5 layout nodes and correctly refused; see the [Divi page](/builders/divi#write-hazards) for that one. The guard itself was right in both cases and has not been loosened.
+
+**What to do.** On 8.6.31 or later, treat this error as genuine: the page really does have a Divi 5 layout and your payload really did not carry layout content. Extract the page and compare before resending.
+
 ## Recent capabilities (plugin v7.5.x)
 
 - **Native, editable module builds across a 112-module catalog (Divi 5.11).** `build_page` writes real `divi/*` modules from the catalog, discoverable through `get_builder_inline_schemas`, instead of falling back to a raw code block.

@@ -137,6 +137,50 @@ Visual Composer's global areas are editable:
 - **`update_element` applies edits as a deep settings patch.** The base-class write path (shared with Visual Composer) now normalizes an `updates` payload into a settings patch and deep-merges it, instead of a shallow merge at the element root that used to overwrite the whole `settings` dict and lose other styling keys.
 - **Successful meta writes are not misreported as no-ops.** Visual Composer stores its canonical tree in post meta, not `post_content`, so the write-noop check reads a storage-specific signature and no longer flags every successful write as a silent failure.
 
+## Write hazards
+
+Reproduced ways a Visual Composer write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder. Visual Composer Website Builder is a different product from [WPBakery](/builders/wpbakery), and the two do not share these entries.
+
+### An edit landing on the wrong element
+
+**What goes wrong.** Visual Composer pages carry no stable element IDs that survive a rewrite, so targeting is by type, class, path or matched content. Before 8.6.28, `find_element` honoured `match_content` and returned the element you meant, then `update_element` and `remove_element` re-resolved the identifier from scratch without it and acted on the first element of that type on the page.
+
+**What you see.** A search that correctly found the third element, followed by an edit to the first.
+
+**Status.** Fixed in 8.6.28. Both tools accept and honour `match_content`, and a genuinely ambiguous target is refused with `respira_ambiguous_target` and the list of candidates rather than guessed at.
+
+**What to do.** Use a custom class as a targeting handle where you can. It is the most stable identifier this builder offers.
+
+### `duplicate_element` unusable on this builder
+
+**What goes wrong.** The MCP tool exposed a single `element_id` argument while the plugin route has always required `identifier_type` and `identifier_value`. On builders with no stable IDs anywhere, there was no workaround.
+
+**What you see.** "Missing parameter(s): identifier_type, identifier_value" on every duplicate call.
+
+**Status.** Fixed in MCP server 6.19.7. Note this is the MCP server version, not the plugin version.
+
+**What to do.** Update the MCP server as well as the plugin.
+
+### Visual Composer recompiles on its own schedule
+
+**What goes wrong.** Nothing in Respira. Visual Composer keeps a self-compiled copy of the page in `post_content` alongside its real storage, and it recompiles that copy on the next save inside its own editor. Restores re-mint element ids, so a raw content comparison after a restore is only ever semantic, never byte-for-byte.
+
+**What you see.** A correct write whose front-end output only fully settles after the next editor save.
+
+**Status.** Not a defect. Visual Composer moved from read to write in 7.4.0 "Clearing" with this caveat stated at the time.
+
+**What to do.** Open and save the page in Visual Composer once after a structural change.
+
+### An empty rollback baseline on duplicates created before 8.6.28
+
+**What goes wrong.** Visual Composer stores its page data in post meta. A duplicate's baseline snapshot used to be captured before that meta was copied onto the new post, so it recorded an empty page.
+
+**What you see.** A restore that reports success and leaves the page exactly as it was.
+
+**Status.** Fixed in 8.6.28. Restoring an empty baseline onto a page that has content is now refused with `respira_snapshot_stale_empty_baseline`.
+
+**What to do.** Re-duplicate anything created before 8.6.28 that you rely on for rollback.
+
 ## When to Use This Tool
 
 - **Content updates** - Change text, links, and images without opening the builder

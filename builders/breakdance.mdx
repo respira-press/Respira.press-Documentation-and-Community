@@ -169,6 +169,60 @@ If you corrupt `_breakdance_data` or remove required elements, the Breakdance ed
 
 </Callout>
 
+## Write hazards
+
+Reproduced ways a Breakdance write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder.
+
+### Every edit on the site refused with "not registered on this site"
+
+**What goes wrong.** The write path guard checked whether an element type was a real PHP class. Breakdance registers its elements as editor definitions, not autoloadable classes, so the standard `EssentialElements\Section` container and everything built on it looked unregistered.
+
+**What you see.** On Breakdance 2.8.0, every `update_element` and `apply_builder_patch` call failing with `Unknown Breakdance element type EssentialElements\Section, not registered on this site`. Every change on the site blocked.
+
+**Status.** Fixed in 7.5.3. The guard now checks the same element catalog the read side uses, so reads and writes agree.
+
+**What to do.** Update to 7.5.3 or later. This one at least failed loudly, which is the reason it was found in a day rather than a month.
+
+### A write that landed in a dead key and reported a real hash change
+
+**What goes wrong.** The write path decided where to store new content by matching the element's stored type name against a list of fully qualified class names. Any element whose stored type was still a bare legacy string, which happens on older Breakdance content and on beta builds, missed that match and was written to a decoy key nothing reads.
+
+**What you see.** `update_element` reporting success with a genuine hash change, because the decoy write was real bytes. The page just never shows them. This is the hardest shape to catch, because even the no-op detector agrees something moved.
+
+**Status.** Fixed in 8.6.3. When the type name does not match, the write now trusts the already-persisted attribute shape instead, so it lands on the field Breakdance's own renderer reads. Reproduced broken and then reproduced fixed on the same page and element.
+
+**What to do.** If a Breakdance edit reported a hash change and still did not show, extract the element and look at which key the new value ended up in.
+
+### A code block that stored correctly and rendered nothing
+
+**What goes wrong.** Code passed to an `EssentialElements\CodeBlock` was stored under the agent's vocabulary key (`code`, `html`, `js` or `css`), which Breakdance never reads. Its renderer reads `php_code`, `css_code` and `js_code`.
+
+**What you see.** A structurally valid block that passes the validator and renders nothing on the page.
+
+**Status.** Fixed in 7.4.25 across all three write paths, live-verified on the Breakdance test environment.
+
+**What to do.** Nothing on 7.4.25 or later. On an older build, pass the native `php_code`, `css_code` and `js_code` field names.
+
+### `build_page` writing elements with empty properties
+
+**What goes wrong.** The complexifier read content only from `attributes`, which is the shape `extract_builder_content` produces. A `build_page` caller has no extract to copy from, so an agent naturally invents the near-native `{type, data: {content: {...}}}` shape instead, and that shape produced an empty `properties` object on every element.
+
+**What you see.** A page built with the right number of elements, all of them empty.
+
+**Status.** Fixed in 7.0.20. Six payload shapes are now accepted in priority order, and the element type is read from `data.type` when it is not at the item root.
+
+**What to do.** Nothing on 7.0.20 or later.
+
+### An empty rollback baseline on duplicates created before 8.6.28
+
+**What goes wrong.** Breakdance stores its page data in `_breakdance_data` post meta, not in the post body. A duplicate's baseline snapshot used to be captured before that meta was copied onto the new post, so it recorded an empty page.
+
+**What you see.** A restore that reports success and leaves the page exactly as it was.
+
+**Status.** Fixed in 8.6.28. Restoring an empty baseline onto a page that has content is now refused with `respira_snapshot_stale_empty_baseline`.
+
+**What to do.** Re-duplicate anything created before 8.6.28 that you rely on for rollback.
+
 ## See also
 
 Use these tools with Breakdance pages:

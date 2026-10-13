@@ -129,6 +129,50 @@ Respira works with content regardless of which editor was used. Both Backend Edi
 - **`find_builder_targets` paginates.** Results carry `total_matches`, `offset`, `has_more` and `next_offset` so large pages page through cleanly.
 - **`_wpb_shortcodes_custom_css` is regenerated on every inject**, so Respira's REST writes (which run without an editor cap check) no longer leave stale per-post shortcode CSS that could break the front-end render on Uncode.
 
+## Write hazards
+
+Reproduced ways a WPBakery write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder.
+
+### An edit landing on the wrong element
+
+**What goes wrong.** WPBakery shortcodes have no stable element IDs. `el_id` is optional and user-set, so targeting is by type, class, path or matched content. Before 8.6.28, `find_element` honoured `match_content` and returned the element you meant, then `update_element` and `remove_element` re-resolved the identifier from scratch without it and acted on the first element of that type on the page.
+
+**What you see.** A search that correctly found the third text block, followed by an edit to the first. The reporter of this one had to restore a snapshot.
+
+**Status.** Fixed in 8.6.28. Both tools accept and honour `match_content`, and a genuinely ambiguous target is refused with `respira_ambiguous_target` and the list of candidates. `on_ambiguous_match: "first"` opts back in to the old behaviour explicitly.
+
+**What to do.** Set `el_id` on elements you edit often. On a builder with no stable IDs it is the only exact handle you can create.
+
+### A button added at page root that rendered nothing
+
+**What goes wrong.** WPBakery ignores any element that is not inside a `vc_row` and `vc_column` chain. `add_button` and the other shortcuts appended a bare module node to the top level content array.
+
+**What you see.** A successful write, and no button on the page.
+
+**Status.** Fixed in 7.4.1. Top level non-structural nodes are wrapped in the required row and column automatically.
+
+**What to do.** Nothing on 7.4.1 or later.
+
+### A snapshot restore that changed the page it restored
+
+**What goes wrong.** Restore used to re-apply the content through the inject path, which re-serialises shortcodes. That pass re-encoded attributes, shifted column widths and re-ordered attributes, so the restored page was not byte-identical to what was captured.
+
+**What you see.** A restore that reports success, followed by a builder hash that does not match the snapshot's. The page is close but not the same.
+
+**Status.** Fixed in 7.4.1. Restore for WPBakery skips the inject pass, the same way Divi 5 and Beaver Builder already did, and `post_content` is restored byte-correctly.
+
+**What to do.** Nothing on 7.4.1 or later. If a restore on an older build left the page subtly different, the snapshot payload itself is intact and can be re-applied.
+
+### `duplicate_element` unusable on this builder
+
+**What goes wrong.** The MCP tool exposed a single `element_id` argument while the plugin route has always required `identifier_type` and `identifier_value`. On builders with stable IDs this was one 400 error. On WPBakery, where nothing has a stable ID, there was no workaround at all.
+
+**What you see.** "Missing parameter(s): identifier_type, identifier_value" on every duplicate call.
+
+**Status.** Fixed in MCP server 6.19.7, which exposes both arguments directly and keeps `element_id` as a back-compat alias. Note this is the MCP server version, not the plugin version.
+
+**What to do.** Update the MCP server, not just the plugin. They release on separate lines.
+
 ## When to Use This Tool
 
 - **Content updates** - Change text, links, and images without opening the builder

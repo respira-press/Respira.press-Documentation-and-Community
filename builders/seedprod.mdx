@@ -34,6 +34,17 @@ What Respira cannot do yet:
 
 Native write support for SeedProd is on the roadmap for a follow-up release.
 
+## Write hazards
+
+None, because there are no writes. SeedProd is the one builder in the list where a write cannot go wrong, since `inject_content` and `create_code_block` return a clear "not supported" error instead of attempting anything. That refusal is deliberate: a half-implemented writer on a landing page is worse than no writer.
+
+Two things worth knowing anyway:
+
+- **SeedProd registers no separate global token store**, so design-token work reports nothing for it rather than writing tokens into a store SeedProd never reads.
+- **Everything else on your site still writes normally.** Only the SeedProd landing pages themselves are read and audit only.
+
+If write support ships, the hazards on this page will be filled in the same way as every other builder. See [Write hazards](/builders/overview#write-hazards) on the overview page for what that means.
+
 ## FAQ
 
 ### Can Respira edit my SeedProd landing pages?

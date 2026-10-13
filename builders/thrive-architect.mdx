@@ -139,6 +139,40 @@ Thrive's Smart Landing Pages work with Respira for content updates while preserv
 - **Animations**: Entry effects and hover animations are preserved but need the builder
 - **Global elements**: Thrive Architect global elements can be edited but changes need verification
 
+## Write hazards
+
+Reproduced ways a Thrive Architect write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder.
+
+### Structural changes are not written, by design
+
+**What goes wrong.** Thrive stores rendered HTML, not a structured tree. Respira only replaces text inside the elements that already exist on the page, in the order they appear. A payload that adds, removes or re-nests elements is not something this path can honour.
+
+**What you see.** If your payload carries a different number of text nodes than the page has, the write is refused with `respira_thrive_structure_change` and a message naming both counts: "Thrive Architect text-node count mismatch (page has 12, request has 9)". If your payload carries no text nodes at all, the stored HTML is returned unchanged and the write reports `write_was_noop: true`.
+
+**Status.** Working as designed, not a defect, and not scheduled to change. Thrive is text edits only.
+
+**What to do.** Open Thrive Architect to add or remove elements. Use Respira for the wording once the structure exists.
+
+### The editor and the front end can disagree
+
+**What goes wrong.** Thrive keeps two copies of the page: `tve_updated_post`, which is what the front end renders, and `tve_updated_post_unfiltered`, which is the copy Thrive reloads when you re-open the visual editor. Writing only the rendered key makes the change vanish the next time you open the page in Thrive.
+
+**What you see.** A correct front end, and an editor that shows the old text as soon as you open it, silently reverting the change on the next editor save.
+
+**Status.** Both keys are written together on every Respira write, so this does not happen through Respira. It is recorded here because it is the failure mode any other tool writing Thrive meta will hit, and because it explains why a Thrive write touches more than one key.
+
+**What to do.** Nothing. Do not hand-edit `tve_updated_post` on its own.
+
+### An empty rollback baseline on duplicates created before 8.6.28
+
+**What goes wrong.** Thrive stores its page data in post meta (`tve_updated_post`), not in the post body. A duplicate's baseline snapshot used to be captured before that meta was copied onto the new post, so it recorded an empty page.
+
+**What you see.** A restore that reports success and leaves the page exactly as it was.
+
+**Status.** Fixed in 8.6.28. Restoring an empty baseline onto a page that has content is now refused with `respira_snapshot_stale_empty_baseline`.
+
+**What to do.** Re-duplicate anything created before 8.6.28 that you rely on for rollback.
+
 ## When to Use This Tool
 
 - **Content optimization** - Update headlines, CTAs, and copy for conversion testing

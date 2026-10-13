@@ -116,5 +116,35 @@ Respira includes a Flatsome Intelligence package with:
 
 When using `build_page`, bare elements (not wrapped in section > row > col) are automatically wrapped in a full container hierarchy. You can pass a flat list of elements and Respira will create the correct structure.
 
+## Write hazards
+
+Reproduced ways a Flatsome write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder.
+
+### An edit landing on the wrong element
+
+**What goes wrong.** Flatsome shortcodes carry no stable element IDs, so targeting is by type, class, path or matched content. Before 8.6.28, `find_element` honoured `match_content` and returned the element you meant, then `update_element` and `remove_element` re-resolved the identifier from scratch without it and acted on the first element of that type on the page.
+
+**What you see.** A search that correctly found the third text box, followed by an edit to the first.
+
+**Status.** Fixed in 8.6.28. Both tools accept and honour `match_content`, and a genuinely ambiguous target is refused with `respira_ambiguous_target` and the list of candidates. `on_ambiguous_match: "first"` opts back in to the old behaviour explicitly.
+
+**What to do.** Put a distinct `class` on elements you edit often. It is the most stable handle a shortcode page has.
+
+### `duplicate_element` unusable on this builder
+
+**What goes wrong.** The MCP tool exposed a single `element_id` argument while the plugin route has always required `identifier_type` and `identifier_value`. On builders with no stable IDs anywhere, there was no workaround.
+
+**What you see.** "Missing parameter(s): identifier_type, identifier_value" on every duplicate call.
+
+**Status.** Fixed in MCP server 6.19.7. Note this is the MCP server version, not the plugin version.
+
+**What to do.** Update the MCP server as well as the plugin.
+
+### Two hazards Flatsome does not have
+
+Recorded so you do not go looking for them. Flatsome stores its content as shortcodes in the post body, so the empty-baseline snapshot problem described on the [overview page](/builders/overview#write-hazards) never affected it: a duplicate's content is copied by the post insert itself. Flatsome's attribute bucket is called `attributes`, which is the name the shared update path already treated as correct, so the key-fold problem that hit the block family and Oxygen Classic never applied here either.
+
+
+
 
 {/* bust build cache 2026-05-06 */}

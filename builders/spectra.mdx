@@ -40,6 +40,30 @@ Prime once at the start of a session so the agent builds and edits in blocks, no
 
 The workflow is the same as core Gutenberg because Spectra blocks are just namespaced WordPress blocks. For the shared block workflow, block identification, and prompt patterns, see [Gutenberg (Block Editor)](/builders/gutenberg).
 
+## Write hazards
+
+Spectra blocks are namespaced WordPress blocks, so every hazard in the [Gutenberg write hazards](/builders/gutenberg#write-hazards) section applies here unchanged. The one worth knowing by heart:
+
+### An `attributes` patch merged onto the block root
+
+**What goes wrong.** A block's attribute bag is called `attrs` in the stored markup. The shared update path treated a payload key named `attributes` as already being in the right place, which is true only for builders whose bucket is literally called that. The patch was merged onto the block root, where the serializer never looks. `attributes` is the vocabulary the WordPress block API itself teaches, so it is the natural thing to write.
+
+**What you see.** `write_was_noop: true` on a response that otherwise reads as successful, and a page that comes back byte-identical. Content updates on the same block worked, which is what made it look like a per-block problem.
+
+**Status.** Fixed in 8.6.28, for every builder that inherits the block path.
+
+**What to do.** Read `write_was_noop` on every write. On any version, that field is the tell that a write reported success and moved nothing.
+
+### The intelligence layer reporting as unavailable
+
+**What goes wrong.** The check that reports whether a builder has an intelligence package derived the package directory from the builder's display name, so the block-vendor builders went looking for directories that do not and should not exist. The block package reads the live block registry, so it already covered every block these builders register.
+
+**What you see.** The builder info screen reporting no intelligence layer for Spectra. Cosmetic: the capability was there the whole time.
+
+**Status.** Fixed in 8.2.1 for Spectra, Kadence Blocks, GenerateBlocks and GreenShift by inheritance.
+
+**What to do.** Nothing.
+
 ## FAQ
 
 ### Does Respira edit Spectra blocks natively or convert them?

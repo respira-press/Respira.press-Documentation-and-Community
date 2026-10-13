@@ -145,6 +145,70 @@ Oxygen can include Gutenberg blocks via Inner Content. Respira can edit both the
 - **Global styles**: Oxygen's global colors and stylesheets need the builder interface
 - **Custom PHP**: Code blocks with PHP are preserved but not editable through Respira
 
+## Write hazards
+
+Reproduced ways an Oxygen write has gone wrong, and what to do about each. See [Write hazards](/builders/overview#write-hazards) on the overview page for the guards that apply to every builder. Oxygen Classic and Oxygen 6 store data differently, so most entries name which one they apply to.
+
+### Oxygen Classic: a flat patch landing in a key Oxygen never reads
+
+**What goes wrong.** Oxygen Classic's attribute bucket is `options`. Two separate versions of this fault existed. Before 7.0.40, a flat patch such as `update_element({type: ct_headline, updates: {ct_content: "new"}})` was wrapped into a hardcoded `settings` bucket that Oxygen's complexifier reads never. Before 8.6.28, a payload that explicitly used the key `attributes` was treated as already structural and merged onto the element root instead of into `options`.
+
+**What you see.** `success: true` with the persisted element unchanged, and the page still rendering the old value. On the 8.6.28 shape you also get `write_was_noop: true`, which is the only field that gives it away.
+
+**Status.** The first half fixed in 7.0.40, which picks the wrap target by looking at the shape of the existing element. The second half fixed in 8.6.28, which was the same change that fixed the block family and Elementor v3.
+
+**What to do.** Read `write_was_noop` on every write. If it is true, the write moved nothing regardless of what the success flag says.
+
+### Oxygen Classic: an image update landing next to the value the renderer reads
+
+**What goes wrong.** Oxygen Classic 4.8 and later store image `src`, `alt`, `width` and `height` under `options.original.*`, not at `options.*`. A flat patch was correctly wrapped into `options` and then deep-merged, which produced `options.src` as a sibling of `options.original` while `options.original.src` stayed at the old value.
+
+**What you see.** A successful write, an internally inconsistent stored shape, and the page still rendering the old image.
+
+**Status.** Fixed in 7.0.51 for `ct_image` and `ct_image_overlay`. An explicit `{original: {src: "..."}}` patch has always passed through untouched, and still wins.
+
+**What to do.** Nothing on 7.0.51 or later. On an older build, pass the explicit `original` shape.
+
+### Oxygen Classic: style writes to global templates that persisted nowhere
+
+**What goes wrong.** The same lift that nests style properties under `options.original` only ever covered image elements. Sections, divs, headlines and anything inside a `ct_template`, such as a global footer, had their style writes land as dead sibling keys.
+
+**What you see.** `color`, `background-color` and similar writes reporting success, with nothing changed on the live page.
+
+**Status.** Fixed in 8.1.1. The lift now covers every element type.
+
+**What to do.** Re-apply any global template styling written before 8.1.1. It was never stored where the renderer looks, so it is not recoverable from a snapshot either.
+
+### Oxygen 6: rich pages collapsing to a handful of basic elements
+
+**What goes wrong.** Oxygen 6 ships its core elements in the `OxygenElements` namespace. The rich `EssentialElements` blocks (Section, Heading, Button and the rest) are registered too, but only when the common "Breakdance Elements for Oxygen" add-on is installed. Respira used to assume they were never registered.
+
+**What you see.** Flat, generic pages. A heading comes out as plain text, a button as a plain link, a section as a bare container. Agents then compensate by dumping the whole design into one raw HTML block, which is worse.
+
+**Status.** Fixed in 7.4.8. The add-on is detected and the real native elements are emitted. Sites without the add-on keep the safe core-only mapping, which is the correct behaviour there.
+
+**What to do.** If your Oxygen 6 pages look basic, check whether the add-on is installed and whether you are on 7.4.8 or later.
+
+### Oxygen 6: design edits to an already-built element dropping everything but colour
+
+**What goes wrong.** `update_element` takes a nested `design` bucket (`design.typography.fontSize`, `design.spacing.margin` and so on), but the translation into Oxygen 6's real control paths only scanned flat top level keys, which is the shape `build_page` and the `add_*` shortcuts use. A `design` bucket edit fell through untranslated and landed at a dead sibling of the real property path. `color` happened to share the same shallow path both ways, which is why it alone appeared to work.
+
+**What you see.** A design edit that reports success, with only the colour actually changing. A related corruption in the same code wrote the literal text `Array` into stored CSS values when a caller passed back the `{value, unit}` object that `extract_builder_content` itself echoes.
+
+**Status.** Fixed in 7.5.48, live-verified against Oxygen 6.0.0.
+
+**What to do.** Note one genuine platform limit that no plugin can work around: `OxygenElements\Container` has no design or CSS support in Oxygen 6 itself. Use `EssentialElements\Div` where you need a design-capable wrapper.
+
+### An empty rollback baseline on duplicates created before 8.6.28
+
+**What goes wrong.** Oxygen stores its page data in post meta, not in the post body. A duplicate's baseline snapshot used to be captured before that meta was copied onto the new post, so it recorded an empty page.
+
+**What you see.** A restore that reports success and leaves the page exactly as it was.
+
+**Status.** Fixed in 8.6.28. Restoring an empty baseline onto a page that has content is now refused with `respira_snapshot_stale_empty_baseline`.
+
+**What to do.** Re-duplicate anything created before 8.6.28 that you rely on for rollback.
+
 ## When to Use This Tool
 
 - **Quick content updates** - Change headlines, button text, or links
