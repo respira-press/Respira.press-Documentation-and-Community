@@ -185,6 +185,30 @@ Add to your Windsurf MCP configuration:
 }
 ```
 
+### Hermes Agent
+
+Hermes reads its MCP servers from `~/.hermes/config.yaml` under `mcp_servers:`, not from a JSON file, so keep whatever servers are already listed there and merge this in:
+
+```yaml
+mcp_servers:
+  respira-wordpress:
+    command: "npx"
+    args:
+      - "-y"
+      - "@respira/wordpress-mcp-server"
+```
+
+Prefer no key on disk? Connect straight to a site's own hosted endpoint instead and let Hermes run OAuth:
+
+```yaml
+mcp_servers:
+  respira:
+    url: "https://your-wordpress-site.com/wp-json/respira/v1/mcp"
+    auth: oauth
+```
+
+Then run `hermes mcp login respira` from a fresh terminal. Hermes's in-session config reload times out at 30 seconds, which is too short for the OAuth round trip. Full walkthrough, including the one-click install and how to verify the connection: [Hermes Agent integration](https://www.respira.press/cli/docs/agents/hermes).
+
 ## How MCP Install Links Work
 
 An MCP install link uses a URL format recognized by Cursor and Claude Desktop. When you click a link:
