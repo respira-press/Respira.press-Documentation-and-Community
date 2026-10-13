@@ -19,7 +19,7 @@ Respira writes the redirect into Redirection when Redirection is active, so it s
 | `target` | string | for 301, 302, 307, 308 | Where visitors go: a path on this site such as `/new-page`, or a full `http` or `https` URL, another domain included. |
 | `status_code` | number | no | `301` permanent (the default), `302` or `307` temporary, `308` permanent and keeps the method, `410` gone, `451` unavailable for legal reasons. 410 and 451 take no target. |
 | `regex` | boolean | no | `source` is a regular expression, written the way Redirection writes them: matched against the path and query, case-insensitive, with `$1` in the target. Default false. |
-| `query` | string | no | `ignore` (the default): `/old?x=1` redirects like `/old`. `exact`: only the query string in `source`. `pass`: the visitor's query string goes on to the target. |
+| `query` | string | no | `ignore` (the default): `/old?x=1` redirects like `/old`. `exact`: only the query string in `source`. `pass`: the visitor's query string goes on to the target. For the home page the default is `exact`, because otherwise every `?p=`, `?s=`, preview and shortlink address goes too. |
 | `engine` | string | no | `auto` (the default), `respira` or `redirection`. |
 | `note` | string | no | Why the redirect exists. It is the title in Redirection. |
 | `enabled` | boolean | no | Default true. False saves the redirect switched off. |
@@ -73,7 +73,8 @@ Respira writes the redirect into Redirection when Redirection is active, so it s
 
 Before anything is written:
 
-- **WordPress's own addresses are never redirected.** wp-admin (admin-ajax included), the login page, the REST API, XML-RPC, cron, wp-content and wp-includes are refused with `respira_redirect_source_protected`, and so is a pattern that reaches them.
+- **WordPress's own addresses are never redirected.** wp-admin (admin-ajax included), the login page, the REST API, XML-RPC, cron, wp-content, wp-includes, `.well-known` and the sign-up and activation pages are refused with `respira_redirect_source_protected`, and so is a pattern that reaches them, query strings such as `wp-login.php?action=logout` included. Redirection answers those addresses too, so when the redirect goes into Redirection a pattern that catches every address is refused as well; Respira's own list never answers them, so there it only needs approval.
+- **A pattern cannot send visitors off the site by accident.** When a pattern copies part of the visitor's address into a target on this site (`^/blog/(.*)$` to `/$1`), the result keeps one leading slash, so `/blog//other-site.example` stays on this site.
 - **No circles.** A target equal to its source is refused with `respira_redirect_same_source_target`. A redirect that leads back to its source through the redirects already on the site is refused with `respira_redirect_loop`, and `hops` shows the circle. Respira follows the redirects of Redirection, its own list, Rank Math, Yoast SEO Premium, Safe Redirect Manager and Simple 301 Redirects, patterns included.
 - **One redirect per address.** A source that already has one in the same place is refused with `respira_redirect_duplicate_source`, naming the redirect to change instead. The same source in another plugin is a warning.
 - **A permanent redirect needs a live target.** For 301 and 308, Respira requests the target first. One that answers 4xx, 5xx or nothing is refused with `respira_redirect_target_unhealthy` unless `allow_unhealthy_target` is true with a `reason`. For 302 and 307 it is a warning.
@@ -81,7 +82,7 @@ Before anything is written:
 
 ## Home page and catch-all patterns
 
-A redirect of the home page, or a pattern that catches almost every address, waits for a person. The first call answers `respira_approval_required` with the predicted effect and an `approval_token`. Show the person the predicted effect, and send the same arguments with the token only after they say yes. A dry run never asks.
+A redirect of the home page, or a pattern that catches almost every address, waits for a person. The first call answers `respira_approval_required` with the predicted effect and an `approval_token`. Show the person the predicted effect, and send the same arguments with the token only after they say yes. A dry run never asks, and only `true` (or `1`, `"true"`, `"yes"`, `"on"`) counts as a dry run: anything else is treated as a real write and meets the question.
 
 ## Undo
 
@@ -93,7 +94,7 @@ Besides the checks above: the connection acts as a WordPress user who cannot man
 
 ## Availability
 
-Plugin 9.1.35.
+Plugin 9.2.1.
 
 ## Example Prompts
 
