@@ -1,0 +1,124 @@
+---
+title: "Fleets and Your Own Gateway"
+description: "Connect a whole account programmatically, and put your own MCP gateway or proxy in front of Respira without configuring every site by hand."
+---
+
+# Fleets and Your Own Gateway
+
+If you run one or two sites, the setup page in your dashboard is the right way in, and this page is not for you. [Multi-Site Management](/guides/multi-site-management) covers working across a handful of sites from one config.
+
+This page is for the case where a person pasting config does not scale: an agency with thirty client sites, or a team that has built its own MCP gateway and wants Respira behind it.
+
+## Which direction the connection runs
+
+The most common misunderstanding, and it is worth clearing up first.
+
+Respira **is** an MCP server, and it lives on each WordPress site. It does not dial out to anything, so there is no setting in the plugin that says "use this gateway". Your gateway calls in.
+
+```
+ChatGPT / Claude / your own client
+        ↓
+   your gateway
+        ↓
+site A + Respira   site B + Respira   site C + Respira
+```
+
+Each site answers MCP on its own endpoint:
+
+```
+POST https://example.com/wp-json/respira/v1/mcp
+Authorization: Bearer <site key>
+```
+
+It speaks ordinary JSON-RPC MCP. `initialize` returns the protocol version and server info, `tools/list` returns every tool that site exposes, which varies with the plugins and page builder it runs. `X-Respira-API-Key: <site key>` works in place of the `Authorization` header if that suits your proxy better.
+
+With no key it answers `401` and a `WWW-Authenticate: Bearer` challenge carrying `resource_metadata`, which is RFC 9728. Clients that understand that, including claude.ai and ChatGPT, start the OAuth handshake from it on their own.
+
+## Getting every site without exporting anything
+
+Configuring each site by hand is the part that does not scale, and you do not have to.
+
+There is an account-level endpoint that returns your whole fleet:
+
+```
+GET https://www.respira.press/api/v1/cli/sites
+Authorization: Bearer <account key>
+```
+
+The account key is not a site key. Create one with `respira auth login`, or from the CLI section of your dashboard. It is revocable on its own, so a compromised gateway costs you one key rather than a rebuild.
+
+The response lists every active site on the account, including sites shared with you through a team, each with the key that site expects:
+
+```json
+{
+  "sites": [
+    {
+      "id": "...",
+      "name": "Example",
+      "url": "https://example.com",
+      "apiKey": "respira_...",
+      "pluginVersion": "8.6.35",
+      "tokenStatus": "ready",
+      "isTeamSite": false,
+      "lastSeenAt": "2026-08-19T10:55:45Z",
+      "firstActivatedAt": "2026-04-17T15:11:02Z"
+    }
+  ],
+  "count": 1,
+  "totalSites": 1
+}
+```
+
+`pluginVersion` is worth reading on every poll, because fleet sites drift and nobody opens wp-admin on a site that is working. A `null` there means the site has not reported in yet, not that it is on an old build, so treat null as unknown rather than stale when you diff it against a changelog.
+
+Four things about it that matter when you are building against it:
+
+**New sites appear on their own.** A site that has no key yet gets one minted the first time it shows up here, so connecting a site in WordPress is all anyone has to do. Nobody re-exports anything.
+
+**Polling is a read.** Sites that already hold a key are returned untouched, so you can call this on a schedule without churning credentials.
+
+**Ask only for what is new** with `?since=`, an ISO 8601 timestamp:
+
+```
+GET /api/v1/cli/sites?since=2026-08-01T00:00:00Z
+```
+
+`since` returns sites connected after that instant, and it cannot report the opposite: a site that is disconnected simply stops appearing. So poll incrementally if you like, but reconcile against a full call periodically, or your gateway will keep credentials for sites that are gone.
+
+**Scope is deliberately not a query parameter.** Keys are minted on a privilege upgrade, so if a scope could be passed here, a single stray `?scope=full` on a routine poll would rotate every key in your fleet. Changing a site's scope stays a deliberate action elsewhere.
+
+## One key per site, on purpose
+
+There is no single key that opens everything. Each site has its own, and that is a decision rather than an omission.
+
+When a site is handed to a client, or a machine goes missing, you revoke that site and everything else keeps working. A master key would mean rebuilding every connection you have.
+
+Each key also carries a scope, set per site, so a consumer can be given less power than your account has. The scopes are `read-only`, `content`, `builder` (the default) and `full`. The scope is not part of the fleet response, and it is not settable from it either, for the reason above.
+
+Your gateway therefore holds one credential per site, fetched and refreshed programmatically. That is "configure once", not "configure once per assistant".
+
+## Keep agent attribution working through your proxy
+
+Respira records which assistant made each call, and it learns that from headers on the request:
+
+```
+X-Respira-Agent-Client     e.g. claude-code, cursor, chatgpt
+X-Respira-Agent-Version
+X-Respira-Agent-Transport
+X-Respira-Agent-Surface
+X-Respira-Agent-Source     how the identity was established
+```
+
+Forward all five. `X-Respira-Agent-Source` is the one people drop first, and it is the one that matters most: it records whether the client named itself or whether Respira guessed. Drop it and a guess gets stored with the same confidence as a declaration.
+
+A gateway sits between the assistant and the site, so unless it forwards these, every call arrives looking like the same client. Your own usage reporting, and the per-agent breakdown in your dashboard, both flatten to one row.
+
+Forward them unchanged. If your gateway is the origin of a call rather than a relay, set them to describe your gateway honestly rather than leaving them off, because a missing header falls back to a guess made from the user agent, and a guess recorded as fact is worse than an absence.
+
+## Before you put it in production
+
+Watch `pluginVersion` in the fleet response and update the stragglers. Fleet sites drift further than single sites do, and the builder write paths in particular have had real fixes recently.
+
+Rate limiting lives on the site, keyed to the key that calls it, so a fleet-wide sweep is not one shared budget. Bulk operations are limited separately from ordinary calls, and dry runs do not count against them.
+
+If your gateway caches `tools/list`, give the cache a short life. The tool set a site exposes changes when a plugin is activated or a builder changes, and a stale list means an assistant calling something that is no longer there.

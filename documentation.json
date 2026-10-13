@@ -822,6 +822,11 @@
                 "icon": "globe"
               },
               {
+                "title": "Fleets and Your Own Gateway",
+                "path": "guides/fleet-and-gateways",
+                "icon": "server"
+              },
+              {
                 "title": "Team Workflows",
                 "path": "guides/team-workflows",
                 "icon": "users"
