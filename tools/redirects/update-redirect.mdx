@@ -1,0 +1,56 @@
+---
+title: "wordpress_update_redirect"
+description: "Change a redirect's target, status code, query handling, note or source, or switch it off, with the same checks as creating one and a snapshot of the previous version."
+---
+
+# wordpress_update_redirect
+
+Change a redirect: `target`, `status_code`, `query`, `enabled`, `note`, or, with `id`, `source` and `regex`. Only redirects in Redirection or Respira's own list can be changed; the other plugins' redirects are read-only.
+
+Name the redirect by `id` from [wordpress_list_redirects](/tools/redirects/list-redirects), or by its exact `source` when there is no id. Then `source` names the redirect and is not changed.
+
+Every check of [wordpress_create_redirect](/tools/redirects/create-redirect) runs again on the result, the approval for the home page and catch-all patterns included. The target is requested again when the target, the status code or `enabled` changes.
+
+## Parameters
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | string | one of `id`, `source` | The id from the list, such as `respira:3` or `redirection:17`. |
+| `source` | string | one of `id`, `source` | With `id`: the new source. Without `id`: the exact source of the redirect to change. |
+| `target` | string | no | New target. |
+| `status_code` | number | no | New status code: 301, 302, 307, 308, 410 or 451. |
+| `regex` | boolean | no | With `id`: whether the new source is a pattern. Without `id`: whether the source that names the redirect is one. |
+| `query` | string | no | `ignore`, `exact` or `pass`. |
+| `enabled` | boolean | no | False switches the redirect off without deleting it, true switches it on. |
+| `note` | string | no | New note. |
+| `dry_run` | boolean | no | Run every check and write nothing. |
+| `allow_unhealthy_target` | boolean | no | Save a 301 or 308 whose target answers 4xx, 5xx or nothing. Needs `reason`. |
+| `reason` | string | with `allow_unhealthy_target` | Why, for the activity log. |
+| `approval_token` | string | no | The token from a `respira_approval_required` answer, after the person said yes. |
+
+## Example call
+
+```json
+{
+  "name": "wordpress_update_redirect",
+  "arguments": { "id": "respira:3", "status_code": 302 }
+}
+```
+
+## Response
+
+The answer carries `previous` (the redirect before the change), `redirect` (after it), `checks`, `warnings` and `recovery_snapshot_uuid`. `wordpress_restore_snapshot` with that uuid puts the previous version back.
+
+## Availability
+
+Plugin 9.1.35.
+
+## Example Prompts
+
+- "Make the /summer-sale redirect temporary until the new page is ready."
+- "Switch off the redirect from /old-page for now, do not delete it."
+
+## Related Tools
+
+- [wordpress_list_redirects](/tools/redirects/list-redirects)
+- [wordpress_delete_redirect](/tools/redirects/delete-redirect)

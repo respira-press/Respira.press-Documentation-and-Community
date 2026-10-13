@@ -1,0 +1,83 @@
+---
+title: "wordpress_list_redirects"
+description: "List the redirects on a WordPress site from every redirect plugin Respira can read, and follow one address through all of them."
+---
+
+# wordpress_list_redirects
+
+List the redirects on the site from every redirect plugin Respira can read: Redirection, Respira's own list, and, read-only, Rank Math, Yoast SEO Premium, Safe Redirect Manager and Simple 301 Redirects.
+
+It also says which redirect plugins are active (`managers`) and where [wordpress_create_redirect](/tools/redirects/create-redirect) writes (`write_engine`): Redirection when it is active, otherwise Respira's own list. When more than one plugin holds redirects, the answer warns that each runs in its own order.
+
+## Parameters
+
+5 parameters, none required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `search` | string | no | Text to find in source, target or note, case-insensitive. |
+| `engine` | string | no | Only one plugin's redirects: `redirection`, `respira`, `rank_math`, `yoast_premium`, `safe_redirect_manager` or `simple_301_redirects`. Default all. |
+| `limit` | number | no | Rows to return, default 50, at most 200. `total` always counts them all. |
+| `offset` | number | no | Rows to skip, for paging. |
+| `check` | string | no | One address on this site to follow through every redirect. |
+
+## Example call
+
+```json
+{
+  "name": "wordpress_list_redirects",
+  "arguments": { "check": "/old-page" }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "redirects": [
+    {
+      "id": "redirection:12",
+      "engine": "redirection",
+      "source": "/old-page",
+      "match": "exact",
+      "query": "ignore",
+      "target": "https://new-domain.example/page/",
+      "status_code": 301,
+      "enabled": true,
+      "hits": 4,
+      "last_hit": "2026-10-13T12:11:02+00:00",
+      "created": null,
+      "note": "Moved to the new domain",
+      "writable": true
+    }
+  ],
+  "total": 1,
+  "write_engine": "redirection",
+  "managers": [ { "key": "redirection", "name": "Redirection", "version": "5.10.1", "ready": true } ],
+  "check": {
+    "address": "https://example.com/old-page",
+    "expected": { "hops": [ { "from": "/old-page", "to": "https://new-domain.example/page/", "status_code": 301, "by": "redirection:12" } ], "loop": false },
+    "live": { "hops": [ { "url": "https://example.com/old-page", "status": 301, "redirect_by": "redirection" }, { "url": "https://new-domain.example/page/", "status": 200, "off_site": true } ] }
+  }
+}
+```
+
+`id` is what [wordpress_update_redirect](/tools/redirects/update-redirect) and [wordpress_delete_redirect](/tools/redirects/delete-redirect) take. `writable` is false for redirects that belong to a plugin Respira only reads, and for Redirection items with a condition (login, referrer and so on).
+
+With `check`, `expected` follows the rules Respira can read, and `live` sends real requests: it follows redirects while they stay on the site and reports the first address on another site without going further.
+
+Respira's own redirects count hits without writing to the database on every visit. Without a persistent object cache, at most one hit per redirect per minute is recorded, so those counts are a floor; `hit_counting` says which applies.
+
+## Availability
+
+Plugin 9.1.35. Read-only.
+
+## Example Prompts
+
+- "Which redirects does this site have, and which plugin holds them?"
+- "Where does /old-page end up, and how many hops does it take?"
+
+## Related Tools
+
+- [wordpress_create_redirect](/tools/redirects/create-redirect)

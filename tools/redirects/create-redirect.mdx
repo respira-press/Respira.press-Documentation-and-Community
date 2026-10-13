@@ -1,0 +1,108 @@
+---
+title: "wordpress_create_redirect"
+description: "Create a redirect on a WordPress site, to another domain too. Respira refuses WordPress's own addresses, loops and permanent redirects to dead pages, and asks a person before it redirects the home page."
+---
+
+# wordpress_create_redirect
+
+Create a redirect: visitors who ask for `source` are sent to `target` with `status_code`. Use it to move a page, to another domain too. Never write a redirect plugin's settings with `wordpress_update_option` instead: this tool checks what that route cannot.
+
+Respira writes the redirect into Redirection when Redirection is active, so it shows in Tools, Redirection like one made there. Without Redirection, Respira keeps it in its own list. `engine` overrides the choice.
+
+## Parameters
+
+12 parameters, `source` required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `source` | string | yes | The address to redirect: a path from the domain root such as `/old-page`, or a full URL on this site. With `regex: true`, a pattern such as `^/old/(.*)$`. |
+| `target` | string | for 301, 302, 307, 308 | Where visitors go: a path on this site such as `/new-page`, or a full `http` or `https` URL, another domain included. |
+| `status_code` | number | no | `301` permanent (the default), `302` or `307` temporary, `308` permanent and keeps the method, `410` gone, `451` unavailable for legal reasons. 410 and 451 take no target. |
+| `regex` | boolean | no | `source` is a regular expression, written the way Redirection writes them: matched against the path and query, case-insensitive, with `$1` in the target. Default false. |
+| `query` | string | no | `ignore` (the default): `/old?x=1` redirects like `/old`. `exact`: only the query string in `source`. `pass`: the visitor's query string goes on to the target. |
+| `engine` | string | no | `auto` (the default), `respira` or `redirection`. |
+| `note` | string | no | Why the redirect exists. It is the title in Redirection. |
+| `enabled` | boolean | no | Default true. False saves the redirect switched off. |
+| `dry_run` | boolean | no | Run every check and write nothing. |
+| `allow_unhealthy_target` | boolean | no | Save a 301 or 308 whose target answers 4xx, 5xx or nothing. Needs `reason`. Use it only when the person says the target will exist. |
+| `reason` | string | with `allow_unhealthy_target` | Why the target is accepted, for the activity log. |
+| `approval_token` | string | no | The token from a `respira_approval_required` answer, sent back with the same arguments after the person said yes. |
+
+## Example call
+
+```json
+{
+  "name": "wordpress_create_redirect",
+  "arguments": {
+    "source": "/old-page",
+    "target": "https://new-domain.example/page/",
+    "note": "Moved to the new domain"
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "created": true,
+  "engine": "respira",
+  "redirect": {
+    "id": "respira:1",
+    "engine": "respira",
+    "source": "/old-page",
+    "match": "exact",
+    "query": "ignore",
+    "target": "https://new-domain.example/page/",
+    "status_code": 301,
+    "enabled": true
+  },
+  "checks": {
+    "loop": "none",
+    "chain_hops": [ { "from": "/old-page", "to": "https://new-domain.example/page/", "status_code": 301, "by": "new" } ],
+    "target": { "checked": true, "reachable": true, "healthy": true, "status": 200, "final_url": "https://new-domain.example/page/" }
+  },
+  "warnings": [],
+  "recovery_snapshot_uuid": "…",
+  "restore_with": "respira_restore_snapshot"
+}
+```
+
+## What it checks
+
+Before anything is written:
+
+- **WordPress's own addresses are never redirected.** wp-admin (admin-ajax included), the login page, the REST API, XML-RPC, cron, wp-content and wp-includes are refused with `respira_redirect_source_protected`, and so is a pattern that reaches them.
+- **No circles.** A target equal to its source is refused with `respira_redirect_same_source_target`. A redirect that leads back to its source through the redirects already on the site is refused with `respira_redirect_loop`, and `hops` shows the circle. Respira follows the redirects of Redirection, its own list, Rank Math, Yoast SEO Premium, Safe Redirect Manager and Simple 301 Redirects, patterns included.
+- **One redirect per address.** A source that already has one in the same place is refused with `respira_redirect_duplicate_source`, naming the redirect to change instead. The same source in another plugin is a warning.
+- **A permanent redirect needs a live target.** For 301 and 308, Respira requests the target first. One that answers 4xx, 5xx or nothing is refused with `respira_redirect_target_unhealthy` unless `allow_unhealthy_target` is true with a `reason`. For 302 and 307 it is a warning.
+- **Chains are reported.** When visitors would pass through more than one redirect, the answer says so and lists the hops.
+
+## Home page and catch-all patterns
+
+A redirect of the home page, or a pattern that catches almost every address, waits for a person. The first call answers `respira_approval_required` with the predicted effect and an `approval_token`. Show the person the predicted effect, and send the same arguments with the token only after they say yes. A dry run never asks.
+
+## Undo
+
+Every write keeps a snapshot. `wordpress_restore_snapshot` with `recovery_snapshot_uuid` removes the redirect again.
+
+## When it is refused
+
+Besides the checks above: the connection acts as a WordPress user who cannot manage options (`respira_redirect_forbidden`), the connection is read-only (`respira_scope_denied`), or the site's tool profile is Observe or Content, which leave redirects closed.
+
+## Availability
+
+Plugin 9.1.35.
+
+## Example Prompts
+
+- "Send /old-pricing to https://new-domain.example/pricing/ with a permanent redirect."
+- "Redirect everything under /old-blog/ to the same path under /blog/."
+- "Try a redirect from /summer-sale to /sale first and tell me what would happen."
+
+## Related Tools
+
+- [wordpress_list_redirects](/tools/redirects/list-redirects)
+- [wordpress_update_redirect](/tools/redirects/update-redirect)
+- [wordpress_delete_redirect](/tools/redirects/delete-redirect)

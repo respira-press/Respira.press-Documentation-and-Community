@@ -716,6 +716,32 @@
             ]
           },
           {
+            "group": "Redirect Tools",
+            "icon": "corner-up-right",
+            "pages": [
+              {
+                "title": "wordpress_list_redirects",
+                "path": "tools/redirects/list-redirects",
+                "icon": "list"
+              },
+              {
+                "title": "wordpress_create_redirect",
+                "path": "tools/redirects/create-redirect",
+                "icon": "plus"
+              },
+              {
+                "title": "wordpress_update_redirect",
+                "path": "tools/redirects/update-redirect",
+                "icon": "edit-3"
+              },
+              {
+                "title": "wordpress_delete_redirect",
+                "path": "tools/redirects/delete-redirect",
+                "icon": "trash-2"
+              }
+            ]
+          },
+          {
             "group": "Comment Tools",
             "icon": "message-square",
             "pages": [

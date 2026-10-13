@@ -1,0 +1,58 @@
+---
+title: "wordpress_delete_redirect"
+description: "Delete a redirect by id or exact source. The answer carries what recreates it, and a snapshot puts it back."
+---
+
+# wordpress_delete_redirect
+
+Delete a redirect, by `id` from [wordpress_list_redirects](/tools/redirects/list-redirects) or by its exact `source`. Only redirects in Redirection or Respira's own list can be deleted.
+
+To stop a redirect for a while, use [wordpress_update_redirect](/tools/redirects/update-redirect) with `enabled: false` instead.
+
+## Parameters
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `id` | string | one of `id`, `source` | The id from the list, such as `respira:3` or `redirection:17`. |
+| `source` | string | one of `id`, `source` | The exact source, when there is no id. |
+| `regex` | boolean | no | Whether that source is a pattern. |
+| `dry_run` | boolean | no | Show what would be deleted and write nothing. |
+
+## Example call
+
+```json
+{
+  "name": "wordpress_delete_redirect",
+  "arguments": { "id": "respira:3" }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "deleted": true,
+  "redirect": { "id": "respira:3", "source": "/old-page", "target": "https://new-domain.example/page/", "status_code": 301 },
+  "recreate_with": {
+    "tool": "respira_create_redirect",
+    "arguments": { "source": "/old-page", "target": "https://new-domain.example/page/", "status_code": 301, "regex": false, "query": "ignore", "engine": "respira" }
+  },
+  "recovery_snapshot_uuid": "…",
+  "restore_with": "respira_restore_snapshot"
+}
+```
+
+`wordpress_restore_snapshot` with `recovery_snapshot_uuid` puts the redirect back. A redirect that lived in Redirection comes back as a new Redirection item with a new id, and the restore says which.
+
+## Availability
+
+Plugin 9.1.35.
+
+## Example Prompts
+
+- "Delete the redirect from /old-promo, it is not needed any more."
+
+## Related Tools
+
+- [wordpress_create_redirect](/tools/redirects/create-redirect)
