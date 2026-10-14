@@ -23,6 +23,7 @@ Every check of [wordpress_create_redirect](/tools/redirects/create-redirect) run
 | `query` | string | no | `ignore`, `exact` or `pass`. |
 | `enabled` | boolean | no | False switches the redirect off without deleting it, true switches it on. |
 | `note` | string | no | New note. |
+| `engine` | string | no | `respira` or `redirection`. Only needed with a bare numeric `id`. |
 | `dry_run` | boolean | no | Run every check and write nothing. |
 | `allow_unhealthy_target` | boolean | no | Save a 301 or 308 whose target answers 4xx, 5xx or nothing. Needs `reason`. |
 | `reason` | string | with `allow_unhealthy_target` | Why, for the activity log. |

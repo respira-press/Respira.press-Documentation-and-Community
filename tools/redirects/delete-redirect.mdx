@@ -16,6 +16,7 @@ To stop a redirect for a while, use [wordpress_update_redirect](/tools/redirects
 | `id` | string | one of `id`, `source` | The id from the list, such as `respira:3` or `redirection:17`. |
 | `source` | string | one of `id`, `source` | The exact source, when there is no id. |
 | `regex` | boolean | no | Whether that source is a pattern. |
+| `engine` | string | no | `respira` or `redirection`. Only needed with a bare numeric `id`. |
 | `dry_run` | boolean | no | Show what would be deleted and write nothing. |
 
 ## Example call
