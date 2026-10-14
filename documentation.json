@@ -229,7 +229,7 @@
             ]
           },
           {
-            "group": "Context Tools",
+            "group": "Context & Site Intelligence",
             "icon": "info",
             "pages": [
               {
@@ -243,34 +243,14 @@
                 "icon": "file"
               },
               {
-                "title": "wordpress_get_builder_info",
-                "path": "tools/context/get-builder-info",
-                "icon": "layout"
-              },
-              {
-                "title": "respira_list_skills",
-                "path": "tools/context/list-skills",
-                "icon": "list"
-              },
-              {
-                "title": "respira_get_skill",
-                "path": "tools/context/get-skill",
-                "icon": "file-search"
-              },
-              {
-                "title": "respira_write_skill",
-                "path": "tools/context/write-skill",
-                "icon": "edit-3"
-              },
-              {
-                "title": "respira_delete_skill",
-                "path": "tools/context/delete-skill",
-                "icon": "trash-2"
+                "title": "wordpress_switch_site",
+                "path": "tools/other/switch-site",
+                "icon": "repeat"
               }
             ]
           },
           {
-            "group": "Page Tools",
+            "group": "Pages",
             "icon": "file-text",
             "pages": [
               {
@@ -297,11 +277,16 @@
                 "title": "wordpress_delete_page",
                 "path": "tools/pages/delete-page",
                 "icon": "trash-2"
+              },
+              {
+                "title": "wordpress_get_page_outline",
+                "path": "tools/builders/get-page-outline",
+                "icon": "list-tree"
               }
             ]
           },
           {
-            "group": "Post Tools",
+            "group": "Posts",
             "icon": "pen-tool",
             "pages": [
               {
@@ -332,89 +317,79 @@
             ]
           },
           {
-            "group": "Builder Tools",
-            "icon": "layout",
+            "group": "Custom Post Types",
+            "icon": "layers",
             "pages": [
               {
-                "title": "wordpress_extract_builder_content",
-                "path": "tools/builders/extract-content",
-                "icon": "scan"
+                "title": "wordpress_list_post_types",
+                "path": "tools/custom-posts/list-post-types",
+                "icon": "list"
               },
               {
-                "title": "wordpress_inject_builder_content",
-                "path": "tools/builders/inject-content",
+                "title": "wordpress_get_post_type",
+                "path": "tools/custom-posts/get-post-type",
+                "icon": "layers"
+              },
+              {
+                "title": "wordpress_list_custom_posts",
+                "path": "tools/custom-posts/list-custom-posts",
+                "icon": "list"
+              },
+              {
+                "title": "wordpress_get_custom_post",
+                "path": "tools/custom-posts/get-custom-post",
+                "icon": "file-search"
+              },
+              {
+                "title": "wordpress_create_custom_post",
+                "path": "tools/custom-posts/create-custom-post",
+                "icon": "plus-circle"
+              },
+              {
+                "title": "wordpress_update_custom_post",
+                "path": "tools/custom-posts/update-custom-post",
+                "icon": "edit-3"
+              },
+              {
+                "title": "wordpress_delete_custom_post",
+                "path": "tools/custom-posts/delete-custom-post",
+                "icon": "trash-2"
+              }
+            ]
+          },
+          {
+            "group": "Media",
+            "icon": "image",
+            "pages": [
+              {
+                "title": "wordpress_list_media",
+                "path": "tools/media/list-media",
+                "icon": "list"
+              },
+              {
+                "title": "wordpress_get_media",
+                "path": "tools/media/get-media",
+                "icon": "file-search"
+              },
+              {
+                "title": "wordpress_upload_media",
+                "path": "tools/media/upload-media",
                 "icon": "upload"
               },
               {
-                "title": "wordpress_update_module",
-                "path": "tools/builders/update-module",
-                "icon": "sliders"
+                "title": "wordpress_update_media",
+                "path": "tools/media/update-media",
+                "icon": "edit-3"
               },
               {
-                "title": "wordpress_get_page_outline",
-                "path": "tools/builders/get-page-outline",
-                "icon": "list-tree"
-              },
-              {
-                "title": "respira_find_element",
-                "path": "tools/builders/find-element",
-                "icon": "search"
+                "title": "wordpress_delete_media",
+                "path": "tools/media/delete-media",
+                "icon": "trash-2"
               }
             ]
           },
           {
-            "group": "Analysis Tools",
-            "icon": "bar-chart-3",
-            "pages": [
-              {
-                "title": "wordpress_analyze_seo",
-                "path": "tools/analysis/analyze-seo",
-                "icon": "search"
-              },
-              {
-                "title": "wordpress_check_seo_issues",
-                "path": "tools/analysis/check-seo-issues",
-                "icon": "alert-triangle"
-              },
-              {
-                "title": "wordpress_analyze_readability",
-                "path": "tools/analysis/analyze-readability",
-                "icon": "book"
-              },
-              {
-                "title": "wordpress_analyze_performance",
-                "path": "tools/analysis/analyze-performance",
-                "icon": "activity"
-              },
-              {
-                "title": "wordpress_get_core_web_vitals",
-                "path": "tools/analysis/get-core-web-vitals",
-                "icon": "pulse"
-              },
-              {
-                "title": "wordpress_analyze_images",
-                "path": "tools/analysis/analyze-images",
-                "icon": "image"
-              },
-              {
-                "title": "wordpress_analyze_aeo",
-                "path": "tools/analysis/analyze-aeo",
-                "icon": "cpu"
-              },
-              {
-                "title": "wordpress_check_structured_data",
-                "path": "tools/analysis/check-structured-data",
-                "icon": "braces"
-              },
-              {
-                "title": "respira_find_in_page",
-                "path": "tools/analysis/find-in-page",
-                "icon": "file-search"
-              }
-            ]
-          },
-          {
-            "group": "Menu Tools",
+            "group": "Menus",
             "icon": "menu",
             "pages": [
               {
@@ -480,69 +455,7 @@
             ]
           },
           {
-            "group": "Media Tools",
-            "icon": "image",
-            "pages": [
-              {
-                "title": "wordpress_list_media",
-                "path": "tools/media/list-media",
-                "icon": "list"
-              },
-              {
-                "title": "wordpress_get_media",
-                "path": "tools/media/get-media",
-                "icon": "file-search"
-              },
-              {
-                "title": "wordpress_upload_media",
-                "path": "tools/media/upload-media",
-                "icon": "upload"
-              },
-              {
-                "title": "wordpress_update_media",
-                "path": "tools/media/update-media",
-                "icon": "edit-3"
-              },
-              {
-                "title": "wordpress_delete_media",
-                "path": "tools/media/delete-media",
-                "icon": "trash-2"
-              }
-            ]
-          },
-          {
-            "group": "User Tools",
-            "icon": "users",
-            "pages": [
-              {
-                "title": "wordpress_list_users",
-                "path": "tools/users/list-users",
-                "icon": "list"
-              },
-              {
-                "title": "wordpress_get_user",
-                "path": "tools/users/get-user",
-                "icon": "user"
-              },
-              {
-                "title": "wordpress_create_user",
-                "path": "tools/users/create-user",
-                "icon": "user-plus"
-              },
-              {
-                "title": "wordpress_update_user",
-                "path": "tools/users/update-user",
-                "icon": "user-cog"
-              },
-              {
-                "title": "wordpress_delete_user",
-                "path": "tools/users/delete-user",
-                "icon": "user-x"
-              }
-            ]
-          },
-          {
-            "group": "Taxonomy Tools",
+            "group": "Taxonomies & Terms",
             "icon": "tag",
             "pages": [
               {
@@ -583,48 +496,121 @@
             ]
           },
           {
-            "group": "Custom Post Type Tools",
-            "icon": "layers",
+            "group": "Users",
+            "icon": "users",
             "pages": [
               {
-                "title": "wordpress_list_post_types",
-                "path": "tools/custom-posts/list-post-types",
+                "title": "wordpress_list_users",
+                "path": "tools/users/list-users",
                 "icon": "list"
               },
               {
-                "title": "wordpress_get_post_type",
-                "path": "tools/custom-posts/get-post-type",
-                "icon": "layers"
+                "title": "wordpress_get_user",
+                "path": "tools/users/get-user",
+                "icon": "user"
               },
               {
-                "title": "wordpress_list_custom_posts",
-                "path": "tools/custom-posts/list-custom-posts",
+                "title": "wordpress_create_user",
+                "path": "tools/users/create-user",
+                "icon": "user-plus"
+              },
+              {
+                "title": "wordpress_update_user",
+                "path": "tools/users/update-user",
+                "icon": "user-cog"
+              },
+              {
+                "title": "wordpress_delete_user",
+                "path": "tools/users/delete-user",
+                "icon": "user-x"
+              }
+            ]
+          },
+          {
+            "group": "Comments",
+            "icon": "message-square",
+            "pages": [
+              {
+                "title": "wordpress_list_comments",
+                "path": "tools/comments/list-comments",
                 "icon": "list"
               },
               {
-                "title": "wordpress_get_custom_post",
-                "path": "tools/custom-posts/get-custom-post",
-                "icon": "file-search"
+                "title": "wordpress_get_comment",
+                "path": "tools/comments/get-comment",
+                "icon": "message-circle"
               },
               {
-                "title": "wordpress_create_custom_post",
-                "path": "tools/custom-posts/create-custom-post",
-                "icon": "plus-circle"
+                "title": "wordpress_create_comment",
+                "path": "tools/comments/create-comment",
+                "icon": "plus"
               },
               {
-                "title": "wordpress_update_custom_post",
-                "path": "tools/custom-posts/update-custom-post",
+                "title": "wordpress_update_comment",
+                "path": "tools/comments/update-comment",
                 "icon": "edit-3"
               },
               {
-                "title": "wordpress_delete_custom_post",
-                "path": "tools/custom-posts/delete-custom-post",
+                "title": "wordpress_delete_comment",
+                "path": "tools/comments/delete-comment",
                 "icon": "trash-2"
               }
             ]
           },
           {
-            "group": "Plugin Tools (Experimental)",
+            "group": "Options & Settings",
+            "icon": "sliders-horizontal",
+            "pages": [
+              {
+                "title": "wordpress_list_options",
+                "path": "tools/options/list-options",
+                "icon": "list"
+              },
+              {
+                "title": "wordpress_get_option",
+                "path": "tools/options/get-option",
+                "icon": "file-search"
+              },
+              {
+                "title": "wordpress_update_option",
+                "path": "tools/options/update-option",
+                "icon": "edit-3"
+              },
+              {
+                "title": "wordpress_delete_option",
+                "path": "tools/options/delete-option",
+                "icon": "trash-2"
+              }
+            ]
+          },
+          {
+            "group": "Redirects",
+            "icon": "corner-up-right",
+            "pages": [
+              {
+                "title": "wordpress_list_redirects",
+                "path": "tools/redirects/list-redirects",
+                "icon": "list"
+              },
+              {
+                "title": "wordpress_create_redirect",
+                "path": "tools/redirects/create-redirect",
+                "icon": "plus"
+              },
+              {
+                "title": "wordpress_update_redirect",
+                "path": "tools/redirects/update-redirect",
+                "icon": "edit-3"
+              },
+              {
+                "title": "wordpress_delete_redirect",
+                "path": "tools/redirects/delete-redirect",
+                "icon": "trash-2"
+              }
+            ]
+          },
+          {
+            "group": "Plugins (Experimental)",
             "icon": "package",
             "pages": [
               {
@@ -666,7 +652,174 @@
                 "title": "wordpress_restore_quarantined_plugin",
                 "path": "tools/plugins/restore-quarantined-plugin",
                 "icon": "undo-2"
+              }
+            ]
+          },
+          {
+            "group": "Page Builder Core",
+            "icon": "layout",
+            "pages": [
+              {
+                "title": "wordpress_get_builder_info",
+                "path": "tools/context/get-builder-info",
+                "icon": "layout"
               },
+              {
+                "title": "wordpress_extract_builder_content",
+                "path": "tools/builders/extract-content",
+                "icon": "scan"
+              },
+              {
+                "title": "wordpress_inject_builder_content",
+                "path": "tools/builders/inject-content",
+                "icon": "upload"
+              },
+              {
+                "title": "wordpress_update_module",
+                "path": "tools/builders/update-module",
+                "icon": "sliders"
+              },
+              {
+                "title": "respira_find_element",
+                "path": "tools/builders/find-element",
+                "icon": "search"
+              }
+            ]
+          },
+          {
+            "group": "YOOtheme Pro",
+            "icon": "layout-template",
+            "pages": [
+              {
+                "title": "wordpress_list_yootheme_templates",
+                "path": "tools/yootheme/list-yootheme-templates",
+                "icon": "list"
+              },
+              {
+                "title": "wordpress_get_yootheme_template",
+                "path": "tools/yootheme/get-yootheme-template",
+                "icon": "file-search"
+              },
+              {
+                "title": "wordpress_create_yootheme_template",
+                "path": "tools/yootheme/create-yootheme-template",
+                "icon": "plus"
+              },
+              {
+                "title": "wordpress_update_yootheme_template",
+                "path": "tools/yootheme/update-yootheme-template",
+                "icon": "edit-3"
+              }
+            ]
+          },
+          {
+            "group": "Advanced Custom Fields",
+            "icon": "list-tree",
+            "pages": [
+              {
+                "title": "ACF tools overview",
+                "path": "tools/acf/overview",
+                "icon": "list"
+              }
+            ]
+          },
+          {
+            "group": "Audits & Analysis",
+            "icon": "bar-chart-3",
+            "pages": [
+              {
+                "title": "wordpress_analyze_seo",
+                "path": "tools/analysis/analyze-seo",
+                "icon": "search"
+              },
+              {
+                "title": "wordpress_check_seo_issues",
+                "path": "tools/analysis/check-seo-issues",
+                "icon": "alert-triangle"
+              },
+              {
+                "title": "wordpress_analyze_readability",
+                "path": "tools/analysis/analyze-readability",
+                "icon": "book"
+              },
+              {
+                "title": "wordpress_analyze_performance",
+                "path": "tools/analysis/analyze-performance",
+                "icon": "activity"
+              },
+              {
+                "title": "wordpress_get_core_web_vitals",
+                "path": "tools/analysis/get-core-web-vitals",
+                "icon": "pulse"
+              },
+              {
+                "title": "wordpress_analyze_images",
+                "path": "tools/analysis/analyze-images",
+                "icon": "image"
+              },
+              {
+                "title": "wordpress_analyze_aeo",
+                "path": "tools/analysis/analyze-aeo",
+                "icon": "cpu"
+              },
+              {
+                "title": "wordpress_check_structured_data",
+                "path": "tools/analysis/check-structured-data",
+                "icon": "braces"
+              },
+              {
+                "title": "respira_find_in_page",
+                "path": "tools/analysis/find-in-page",
+                "icon": "file-search"
+              },
+              {
+                "title": "wordpress_validate_security",
+                "path": "tools/other/validate-security",
+                "icon": "shield-check"
+              }
+            ]
+          },
+          {
+            "group": "Safety & Approvals",
+            "icon": "shield-check",
+            "pages": [
+              {
+                "title": "respira_begin_session",
+                "path": "tools/other/begin-session",
+                "icon": "play"
+              },
+              {
+                "title": "respira_get_plan",
+                "path": "tools/other/get-plan",
+                "icon": "list-checks"
+              },
+              {
+                "title": "respira_apply_plan",
+                "path": "tools/other/apply-plan",
+                "icon": "check-circle"
+              },
+              {
+                "title": "respira_discard_plan",
+                "path": "tools/other/discard-plan",
+                "icon": "x-circle"
+              }
+            ]
+          },
+          {
+            "group": "Art Direction",
+            "icon": "sparkles",
+            "pages": [
+              {
+                "title": "wordpress_mint_design_preview",
+                "path": "tools/other/mint-design-preview",
+                "icon": "eye"
+              }
+            ]
+          },
+          {
+            "group": "Updates & Site Health",
+            "icon": "refresh-cw",
+            "pages": [
               {
                 "title": "respira_check_guarded_update",
                 "path": "tools/plugins/check-guarded-update",
@@ -690,127 +843,35 @@
             ]
           },
           {
-            "group": "Options Tools",
-            "icon": "sliders-horizontal",
+            "group": "Memory, Skills & Playbooks",
+            "icon": "bookmark",
             "pages": [
               {
-                "title": "wordpress_list_options",
-                "path": "tools/options/list-options",
+                "title": "respira_list_skills",
+                "path": "tools/context/list-skills",
                 "icon": "list"
               },
               {
-                "title": "wordpress_get_option",
-                "path": "tools/options/get-option",
+                "title": "respira_get_skill",
+                "path": "tools/context/get-skill",
                 "icon": "file-search"
               },
               {
-                "title": "wordpress_update_option",
-                "path": "tools/options/update-option",
+                "title": "respira_write_skill",
+                "path": "tools/context/write-skill",
                 "icon": "edit-3"
               },
               {
-                "title": "wordpress_delete_option",
-                "path": "tools/options/delete-option",
+                "title": "respira_delete_skill",
+                "path": "tools/context/delete-skill",
                 "icon": "trash-2"
               }
             ]
           },
           {
-            "group": "Redirect Tools",
-            "icon": "corner-up-right",
-            "pages": [
-              {
-                "title": "wordpress_list_redirects",
-                "path": "tools/redirects/list-redirects",
-                "icon": "list"
-              },
-              {
-                "title": "wordpress_create_redirect",
-                "path": "tools/redirects/create-redirect",
-                "icon": "plus"
-              },
-              {
-                "title": "wordpress_update_redirect",
-                "path": "tools/redirects/update-redirect",
-                "icon": "edit-3"
-              },
-              {
-                "title": "wordpress_delete_redirect",
-                "path": "tools/redirects/delete-redirect",
-                "icon": "trash-2"
-              }
-            ]
-          },
-          {
-            "group": "Comment Tools",
-            "icon": "message-square",
-            "pages": [
-              {
-                "title": "wordpress_list_comments",
-                "path": "tools/comments/list-comments",
-                "icon": "list"
-              },
-              {
-                "title": "wordpress_get_comment",
-                "path": "tools/comments/get-comment",
-                "icon": "message-circle"
-              },
-              {
-                "title": "wordpress_create_comment",
-                "path": "tools/comments/create-comment",
-                "icon": "plus"
-              },
-              {
-                "title": "wordpress_update_comment",
-                "path": "tools/comments/update-comment",
-                "icon": "edit-3"
-              },
-              {
-                "title": "wordpress_delete_comment",
-                "path": "tools/comments/delete-comment",
-                "icon": "trash-2"
-              }
-            ]
-          },
-          {
-            "group": "Other Tools",
+            "group": "Other",
             "icon": "shield",
             "pages": [
-              {
-                "title": "wordpress_validate_security",
-                "path": "tools/other/validate-security",
-                "icon": "shield-check"
-              },
-              {
-                "title": "wordpress_switch_site",
-                "path": "tools/other/switch-site",
-                "icon": "repeat"
-              },
-              {
-                "title": "wordpress_mint_design_preview",
-                "path": "tools/other/mint-design-preview",
-                "icon": "eye"
-              },
-              {
-                "title": "respira_begin_session",
-                "path": "tools/other/begin-session",
-                "icon": "play"
-              },
-              {
-                "title": "respira_get_plan",
-                "path": "tools/other/get-plan",
-                "icon": "list-checks"
-              },
-              {
-                "title": "respira_apply_plan",
-                "path": "tools/other/apply-plan",
-                "icon": "check-circle"
-              },
-              {
-                "title": "respira_discard_plan",
-                "path": "tools/other/discard-plan",
-                "icon": "x-circle"
-              },
               {
                 "title": "respira_search_abilities",
                 "path": "tools/other/search-abilities",

@@ -1,33 +1,81 @@
 ---
 title: "Tools Reference"
-description: "Reference for current Respira MCP tools. Find the right tool for pages, posts, builders, snapshots, menus, SEO analysis, and more."
+description: "Reference for Respira's MCP tools in the 30 categories of the public catalog: pages, posts, builders, YOOtheme Pro, redirects, snapshots, menus, SEO analysis and more."
 ---
 
 # Tools Reference
 
-The current number of MCP tools, WebMCP browser abilities and skills is on the [live tools catalog](https://www.respira.press/tools), counted from the code on every release, so this page never quotes a number that has since changed. A given site sees fewer tools than the catalog total, because the server lists only the tools for the site's builder and add-ons. This reference documents the core categories and naming patterns.
+As of plugin 9.2.3 and MCP server 8.5.0 (npm `@respira/wordpress-mcp-server`), the MCP server lists **252 core tools, 356 with the WooCommerce add-on**. 91 more tools come from modules that list them where they apply:
+
+- 54 ACF tools, only when Advanced Custom Fields is active
+- 25 Bricks tools, only on Bricks
+- 8 tools from the Elementor module: 7 only on Elementor, and `respira_add_stock_image`, which every site sees
+- 4 YOOtheme Pro template tools, only on YOOtheme Pro
+
+The [public tools catalog](https://www.respira.press/tools) counts all of them: 447 tools in 30 categories. It is counted from the code on every release, so it is the place to check the current numbers. This page follows the same categories. Tool names here use the `wordpress_` prefix, as the catalog does; an MCP client lists the same tools as `respira_*`.
+
+## What one site sees
+
+A site sees fewer tools than the catalog, because the server lists only the tools for the site's builder and plugins. Measured `tools/list` counts:
+
+| Site | Tools listed |
+|------|--------------|
+| Core, on Gutenberg | 253 |
+| Core, with ACF | 307 |
+| With the WooCommerce add-on | 357 |
+| YOOtheme Pro site | 257 |
+| WooCommerce and ACF, on Elementor | 418 |
+| WooCommerce and ACF, on Bricks | 436 (the most one site can see) |
+
+## Other surfaces
+
+- **The site's own MCP endpoint**, used by the claude.ai and ChatGPT connectors, lists 353 tools named `respira_wordpress_*`. 10 of them are only there. They are listed further down this page.
+- **WordPress Abilities**: the plugin registers 360. Across the MCP server and the abilities that makes 366 distinct tools and abilities (360+), or 262 (260+) without the paid WooCommerce add-on.
 
 ## Tool Categories
 
-### Context Tools (3 tools)
+### Context & Site Intelligence (19 tools)
 
-Get information about your WordPress site, theme, and page builder.
+Site context, the sites in a multi-site setup, and the native Site Editor: block templates, template parts, synced and unsynced patterns, and block navigation.
 
 - [wordpress_get_site_context](/tools/context/get-site-context)
-- [wordpress_get_theme_docs](/tools/context/get-theme-docs)
-- [wordpress_get_builder_info](/tools/context/get-builder-info)
+- `wordpress_list_sites`
+- `wordpress_get_active_site`
+- `wordpress_list_site_templates`
+- `wordpress_get_site_template`
+- `wordpress_create_site_template`
+- `wordpress_update_site_template`
+- `wordpress_reset_site_template`
+- `wordpress_list_site_patterns`
+- `wordpress_get_site_pattern`
+- `wordpress_create_site_pattern`
+- `wordpress_update_site_pattern`
+- `wordpress_delete_site_pattern`
+- `wordpress_list_site_navigations`
+- `wordpress_get_site_navigation`
+- `wordpress_create_site_navigation`
+- `wordpress_update_site_navigation`
+- `wordpress_delete_site_navigation`
+- [wordpress_switch_site](/tools/other/switch-site)
 
-### Page Tools (5 tools)
+The Site Editor tools are new in 8.0. Read-only discovery works on any site with a block theme. **Structural writes are off by default; the site owner turns them on in Respira > Settings.** See [Site Editor (Full Site Editing)](/builders/site-editor). The Site Editor's design tokens are under Art Direction.
 
-List, read, create, update, and delete pages.
+### Pages (10 tools)
+
+List, read, duplicate, update and delete pages, read a page's outline, run PageSpeed on it, build a complete page in one call and apply one change across many pages.
 
 - [wordpress_list_pages](/tools/pages/list-pages)
 - [wordpress_read_page](/tools/pages/read-page)
 - [wordpress_create_page_duplicate](/tools/pages/create-duplicate)
 - [wordpress_update_page](/tools/pages/update-page)
 - [wordpress_delete_page](/tools/pages/delete-page)
+- [wordpress_get_page_outline](/tools/builders/get-page-outline)
+- `wordpress_run_pagespeed_audit`
+- `wordpress_analyze_pagespeed`
+- `wordpress_build_page` creates a complete page from a declarative structure
+- `wordpress_bulk_pages_operation` applies operations across many pages, with a snapshot of each
 
-### Post Tools (5 tools)
+### Posts (5 tools)
 
 Manage blog posts with full CRUD operations.
 
@@ -37,42 +85,39 @@ Manage blog posts with full CRUD operations.
 - [wordpress_update_post](/tools/posts/update-post)
 - [wordpress_delete_post](/tools/posts/delete-post)
 
-### Builder Tools (3 tools)
+### Custom Post Types (11 tools)
 
-Work directly with page builder structures (Divi, Elementor, Bricks, etc.).
+Register custom post types and work with their posts.
 
-- [wordpress_extract_builder_content](/tools/builders/extract-content)
-- [wordpress_inject_builder_content](/tools/builders/inject-content)
-- [wordpress_update_module](/tools/builders/update-module)
+- [wordpress_list_post_types](/tools/custom-posts/list-post-types)
+- [wordpress_get_post_type](/tools/custom-posts/get-post-type)
+- `wordpress_create_post_type`
+- `wordpress_update_post_type`
+- `wordpress_delete_post_type`
+- `wordpress_list_custom_post_types`
+- [wordpress_list_custom_posts](/tools/custom-posts/list-custom-posts)
+- [wordpress_get_custom_post](/tools/custom-posts/get-custom-post)
+- [wordpress_create_custom_post](/tools/custom-posts/create-custom-post)
+- [wordpress_update_custom_post](/tools/custom-posts/update-custom-post)
+- [wordpress_delete_custom_post](/tools/custom-posts/delete-custom-post)
 
-### Fidelity & Snapshot Tools (5 tools)
+### Media (7 tools)
 
-Safer comparison, rollback, and patch workflows on v2-capable sites.
+Upload, read, update and delete media, update many items in one call, and import an image from a URL into the Media Library.
 
-- `wordpress_list_snapshots`
-- `wordpress_get_snapshot`
-- `wordpress_diff_snapshots`
-- `wordpress_restore_snapshot`
-- `wordpress_apply_builder_patch`
+- [wordpress_list_media](/tools/media/list-media)
+- [wordpress_upload_media](/tools/media/upload-media)
+- [wordpress_get_media](/tools/media/get-media)
+- [wordpress_update_media](/tools/media/update-media)
+- `wordpress_update_media_batch`
+- [wordpress_delete_media](/tools/media/delete-media)
+- `wordpress_sideload_image`
 
-### Analysis Tools (9 tools)
+### Menus (14 tools)
 
-Read-only analysis of SEO, performance, images, and AI Engine Optimization (AEO), plus a search of the published HTML for text that is not in page content.
+Manage WordPress navigation menus, menu items and menu locations.
 
-- [wordpress_analyze_seo](/tools/analysis/analyze-seo)
-- [wordpress_check_seo_issues](/tools/analysis/check-seo-issues)
-- [wordpress_analyze_readability](/tools/analysis/analyze-readability)
-- [wordpress_analyze_performance](/tools/analysis/analyze-performance)
-- [wordpress_get_core_web_vitals](/tools/analysis/get-core-web-vitals)
-- [wordpress_analyze_images](/tools/analysis/analyze-images)
-- [wordpress_analyze_aeo](/tools/analysis/analyze-aeo)
-- [wordpress_check_structured_data](/tools/analysis/check-structured-data)
-- [respira_find_in_page](/tools/analysis/find-in-page) <span style={{color: '#10b981'}}>NEW in 9.1.11</span>: finds text in the published HTML, head included, and names the snippet or setting that holds it
-
-### Menu Tools (13 tools)
-
-Manage WordPress navigation menus and menu items.
-
+- `wordpress_build_mega_menu` <span style={{color: '#10b981'}}>NEW in 7.6.1</span>: builds a complete Divi mega menu in one call (a top item with the `mega-menu` class, columns as children, links as grandchildren) and can assign it to a theme location. Works on Divi 4 and Divi 5.
 - [wordpress_list_menus](/tools/menus/list-menus)
 - [wordpress_get_menu](/tools/menus/get-menu)
 - [wordpress_create_menu](/tools/menus/create-menu)
@@ -85,19 +130,25 @@ Manage WordPress navigation menus and menu items.
 - [wordpress_get_menu_item](/tools/menus/get-menu-item)
 - [wordpress_update_menu_item](/tools/menus/update-menu-item)
 - [wordpress_delete_menu_item](/tools/menus/delete-menu-item)
-- `wordpress_build_mega_menu` <span style={{color: '#10b981'}}>NEW in 7.6.1</span> — builds a complete Divi mega menu in one call (a top item with the `mega-menu` class, columns as children, links as grandchildren) and can assign it to a theme location. Works on Divi 4 and Divi 5.
+- `wordpress_add_menu`
 
-### Media Tools (5 tools)
+### Taxonomies & Terms (11 tools)
 
-Upload and manage media.
+Register custom taxonomies and manage their terms (categories, tags, custom taxonomies).
 
-- [wordpress_list_media](/tools/media/list-media)
-- [wordpress_get_media](/tools/media/get-media)
-- [wordpress_upload_media](/tools/media/upload-media)
-- [wordpress_update_media](/tools/media/update-media)
-- [wordpress_delete_media](/tools/media/delete-media)
+- [wordpress_list_taxonomies](/tools/taxonomies/list-taxonomies)
+- [wordpress_get_taxonomy](/tools/taxonomies/get-taxonomy)
+- [wordpress_list_terms](/tools/taxonomies/list-terms)
+- [wordpress_get_term](/tools/taxonomies/get-term)
+- [wordpress_create_term](/tools/taxonomies/create-term)
+- [wordpress_update_term](/tools/taxonomies/update-term)
+- [wordpress_delete_term](/tools/taxonomies/delete-term)
+- `wordpress_create_taxonomy`
+- `wordpress_update_taxonomy`
+- `wordpress_delete_taxonomy`
+- `wordpress_list_custom_taxonomies`
 
-### User Tools (5 tools)
+### Users (5 tools)
 
 Manage WordPress users.
 
@@ -107,60 +158,7 @@ Manage WordPress users.
 - [wordpress_update_user](/tools/users/update-user)
 - [wordpress_delete_user](/tools/users/delete-user)
 
-### Taxonomy Tools (7 tools)
-
-Manage taxonomies and terms (categories, tags, custom taxonomies).
-
-- [wordpress_list_taxonomies](/tools/taxonomies/list-taxonomies)
-- [wordpress_get_taxonomy](/tools/taxonomies/get-taxonomy)
-- [wordpress_list_terms](/tools/taxonomies/list-terms)
-- [wordpress_get_term](/tools/taxonomies/get-term)
-- [wordpress_create_term](/tools/taxonomies/create-term)
-- [wordpress_update_term](/tools/taxonomies/update-term)
-- [wordpress_delete_term](/tools/taxonomies/delete-term)
-
-### Custom Post Type Tools (7 tools)
-
-Work with custom post types and their posts.
-
-- [wordpress_list_post_types](/tools/custom-posts/list-post-types)
-- [wordpress_get_post_type](/tools/custom-posts/get-post-type)
-- [wordpress_list_custom_posts](/tools/custom-posts/list-custom-posts)
-- [wordpress_get_custom_post](/tools/custom-posts/get-custom-post)
-- [wordpress_create_custom_post](/tools/custom-posts/create-custom-post)
-- [wordpress_update_custom_post](/tools/custom-posts/update-custom-post)
-- [wordpress_delete_custom_post](/tools/custom-posts/delete-custom-post)
-
-### Plugin Tools (6 tools)
-
-Experimental plugin management (install/activate/update/delete).
-
-- [wordpress_list_plugins](/tools/plugins/list-plugins)
-- [wordpress_install_plugin](/tools/plugins/install-plugin)
-- [wordpress_activate_plugin](/tools/plugins/activate-plugin)
-- [wordpress_deactivate_plugin](/tools/plugins/deactivate-plugin)
-- [wordpress_update_plugin](/tools/plugins/update-plugin)
-- [wordpress_delete_plugin](/tools/plugins/delete-plugin)
-
-### Options Tools (4 tools)
-
-Manage WordPress options (settings).
-
-- [wordpress_list_options](/tools/options/list-options)
-- [wordpress_get_option](/tools/options/get-option)
-- [wordpress_update_option](/tools/options/update-option)
-- [wordpress_delete_option](/tools/options/delete-option)
-
-### Redirect Tools (4 tools) <span style={{color: '#10b981'}}>NEW in 9.2.0</span>
-
-Redirects, another domain included, written through Redirection when it is active and kept in Respira's own list otherwise. WordPress's own addresses, loops and permanent redirects to dead pages are refused, and the home page or a catch-all pattern waits for a person's approval. Every write keeps a snapshot.
-
-- [wordpress_list_redirects](/tools/redirects/list-redirects)
-- [wordpress_create_redirect](/tools/redirects/create-redirect)
-- [wordpress_update_redirect](/tools/redirects/update-redirect)
-- [wordpress_delete_redirect](/tools/redirects/delete-redirect)
-
-### Comment Tools (5 tools)
+### Comments (5 tools)
 
 Read and manage comments.
 
@@ -170,155 +168,315 @@ Read and manage comments.
 - [wordpress_update_comment](/tools/comments/update-comment)
 - [wordpress_delete_comment](/tools/comments/delete-comment)
 
-### Other Tools (2 tools)
+### Options & Settings (4 tools)
 
-Miscellaneous utilities.
+Manage WordPress options (settings).
 
-- [wordpress_validate_security](/tools/other/validate-security)
-- [wordpress_switch_site](/tools/other/switch-site)
+- [wordpress_list_options](/tools/options/list-options)
+- [wordpress_get_option](/tools/options/get-option)
+- [wordpress_update_option](/tools/options/update-option)
+- [wordpress_delete_option](/tools/options/delete-option)
 
-### Element Operations (7 tools) <span style={{color: '#10b981'}}>NEW in 5.2</span>
+### Redirects (4 tools) <span style={{color: '#10b981'}}>NEW in 9.2.0</span>
 
-Find, update, move, duplicate, and remove individual elements within any page builder.
+Redirects, another domain included, written through Redirection when it is active and kept in Respira's own list otherwise. WordPress's own addresses, loops and permanent redirects to dead pages are refused, and the home page or a catch-all pattern waits for a person's approval. Every write keeps a snapshot.
 
+- [wordpress_list_redirects](/tools/redirects/list-redirects)
+- [wordpress_create_redirect](/tools/redirects/create-redirect)
+- [wordpress_update_redirect](/tools/redirects/update-redirect)
+- [wordpress_delete_redirect](/tools/redirects/delete-redirect)
+
+### Plugins (6 tools)
+
+Experimental plugin management: list, install, activate, deactivate, update and delete. Quarantining a plugin is under Security.
+
+- [wordpress_list_plugins](/tools/plugins/list-plugins)
+- [wordpress_install_plugin](/tools/plugins/install-plugin)
+- [wordpress_activate_plugin](/tools/plugins/activate-plugin)
+- [wordpress_deactivate_plugin](/tools/plugins/deactivate-plugin)
+- [wordpress_update_plugin](/tools/plugins/update-plugin)
+- [wordpress_delete_plugin](/tools/plugins/delete-plugin)
+
+### Page Builder Core (19 tools)
+
+Work directly with page builder structures (Divi, Elementor, Bricks, YOOtheme Pro and the rest): detect the builder, extract and inject content, patch it, convert HTML into native builder elements, and find, update, move, duplicate, remove and reorder single elements (new in 5.2).
+
+- [wordpress_get_builder_info](/tools/context/get-builder-info)
+- `wordpress_list_theme_builder_templates` (Divi Theme Builder, read)
+- `wordpress_create_theme_builder_template` (Divi Theme Builder, write)
+- `wordpress_update_theme_builder_template` (Divi Theme Builder, write)
+- [wordpress_extract_builder_content](/tools/builders/extract-content)
+- `wordpress_find_builder_targets`
+- `wordpress_get_builder_inline_schemas`
+- [wordpress_inject_builder_content](/tools/builders/inject-content)
+- `wordpress_make_responsive`
+- [wordpress_update_module](/tools/builders/update-module)
+- `wordpress_apply_builder_patch`
 - [respira_find_element](/tools/builders/find-element)
-- `respira_update_element`
-- `respira_move_element`
-- `respira_duplicate_element`
-- `respira_remove_element`
-- `respira_batch_update`
-- `respira_reorder_elements`
+- `wordpress_update_element`
+- `wordpress_move_element`
+- `wordpress_duplicate_element`
+- `wordpress_remove_element`
+- `wordpress_batch_update`
+- `wordpress_reorder_elements`
+- `wordpress_convert_html_to_builder`
 
-### Page Building (3 tools) <span style={{color: '#10b981'}}>NEW in 5.2</span>
-
-Create complete pages, convert HTML prototypes, and apply bulk changes.
-
-- `respira_build_page`
-- `respira_convert_html_to_builder`
-- `respira_bulk_pages_operation`
-
-### Stock Images (2 tools) <span style={{color: '#10b981'}}>NEW in 5.2</span>
-
-Search and sideload openly-licensed images from Openverse.
-
-- `respira_search_stock_images`
-- `respira_sideload_image`
+The three Divi Theme Builder tools, new in 7.6, discover and edit Divi's global Theme Builder templates (headers, footers and body layouts), not only regular pages: list the templates on a site, edit a header in place (for example to build a mega menu), or create a new global template with page assignments. Every edit is snapshot-protected. Divi 5.
 
 ### Widget Shortcuts (27 tools) <span style={{color: '#10b981'}}>NEW in 5.2</span>
 
-Quick single-element additions without building full page structures.
+Quick single-element additions without building full page structures. `wordpress_add_menu` is under Menus.
 
-- `respira_add_heading`, `respira_add_text`, `respira_add_button`, `respira_add_image`, `respira_add_video`, `respira_add_divider`, `respira_add_spacer`, `respira_add_icon`, `respira_add_icon_list`, `respira_add_social_icons`, `respira_add_form`, `respira_add_map`, `respira_add_counter`, `respira_add_progress_bar`, `respira_add_testimonial`, `respira_add_tabs`, `respira_add_accordion`, `respira_add_toggle`, `respira_add_alert`, `respira_add_html`, `respira_add_menu`, `respira_add_sidebar`, `respira_add_search`, `respira_add_gallery`, `respira_add_slider`, `respira_add_pricing_table`, `respira_add_section`
+- `wordpress_add_heading`, `wordpress_add_text`, `wordpress_add_button`, `wordpress_add_image`, `wordpress_add_section`, `wordpress_add_video`, `wordpress_add_divider`, `wordpress_add_spacer`, `wordpress_add_icon`, `wordpress_add_icon_list`, `wordpress_add_social_icons`, `wordpress_add_form`, `wordpress_add_map`, `wordpress_add_counter`, `wordpress_add_progress_bar`, `wordpress_add_testimonial`, `wordpress_add_tabs`, `wordpress_add_accordion`, `wordpress_add_toggle`, `wordpress_add_alert`, `wordpress_add_html`, `wordpress_add_sidebar`, `wordpress_add_search`, `wordpress_add_gallery`, `wordpress_add_slider`, `wordpress_add_pricing_table`, `wordpress_add_stock_image`
 
-### Advanced Custom Fields (54 tools) <span style={{color: '#10b981'}}>NEW in 6.6</span>
+### Elementor Intelligence (7 tools)
 
-Full ACF and ACF Pro coverage: field reads/writes, field group management, repeater and flexible-content operations, galleries, options pages, relationships, user/term fields, and bulk operations across up to 500 posts. See [ACF tools overview](/tools/acf/overview) for the full list and example workflows.
+Listed only when Elementor is the site's builder: the widget catalog and schemas, global colours and typography, custom JavaScript and JSON validation.
 
-### Theme Builder — Divi (3 tools) <span style={{color: '#10b981'}}>NEW in 7.6</span>
+- `wordpress_list_elementor_widgets`, `wordpress_get_elementor_widget_schema`, `wordpress_elementor_design_system`, `wordpress_update_elementor_global_colors`, `wordpress_update_elementor_global_typography`, `wordpress_elementor_add_custom_js`, `wordpress_validate_elementor_json`
 
-Discover and edit Divi's global Theme Builder templates (headers, footers, and body layouts), not just regular pages. List the templates on a site, edit a header in place (for example to build a mega menu), or create a new global template with page assignments. Every edit is snapshot-protected. Divi 5.
+### Bricks Intelligence (25 tools)
 
-- `respira_list_theme_builder_templates` (read)
-- `respira_create_theme_builder_template` (write)
-- `respira_update_theme_builder_template` (write)
+Listed only when Bricks is the site's builder: global classes, theme styles, colour palette, typography, components, section presets, ACSS, BEM and query loops.
 
-### Site Editor / FSE (19 tools) <span style={{color: '#10b981'}}>NEW in 8.0</span>
+- `wordpress_list_bricks_global_classes`, `wordpress_create_bricks_global_class`, `wordpress_update_bricks_global_class`, `wordpress_delete_bricks_global_class`, `wordpress_get_bricks_theme_styles`, `wordpress_update_bricks_theme_styles`, `wordpress_get_bricks_color_palette`, `wordpress_update_bricks_color_palette`, `wordpress_get_bricks_typography`, `wordpress_update_bricks_typography`, `wordpress_list_bricks_components`, `wordpress_get_bricks_component`, `wordpress_apply_bricks_component`, `wordpress_search_bricks_elements`, `wordpress_bricks_health_check`, `wordpress_bricks_detect_acss`, `wordpress_bricks_import_acss`, `wordpress_bricks_import_design_tokens`, `wordpress_bricks_list_section_presets`, `wordpress_bricks_insert_section_preset`, `wordpress_bricks_scaffold_bem`, `wordpress_bricks_lint_bem`, `wordpress_bricks_query_loops`, `wordpress_bricks_style_profile`, `wordpress_bricks_design_system`
 
-Read and write the native WordPress Site Editor: block templates and template parts, synced and unsynced patterns, block navigation, and global styles. Read-only discovery is available on any site with a block theme. **Structural writes are off by default; the site owner turns them on in Respira > Settings.** See [Site Editor (Full Site Editing)](/builders/site-editor).
+### YOOtheme Pro (4 tools) <span style={{color: '#10b981'}}>NEW in 9.2.0</span>
 
-- `respira_list_site_templates`, `respira_get_site_template`, `respira_create_site_template`, `respira_update_site_template`, `respira_reset_site_template`
-- `respira_list_site_patterns`, `respira_get_site_pattern`, `respira_create_site_pattern`, `respira_update_site_pattern`, `respira_delete_site_pattern`
-- `respira_list_site_navigations`, `respira_get_site_navigation`, `respira_create_site_navigation`, `respira_update_site_navigation`, `respira_delete_site_navigation`
-- `respira_list_design_tokens`, `respira_create_design_token`, `respira_update_design_token`, `respira_delete_design_token`
+Listed only when YOOtheme Pro is the site's builder. A YOOtheme template is a builder layout the theme renders for a whole view: every single post, the blog index, a category archive, search or the 404 page. A new template starts disabled for review, and a live one changes only with `confirm_live_edit`. Pages themselves are edited with the page and element tools. See [YOOtheme Pro](/builders/yootheme).
 
-### Activity (2 tools) <span style={{color: '#10b981'}}>NEW in 8.0</span>
+- [wordpress_list_yootheme_templates](/tools/yootheme/list-yootheme-templates)
+- [wordpress_get_yootheme_template](/tools/yootheme/get-yootheme-template)
+- [wordpress_create_yootheme_template](/tools/yootheme/create-yootheme-template)
+- [wordpress_update_yootheme_template](/tools/yootheme/update-yootheme-template)
 
-Agent-facing activity history that links audit entries to the snapshots, proposals, approvals, and rollbacks they belong to.
+### Advanced Custom Fields (58 tools) <span style={{color: '#10b981'}}>NEW in 6.6</span>
 
-- `respira_list_activity`, `respira_get_activity`
+Full ACF and ACF Pro coverage: field reads and writes, field group management, repeater and flexible-content operations, galleries, options pages, relationships, user and term fields, and bulk operations across up to 500 posts. The 4 field group tools below are listed on every site. The other 54 `respira_acf_*` tools are listed only when Advanced Custom Fields is active. See the [ACF tools overview](/tools/acf/overview) for the full list and example workflows.
 
-### Translations — WPML (3 tools) <span style={{color: '#10b981'}}>NEW in 7.6</span>
+- `wordpress_create_acf_field_group`
+- `wordpress_update_acf_field_group`
+- `wordpress_delete_acf_field_group`
+- `wordpress_list_acf_field_groups`
 
-Create and update WPML translations through the agent. A created translation joins the page's existing language group so WPML treats it as a real translation, and the builder content is carried across into the new copy.
+### WooCommerce (104 tools)
 
-- `respira_get_translations` (read)
-- `respira_create_translation` (write)
-- `respira_update_translation` (write)
+Products, orders, inventory, storefront, feeds, extensions and store analytics, listed when the paid [WooCommerce Add-on](/woocommerce/overview) is active. See the [WooCommerce tools reference](/woocommerce/tools).
 
-### Plan mode (4 tools) <span style={{color: '#10b981'}}>NEW in 9.1</span>
+### Audits & Analysis (18 tools)
 
-Every write in a plan-mode session answers a proposed step instead of changing the site; the person reads the plan and one call applies it. See [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients).
+Read-only analysis of SEO, readability, performance, images, structured data and AI Engine Optimization (AEO), accessibility scans, the activity history (new in 8.0), and a search of the published HTML for text that is not in page content. Only `wordpress_apply_accessibility_fixes` writes.
 
-- [respira_begin_session](/tools/other/begin-session) with `mode: "plan"`
-- [respira_get_plan](/tools/other/get-plan) (read)
+- `wordpress_list_activity`: agent-facing activity history that links audit entries to the snapshots, proposals, approvals and rollbacks they belong to
+- `wordpress_get_activity`
+- `wordpress_generate_activity_report`
+- [wordpress_validate_security](/tools/other/validate-security)
+- [wordpress_analyze_performance](/tools/analysis/analyze-performance)
+- [wordpress_get_core_web_vitals](/tools/analysis/get-core-web-vitals)
+- [wordpress_analyze_images](/tools/analysis/analyze-images)
+- [wordpress_analyze_seo](/tools/analysis/analyze-seo)
+- [wordpress_check_seo_issues](/tools/analysis/check-seo-issues)
+- [wordpress_analyze_readability](/tools/analysis/analyze-readability)
+- `wordpress_analyze_rankmath`
+- [wordpress_analyze_aeo](/tools/analysis/analyze-aeo)
+- [wordpress_check_structured_data](/tools/analysis/check-structured-data)
+- [respira_find_in_page](/tools/analysis/find-in-page) <span style={{color: '#10b981'}}>NEW in 9.1.11</span>: finds text in the published HTML, head included, and names the snippet or setting that holds it
+- `wordpress_list_accessibility_scans`
+- `wordpress_get_accessibility_scan`
+- `wordpress_scan_page_accessibility`
+- `wordpress_apply_accessibility_fixes`
+
+### Safety & Approvals (14 tools)
+
+Snapshots, rollback, sessions, plan mode, duplicate approval and owner approval links. Every write in a plan-mode session answers a proposed step instead of changing the site; the person reads the plan and one call applies it (new in 9.1). See [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients).
+
+- `wordpress_list_snapshots`
+- `wordpress_get_snapshot`
+- `wordpress_diff_snapshots`
+- `wordpress_restore_snapshot`
+- `wordpress_restore_session`
+- [respira_begin_session](/tools/other/begin-session) (with `mode: "plan"` for plan mode)
+- `wordpress_end_session`
+- `wordpress_approve_duplicate`
+- `wordpress_reject_duplicate`
+- [respira_get_plan](/tools/other/get-plan)
 - [respira_apply_plan](/tools/other/apply-plan) (write, the person's approval)
 - [respira_discard_plan](/tools/other/discard-plan)
+- `wordpress_create_approval_link`
+- `wordpress_revoke_approval_link`
 
-### Site skills (4 tools) <span style={{color: '#10b981'}}>NEW in 9.1</span>
+### Theme Docs (2 tools)
 
-A site's own instructions for agents, kept under Respira > AI Skills. See [Site Skills](/site-skills).
+Theme documentation and a search of the Respira docs.
 
-- [respira_list_skills](/tools/context/list-skills) (read)
-- [respira_get_skill](/tools/context/get-skill) (read)
+- [wordpress_get_theme_docs](/tools/context/get-theme-docs)
+- `wordpress_search_docs`
+
+### Stock Imagery (1 tools)
+
+Search openly licensed images from Openverse. `wordpress_sideload_image`, under Media, imports one into the Media Library.
+
+- `wordpress_search_stock_images`
+
+### Review & Sharing (8 tools)
+
+Share preview links, review links and the comments reviewers leave on them. See [Share Preview Links](/share-preview-links) and [Murmur: Review and Request Links](/murmur).
+
+- `wordpress_create_share_link`
+- `wordpress_create_review_link`
+- `wordpress_list_review_links`
+- `wordpress_revoke_review_link`
+- `wordpress_list_review_comments`
+- `wordpress_get_review_comment`
+- `wordpress_reply_to_review_comment`
+- `wordpress_resolve_review_comment`
+
+### Art Direction (16 tools)
+
+Design tokens (the Site Editor's global styles), saved design directions, design checks and design previews.
+
+- `wordpress_list_design_tokens`
+- `wordpress_create_design_token`
+- `wordpress_update_design_token`
+- `wordpress_delete_design_token`
+- `wordpress_get_design_direction`
+- `wordpress_list_design_directions`
+- `wordpress_save_design_direction`
+- `wordpress_activate_design_direction`
+- `wordpress_deactivate_design_direction`
+- `wordpress_delete_design_direction`
+- `wordpress_import_design_tokens`
+- `wordpress_apply_design_direction`
+- `wordpress_export_design_direction`
+- `wordpress_check_design`
+- [wordpress_mint_design_preview](/tools/other/mint-design-preview)
+- `wordpress_get_design_apply_reports`
+
+### Divi Presets & Library (7 tools)
+
+Divi presets, the Divi Library and the Divi 5 migration readiness report.
+
+- `wordpress_get_divi_migration_readiness`
+- `wordpress_list_divi_presets`
+- `wordpress_upsert_divi_presets`
+- `wordpress_delete_divi_preset`
+- `wordpress_save_divi_library_item`
+- `wordpress_apply_divi_library_item`
+- `wordpress_resolve_divi_preset`
+
+### Security (7 tools)
+
+Security audit, core security updates, theme updates, revoking an application password, quarantining a plugin and flushing rewrite rules.
+
+- `wordpress_run_security_audit`
+- `wordpress_update_core_security`
+- `wordpress_update_theme`
+- `wordpress_revoke_application_password`
+- [wordpress_quarantine_plugin](/tools/plugins/quarantine-plugin)
+- [wordpress_restore_quarantined_plugin](/tools/plugins/restore-quarantined-plugin)
+- [wordpress_flush_rewrites](/tools/other/flush-rewrites)
+
+### Updates & Site Health (5 tools)
+
+Connection diagnosis, server compatibility, cache purge, and listing and running the updates waiting on the site.
+
+- `wordpress_diagnose_connection`
+- `wordpress_get_server_compatibility`
+- `wordpress_purge_cache`
+- `wordpress_list_updates`
+- `wordpress_run_updates`
+
+### Memory, Skills & Playbooks (12 tools)
+
+Playbooks, notes the agent keeps for a site, and the site's own skills: instructions for agents kept under Respira > AI Skills (new in 9.1). See [Playbooks](/playbooks) and [Site Skills](/site-skills).
+
+- `wordpress_create_playbook`
+- `wordpress_list_playbooks`
+- `wordpress_get_playbook`
+- `wordpress_update_playbook`
+- `wordpress_delete_playbook`
+- `wordpress_remember`
+- `wordpress_forget`
+- `wordpress_list_memory`
+- [respira_list_skills](/tools/context/list-skills)
+- [respira_get_skill](/tools/context/get-skill)
 - [respira_write_skill](/tools/context/write-skill) (write, only when the user asked)
 - [respira_delete_skill](/tools/context/delete-skill) (write, approval-gated)
 
+### Other (12 tools)
+
+Abilities from other plugins, WPML translations, theme files, issue reports and token redemption. The WPML tools (new in 7.6) create and update translations: a created translation joins the page's existing language group so WPML treats it as a real translation, and the builder content is carried across into the new copy.
+
+- [respira_search_abilities](/tools/other/search-abilities) (read; live search of the site's Abilities API since 9.1)
+- `wordpress_abilities_gap_report`
+- [respira_invoke_ability](/tools/other/invoke-ability)
+- `respira_duplicate_with_translations`
+- `wordpress_get_translations`
+- `wordpress_create_translation`
+- `wordpress_update_translation`
+- `wordpress_read_theme_file`
+- `wordpress_write_theme_file`
+- `wordpress_append_theme_file`
+- `wordpress_report_issue`
+- `wordpress_redeem_token`
+
+## Only on the site's own MCP endpoint
+
+The site's own MCP endpoint, used by the claude.ai and ChatGPT connectors, lists 353 tools named `respira_wordpress_*`. 10 of them are only there and not on the npm server, among them the guarded update tools:
+
 ### Guarded update and backups (4 tools) <span style={{color: '#10b981'}}>NEW in 9.1</span>
 
-One wordpress.org plugin, one advisory, with a restore point before, four health checks after and a rollback from wordpress.org. On the site's own MCP endpoint, not on the npm server. See [Guarded plugin update](/security/guarded-plugin-update).
+One wordpress.org plugin, one advisory, with a restore point before, four health checks after and a rollback from wordpress.org. See [Guarded plugin update](/security/guarded-plugin-update).
 
 - [respira_check_guarded_update](/tools/plugins/check-guarded-update) (read)
 - [respira_guarded_plugin_update](/tools/plugins/guarded-plugin-update) (write, approval-gated)
 - [respira_get_guarded_update](/tools/plugins/get-guarded-update) (read)
 - [respira_take_backup](/tools/plugins/take-backup) (write, approval-gated)
 
-### Abilities from other plugins (2 tools)
-
-- [respira_search_abilities](/tools/other/search-abilities) (read; live search of the site's Abilities API since 9.1)
-- [respira_invoke_ability](/tools/other/invoke-ability) (write)
-
 ## Quick Reference Table
 
 | Category | Tools | Read-Only | Write |
 |----------|-------|-----------|-------|
-| Context | 3 | 3 | 0 |
-| Pages | 5 | 2 | 3 |
+| Context & Site Intelligence | 19 | 9 | 10 |
+| Pages | 10 | 5 | 5 |
 | Posts | 5 | 2 | 3 |
-| Builders | 3 | 1 | 2 |
-| Fidelity & Snapshots | 5 | 3 | 2 |
-| Analysis | 9 | 9 | 0 |
-| Menus | 13 | 4 | 9 |
-| Media | 5 | 2 | 3 |
+| Custom Post Types | 11 | 5 | 6 |
+| Media | 7 | 2 | 5 |
+| Menus | 14 | 5 | 9 |
+| Taxonomies & Terms | 11 | 5 | 6 |
 | Users | 5 | 2 | 3 |
-| Taxonomies | 7 | 4 | 3 |
-| Custom Posts | 7 | 4 | 3 |
-| Plugins | 6 | 1 | 5 |
-| Options | 4 | 2 | 2 |
 | Comments | 5 | 2 | 3 |
-| Other | 2 | 1 | 1 |
-| Element Operations | 7 | 1 | 6 |
-| Page Building | 3 | 0 | 3 |
-| Stock Images | 2 | 1 | 1 |
+| Options & Settings | 4 | 2 | 2 |
+| Redirects | 4 | 1 | 3 |
+| Plugins | 6 | 1 | 5 |
+| Page Builder Core | 19 | 6 | 13 |
 | Widget Shortcuts | 27 | 0 | 27 |
-| Analysis (new) | 9 | 9 | 0 |
-| ACF (v6.6.0) | 54 | 18 | 36 |
-| Bricks deep tools | 20 | 8 | 12 |
-| Elementor deep tools | 8 | 5 | 3 |
-| Theme Builder — Divi <span style={{color: '#10b981'}}>NEW in 7.6</span> | 3 | 1 | 2 |
-| Translations — WPML <span style={{color: '#10b981'}}>NEW in 7.6</span> | 3 | 1 | 2 |
-| Site Editor / FSE <span style={{color: '#10b981'}}>NEW in 8.0</span> | 19 | 7 | 12 |
-| Activity <span style={{color: '#10b981'}}>NEW in 8.0</span> | 2 | 2 | 0 |
-| WooCommerce (add-on) | 21 | 11 | 10 |
-| **Total** | **262** | **107** | **155** |
+| Elementor Intelligence | 7 | 3 | 4 |
+| Bricks Intelligence | 25 | 7 | 18 |
+| YOOtheme Pro | 4 | 2 | 2 |
+| Advanced Custom Fields | 58 | 25 | 33 |
+| WooCommerce | 104 | 49 | 55 |
+| Audits & Analysis | 18 | 17 | 1 |
+| Safety & Approvals | 14 | 4 | 10 |
+| Theme Docs | 2 | 2 | 0 |
+| Stock Imagery | 1 | 1 | 0 |
+| Review & Sharing | 8 | 4 | 4 |
+| Art Direction | 16 | 7 | 9 |
+| Divi Presets & Library | 7 | 3 | 4 |
+| Security | 7 | 1 | 6 |
+| Updates & Site Health | 5 | 3 | 2 |
+| Memory, Skills & Playbooks | 12 | 5 | 7 |
+| Other | 12 | 4 | 8 |
+| **Total** | **447** | **184** | **263** |
 
-> This table lists documented categories, not the per-site surface. Some categories only register when the matching builder or add-on is present, so the column total is higher than what a single site sees. The current totals for tools, WebMCP abilities and skills are on the [live tools catalog](https://www.respira.press/tools).
+> This table follows the public catalog. Some categories are listed only when the matching builder, plugin or add-on is present, so the total is higher than what a single site sees. Read-only counts the tools that only read; Write counts every tool that can change the site.
 
 ## Tool Naming Convention
 
-All tools follow the pattern: `wordpress_[action]_[resource]`
+Core tools follow the pattern `respira_[action]_[resource]`. ACF tools are named `respira_acf_*` and WooCommerce tools `woocommerce_*`.
 
 <Callout kind="info">
-Starting in v5.2.0, all tools are available with both `respira_*` (preferred) and `wordpress_*` (deprecated) prefixes. New tools only use `respira_*` names. The `wordpress_*` names will be removed in a future major version.
+Starting in v5.2.0, the MCP server lists every core tool under its `respira_*` name (preferred). The same tool called with the `wordpress_*` prefix still works, and is deprecated. The `wordpress_*` names will be removed in a future major version. This page, most per-tool pages and the public catalog show the `wordpress_*` names, so `wordpress_list_pages` here is `respira_list_pages` in an MCP client.
 </Callout>
 
 - `list_*` - Get multiple items
@@ -333,7 +491,7 @@ Starting in v5.2.0, all tools are available with both `respira_*` (preferred) an
 
 ### How many tools does Respira have?
 
-Respira provides **234** tools across the categories above. 54 new in v6.6.0 (ACF), 39 new in v5.2.0 Elemental. With the WooCommerce add-on installed, all 21 WooCommerce tools register on top.
+As of plugin 9.2.3 and MCP server 8.5.0: 252 core tools, 356 with the WooCommerce add-on. 91 more come from modules listed where they apply (ACF, Bricks, Elementor and YOOtheme Pro), so the public catalog counts 447 tools in 30 categories. One site sees between 253 and 436, depending on its builder and plugins. The plugin also registers 360 WordPress Abilities. The [live tools catalog](https://www.respira.press/tools) has the current numbers.
 
 ### What's the difference between read-only and write tools?
 

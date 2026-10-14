@@ -1,0 +1,85 @@
+---
+title: "wordpress_get_yootheme_template"
+description: "Read one YOOtheme Pro site template with its full layout, migrated to the running YOOtheme version."
+---
+
+# wordpress_get_yootheme_template
+
+Read one YOOtheme Pro site template with its full layout (`content`), migrated to the YOOtheme version running on the site. Use the content as the starting point for [wordpress_update_yootheme_template](/tools/yootheme/update-yootheme-template), and address elements by their position in it.
+
+## Parameters
+
+1 parameter, `template_id` required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `template_id` | string | yes | The template `id` from [wordpress_list_yootheme_templates](/tools/yootheme/list-yootheme-templates). |
+
+## Example call
+
+```json
+{
+  "name": "wordpress_get_yootheme_template",
+  "arguments": { "template_id": "Xk3pQ7aL" }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "template": {
+    "id": "Xk3pQ7aL",
+    "name": "Single post",
+    "assigned": "single-post",
+    "query": {},
+    "enabled": true,
+    "priority": 0,
+    "sections": 1,
+    "outline": [ { "index": 0, "type": "section", "label": "…" } ],
+    "content": [
+      {
+        "type": "section",
+        "props": {},
+        "children": [
+          {
+            "type": "row",
+            "props": {},
+            "children": [
+              {
+                "type": "column",
+                "props": {},
+                "children": [
+                  { "type": "headline", "props": { "title_element": "h1" }, "source": { "…": "…" }, "children": [] }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+`content` uses the same node shape as a YOOtheme page: `type`, `props` and `children`. Nodes that show dynamic content (the post title, its content, a custom field) carry a `source` key. Keep it when you send the layout back: a template is shared by every page of its type, so static text in its place shows the same words on all of them.
+
+## When it is refused
+
+- `respira_yootheme_template_not_found`: no template has that id. The answer lists the templates there are in `available_templates`.
+- `respira_builder_not_active`: YOOtheme Pro is not the active theme.
+
+## Availability
+
+Plugin 9.2.0 with MCP server 8.5.0. Listed only when YOOtheme Pro is the site's builder. Read-only.
+
+## Example Prompts
+
+- "Show me the layout of the single post template."
+- "What is in the search results template?"
+
+## Related Tools
+
+- [wordpress_list_yootheme_templates](/tools/yootheme/list-yootheme-templates)
+- [wordpress_update_yootheme_template](/tools/yootheme/update-yootheme-template)

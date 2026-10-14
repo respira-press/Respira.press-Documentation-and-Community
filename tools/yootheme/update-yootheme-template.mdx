@@ -1,0 +1,100 @@
+---
+title: "wordpress_update_yootheme_template"
+description: "Change a YOOtheme Pro site template: replace or extend its layout, rename it, reassign it, change its filter, enable or disable it, or move it in the match order. Changes to a live template need the person's confirmation."
+---
+
+# wordpress_update_yootheme_template
+
+Change a YOOtheme Pro site template: replace its layout (`content`), add sections to the end (`append`), rename it, reassign it to another view, change its filter, enable or disable it, or move it first or last in the match order. Send only what changes.
+
+Start a layout change from the `content` of [wordpress_get_yootheme_template](/tools/yootheme/get-yootheme-template).
+
+## Parameters
+
+9 parameters, `template_id` required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `template_id` | string | yes | The template `id` from [wordpress_list_yootheme_templates](/tools/yootheme/list-yootheme-templates). |
+| `content` | array | no | Replaces the whole layout. Start from the template's current `content`. |
+| `append` | array | no | Nodes added after the existing layout. |
+| `name` | string | no | New name. |
+| `assigned` | string | no | New view, one of `available_types`. |
+| `query` | object | no | New assignment filter. `{}` removes it. |
+| `enabled` | boolean | no | True puts the template live, false switches it off. |
+| `priority` | string | no | `first` or `last`: move the template in the match order. Without it the template keeps its place. |
+| `confirm_live_edit` | boolean | when the template is or becomes enabled | Send it only after the person agreed to change the live site. |
+
+The layout takes the same nodes as [wordpress_create_yootheme_template](/tools/yootheme/create-yootheme-template), with the same repairs, warnings and refusals. Keep the `source` key on nodes that show dynamic content.
+
+## Example call
+
+```json
+{
+  "name": "wordpress_update_yootheme_template",
+  "arguments": {
+    "template_id": "Hq8nT2vB",
+    "enabled": true,
+    "confirm_live_edit": true
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "changed": [ "enabled" ],
+  "template": {
+    "id": "Hq8nT2vB",
+    "name": "404 page",
+    "assigned": "error-404",
+    "query": {},
+    "enabled": true,
+    "priority": 3,
+    "sections": 1,
+    "outline": [ { "index": 0, "type": "section", "label": "…" } ]
+  },
+  "validator_warnings": [],
+  "rollback": { "snapshot_uuid": "…" }
+}
+```
+
+`changed` names what the call changed: `layout replaced`, `layout appended`, `name`, `assigned`, `query`, `enabled` or `priority`.
+
+## Live templates
+
+<Callout kind="alert">
+A change to an enabled template, or enabling a disabled one, shows on every page of its type at once. Without `confirm_live_edit: true` it is refused with `respira_live_edit_confirmation_required`, and nothing is changed. Ask the site owner first. A disabled template can be changed without it.
+</Callout>
+
+## Undo
+
+Every write saves a snapshot of all YOOtheme templates first. `wordpress_restore_snapshot` with `rollback.snapshot_uuid` puts every template back as it was. After a write, Respira clears the site's page caches.
+
+## When it is refused
+
+- `respira_nothing_to_update`: the call sent nothing to change.
+- `respira_yootheme_template_not_found`: no template has that id. The answer lists `available_templates`.
+- `respira_yootheme_invalid_type`: `assigned` is not a view on this site. The answer lists `available_types`.
+- `respira_yootheme_invalid_content` or `respira_yootheme_unknown_element`: the layout is not valid YOOtheme nodes, or uses an element the running YOOtheme does not have. Nothing is written.
+- `respira_live_edit_confirmation_required`: see Live templates above.
+- `respira_builder_not_active`: YOOtheme Pro is not the active theme.
+- `respira_write_not_persisted`: the templates were written, but the option did not hold them on read-back.
+
+## Availability
+
+Plugin 9.2.0 with MCP server 8.5.0. Listed only when YOOtheme Pro is the site's builder.
+
+## Example Prompts
+
+- "Add a related posts section to the end of the single post template."
+- "Switch on the new 404 template. I checked it in the customizer."
+- "Move the News template first so it wins over the general single post template."
+
+## Related Tools
+
+- [wordpress_get_yootheme_template](/tools/yootheme/get-yootheme-template)
+- [wordpress_create_yootheme_template](/tools/yootheme/create-yootheme-template)
+- [wordpress_list_yootheme_templates](/tools/yootheme/list-yootheme-templates)

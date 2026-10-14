@@ -1,0 +1,83 @@
+---
+title: "wordpress_list_yootheme_templates"
+description: "List the YOOtheme Pro site templates: the view each one renders, its filter, whether it is enabled, its place in the match order and a section outline, plus the views this site can assign."
+---
+
+# wordpress_list_yootheme_templates
+
+List the YOOtheme Pro site templates. A YOOtheme template is a builder layout the theme renders for a whole view: every single post, the blog index, a category archive, search results or the 404 page. Read this before changing anything a visitor sees on posts, archives, search or the 404 page.
+
+For a view, YOOtheme renders the first enabled template whose assigned view and filter match. A page or post with its own YOOtheme builder layout ignores templates. Pages themselves are edited with the page and element tools, as on any other builder. See [YOOtheme Pro](/builders/yootheme).
+
+## Parameters
+
+None.
+
+## Example call
+
+```json
+{
+  "name": "wordpress_list_yootheme_templates",
+  "arguments": {}
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "templates": [
+    {
+      "id": "Xk3pQ7aL",
+      "name": "Single post",
+      "assigned": "single-post",
+      "query": {},
+      "enabled": true,
+      "priority": 0,
+      "sections": 2,
+      "outline": [
+        { "index": 0, "type": "section", "label": "…" },
+        { "index": 1, "type": "section", "label": "…" }
+      ]
+    }
+  ],
+  "available_types": {
+    "archive-post": "Posts page (blog index)",
+    "author-archive": "Author archive",
+    "date-archive": "Date archive",
+    "search": "Search results",
+    "_search": "Live search results",
+    "error-404": "Error 404",
+    "single-post": "Single Post",
+    "single-page": "Single Page",
+    "taxonomy-category": "Category archive"
+  },
+  "rule": "For a view, YOOtheme renders the first enabled template (lowest priority number) whose assigned type and query match. A page or post with its own YOOtheme builder layout ignores templates."
+}
+```
+
+- `id` is what [wordpress_get_yootheme_template](/tools/yootheme/get-yootheme-template) and [wordpress_update_yootheme_template](/tools/yootheme/update-yootheme-template) take.
+- `assigned` is the view the template renders. `query` is its filter, for example one category; `{}` means every page of the view.
+- `priority` is the template's place in the match order, `0` first.
+- `outline` lists the top-level sections of the layout, without their content.
+- `available_types` lists the views this site can assign, with a label for each. Public post types add `single-{post_type}` (and `archive-{post_type}` when the type has an archive), public taxonomies add `taxonomy-{taxonomy}`.
+
+## When it is refused
+
+When YOOtheme Pro is not the active theme, the answer is `respira_builder_not_active`: the site has no YOOtheme templates to read.
+
+## Availability
+
+Plugin 9.2.0 with MCP server 8.5.0. Listed only when YOOtheme Pro is the site's builder. Read-only.
+
+## Example Prompts
+
+- "Which YOOtheme templates does this site have, and which one renders a single blog post?"
+- "Is there a template for the 404 page, and is it switched on?"
+
+## Related Tools
+
+- [wordpress_get_yootheme_template](/tools/yootheme/get-yootheme-template)
+- [wordpress_create_yootheme_template](/tools/yootheme/create-yootheme-template)
+- [wordpress_update_yootheme_template](/tools/yootheme/update-yootheme-template)

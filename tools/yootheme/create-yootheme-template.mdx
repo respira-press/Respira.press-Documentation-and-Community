@@ -1,0 +1,137 @@
+---
+title: "wordpress_create_yootheme_template"
+description: "Create a YOOtheme Pro site template for a view such as single posts, an archive, search or the 404 page. It starts disabled, so a person reviews it in the YOOtheme customizer before it changes the site."
+---
+
+# wordpress_create_yootheme_template
+
+Create a YOOtheme Pro site template: a builder layout the theme renders for a whole view, such as every single post, a category archive, search results or the 404 page.
+
+The template is created **disabled** unless `enabled` is true. YOOtheme then shows it only inside its customizer, so the person can review it there before it changes the site. The layout goes through the same checks and save as a YOOtheme page, so the template opens in the customizer like one built there.
+
+## Parameters
+
+7 parameters, `name` and `assigned` required.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `name` | string | yes | The template name shown in the YOOtheme customizer. |
+| `assigned` | string | yes | The view it renders: one of `available_types` from [wordpress_list_yootheme_templates](/tools/yootheme/list-yootheme-templates), such as `single-post`, `single-page`, `archive-post`, `taxonomy-category`, `author-archive`, `date-archive`, `search` or `error-404`. |
+| `content` | array | no | The layout nodes. Omit it for an empty template. |
+| `query` | object | no | A YOOtheme assignment filter, such as `{"terms":[12]}` to limit a single post template to one category. Omit it to match every page of the view. |
+| `enabled` | boolean | no | Default false. True puts the template live and needs `confirm_live_edit`. |
+| `priority` | string | no | `first` or `last`: where the template goes in the match order. Default `last`. |
+| `confirm_live_edit` | boolean | with `enabled: true` | Send it only after the person agreed to change the live site. |
+
+## The layout
+
+`content` takes YOOtheme layout nodes, the same shape as a YOOtheme page: section, row, column, element.
+
+```json
+[
+  {
+    "type": "section",
+    "props": {},
+    "children": [
+      {
+        "type": "row",
+        "children": [
+          {
+            "type": "column",
+            "props": { "width_medium": "1-2" },
+            "children": [ { "type": "headline", "props": { "content": "…" } } ]
+          }
+        ]
+      }
+    ]
+  }
+]
+```
+
+[wordpress_get_builder_info](/tools/context/get-builder-info) returns the fields of every element on the site. Respira repairs the structure the same way it does on a YOOtheme page and reports each repair in `validator_warnings`; see [YOOtheme Pro](/builders/yootheme) for the structure rules. An element type the running YOOtheme does not have is refused with `respira_yootheme_unknown_element`, and nothing is written.
+
+Nodes that show dynamic content (the post title, its content, a custom field) carry a `source` key. Keep it as you read it from another template: a template is shared by every page of its type, so static text shows the same words on all of them.
+
+## Example call
+
+```json
+{
+  "name": "wordpress_create_yootheme_template",
+  "arguments": {
+    "name": "404 page",
+    "assigned": "error-404",
+    "content": [
+      {
+        "type": "section",
+        "children": [
+          {
+            "type": "row",
+            "children": [
+              {
+                "type": "column",
+                "props": { "width_medium": "expand" },
+                "children": [ { "type": "headline", "props": { "content": "This page is not here" } } ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## Response
+
+```json
+{
+  "success": true,
+  "template": {
+    "id": "Hq8nT2vB",
+    "name": "404 page",
+    "assigned": "error-404",
+    "query": {},
+    "enabled": false,
+    "priority": 3,
+    "sections": 1,
+    "outline": [ { "index": 0, "type": "section", "label": "…" } ]
+  },
+  "validator_warnings": [],
+  "rollback": { "snapshot_uuid": "…" },
+  "next_step": "The template is disabled: YOOtheme shows it only inside its customizer, so the person can review it there. To put it live, call update_yootheme_template with enabled=true and confirm_live_edit=true once they agree."
+}
+```
+
+## Live templates
+
+<Callout kind="alert">
+An enabled template changes every page of its type at once. `enabled: true` without `confirm_live_edit: true` is refused with `respira_live_edit_confirmation_required`, and nothing is changed. Ask the site owner first, or leave the template disabled so they can review it in the YOOtheme customizer.
+</Callout>
+
+## Undo
+
+Every write saves a snapshot of all YOOtheme templates first. `wordpress_restore_snapshot` with `rollback.snapshot_uuid` puts every template back as it was. After a write, Respira clears the site's page caches, because a template shows on every page of its view.
+
+## When it is refused
+
+- `respira_missing_param`: `name` is empty.
+- `respira_yootheme_invalid_type`: `assigned` is not a view on this site. The answer lists `available_types`.
+- `respira_yootheme_invalid_content`: `content` is not a list of YOOtheme nodes.
+- `respira_yootheme_unknown_element`: the running YOOtheme has no element of that type. Do not retry the same layout.
+- `respira_live_edit_confirmation_required`: see Live templates above.
+- `respira_builder_not_active`: YOOtheme Pro is not the active theme.
+- `respira_write_not_persisted`: the templates were written, but the option did not hold them on read-back. An object cache or a plugin that filters options is the likely cause.
+
+## Availability
+
+Plugin 9.2.0 with MCP server 8.5.0. Listed only when YOOtheme Pro is the site's builder.
+
+## Example Prompts
+
+- "Make a 404 page template with a short message and a button back to the home page. Leave it off so I can check it first."
+- "Create a single post template for the News category only."
+
+## Related Tools
+
+- [wordpress_list_yootheme_templates](/tools/yootheme/list-yootheme-templates)
+- [wordpress_update_yootheme_template](/tools/yootheme/update-yootheme-template)
