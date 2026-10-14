@@ -56,13 +56,15 @@ You can change the model at any point in a thread, even to another provider. Typ
 
 - The conversation and the work so far carry over: the pages it read, the changes it made, the copies waiting for your approval.
 - The change applies from the next turn: your next message, an approval, or Continue. A step that is already running finishes on the model it started with.
-- The picker lists each provider's models from the most effective to the smallest. A new thread starts on the first one.
+- The picker lists each provider's models from the most effective to the smallest. A new thread starts on the first one. On OpenRouter the free models sit in their own group under the paid ones, best first, so a thread can start with no credit at all.
 
 A common use: start on one model and move to another when the first gets stuck, or when the rest of the job does not need the most expensive one.
 
 ### Where the key is kept, and who bills you
 
-- The key is yours, made in your own account at the provider. The provider bills you for model usage. A Claude or ChatGPT subscription does not include API usage.
+- The key is yours, made in your own account at the provider. The provider bills you for model usage. A ChatGPT subscription does not include API usage. A Claude Max or Team plan does, since 7 October 2026: $100 a month on Max 5x, $200 on Max 20x, up to $500 pooled on Team, paid into a Claude Console organization you link once under Settings, Billing on claude.ai. A key from that organization runs Respira AER on that credit. The steps are in [Your Claude Max or Team plan now pays for Respira AER](https://www.respira.press/blog/claude-max-api-credits-respira-aer).
+- Under each provider, the model picker shows what this account has spent on that key through Respira AER since the first of the month, with a link to the provider's billing page. On OpenRouter it also shows the balance left on the key; Anthropic, OpenAI and Google do not tell a key its balance.
+- When a provider refuses a request because the key has no credit left, the key is wrong, or it is being rate limited, the chat shows a card with the way out: the provider's billing or keys page, a button to choose another model, and a button that sends your last request again.
 - Set a monthly spend limit at the provider before you paste the key. The card's advice: make a workspace or project at your provider, set the limit on it, then create the key inside it.
 - The key is stored on respira.press, sealed with AES-256-GCM, and opened only inside the request that sends your message to the provider. Only its last four characters are ever shown.
 - The key is not stored in WordPress. No screen in the plugin asks for it.
