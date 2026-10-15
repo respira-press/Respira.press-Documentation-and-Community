@@ -1,6 +1,6 @@
 ---
 title: "Elementor Builder Reference"
-description: "Technical documentation for using Respira with Elementor: JSON-based layouts, widget targeting, and safe editing workflows."
+description: "How Respira reads and edits Elementor pages: classic widgets and Atomic elements, Site Settings globals, Elementor's own MCP abilities, safety rules, limits and errors."
 ---
 
 # Elementor Builder Reference
@@ -9,15 +9,62 @@ This page is the technical reference. For what Respira does on Elementor, how it
 
 Technical documentation for using Respira with [Elementor](https://elementor.com/).
 
+## Elementor support overview
+
+Respira reads and edits Elementor pages in Elementor's own format: classic widget pages (Elementor v3 widgets, Free and Pro) and pages built with Atomic elements (Elementor v4). Every edit to a published page lands on a draft copy first, with a snapshot to restore from for 90 days. Colours and fonts taken from Site Settings stay linked, and Elementor's own MCP abilities can run through Respira with a snapshot taken first.
+
+**What you'll learn:**
+
+1. How Respira tells classic widgets and Atomic elements apart, and which Atomic types it writes.
+2. Which tools work on Elementor, and what each one is for.
+3. How globals, styles written as CSS, and Elementor's own abilities are handled.
+4. The safety rules, the limits, and the errors you can meet.
+
+> Tip: Ask for native Elementor widgets and elements, not HTML. A page built from real widgets stays editable in the Elementor editor; an HTML widget does not.
+
+---
+
 ## About Elementor
 
-[Elementor](https://elementor.com/) is the leading WordPress page builder with over 16 million active installations. It provides a drag-and-drop interface for building pages using widgets, sections, and containers.
+[Elementor](https://elementor.com/) is a drag-and-drop page builder for WordPress. It builds pages from widgets placed in sections, columns and containers, and since Elementor 4 from Atomic elements as well. Elementor Pro adds more widgets and the Theme Builder.
 
-Respira supports classic Elementor and Elementor v4 (Atomic). On v4, Respira writes around 20 element types (9 widgets plus 11 layout containers) with per-breakpoint and per-state styling. Types it does not yet support return a clear 422 error naming the unsupported type instead of dropping the element silently.
+## Classic widgets and Atomic elements
 
-## Data Structure
+Elementor now stores two kinds of element on the same site, and sometimes on the same page:
 
-Elementor stores page layouts as structured JSON in WordPress post meta (`_elementor_data`). Each page contains a hierarchical tree of elements:
+- **Classic widgets (v3).** The widgets Elementor had before version 4: heading, text editor, button, image, icon box and the rest, Free and Pro.
+- **Atomic elements (v4).** The newer element set, with types named `e-heading`, `e-paragraph`, `e-flexbox` and so on, styled through classes, variables and per-breakpoint, per-state styles.
+
+When Respira reads a page, it marks each element `"kind": "v3-widget"` or `"kind": "v4-atomic"`, so the agent writes each one in its own format. `respira_list_elementor_widgets` reports, for every widget and element, whether it is atomic or classic, whether it can hold children and whether it needs Elementor Pro, read from Elementor itself rather than a fixed list.
+
+### Atomic element types Respira writes
+
+| Kind | Types |
+|------|-------|
+| Widgets (9) | `e-heading`, `e-paragraph`, `e-button`, `e-image`, `e-svg`, `e-divider`, `e-youtube`, `e-self-hosted-video`, `e-component` |
+| Layout (11) | `e-flexbox`, `e-div-block`, `e-grid`, `e-tabs`, `e-tabs-menu`, `e-tab`, `e-tabs-content-area`, `e-tab-content`, `e-form`, `e-form-success-message`, `e-form-error-message` |
+
+Atomic elements are written with per-breakpoint and per-state styles (hover, focus, active and more), and each tree is validated before it is saved.
+
+<Callout kind="info">
+A page can hold Atomic types outside this list (for example `e-accordion`, `e-background-video` or `e-collection-loop` on Elementor 4.3.2). Since 9.1.6 those nodes are kept exactly as stored when you edit something else on the page, and their children stay editable. Only creating or changing an unsupported type is refused, with an error that names the type.
+</Callout>
+
+---
+
+## Prompting for good results on Elementor
+
+For the full prompting guide, see [Get Great Results: How to Prompt](/prompts). Three things matter most on Elementor:
+
+- **Ask for native widgets, not HTML.** The add tools and `respira_build_page` write real Elementor widgets and elements. Ask for "HTML" and you get an HTML widget your client cannot edit in the canvas.
+- **Reuse the design system.** Tell the agent to read `respira_elementor_design_system` first and reuse the kit colours, fonts, v4 variables and global classes already on the site, instead of setting a one-off colour on every element.
+- **Say which kind of page it is.** If a site mixes classic and Atomic pages, name the page and let the agent read it first. It writes each element in the format it already has.
+
+---
+
+## Data structure
+
+Elementor stores page layouts as structured JSON in WordPress post meta (`_elementor_data`). Each page contains a hierarchical tree of elements. A classic page looks like this:
 
 ```json
 [
@@ -36,7 +83,7 @@ Elementor stores page layouts as structured JSON in WordPress post meta (`_eleme
             "elType": "widget",
             "widgetType": "heading",
             "settings": {
-              "title": "Welcome to Our Site",
+              "title": "Welcome",
               "_element_id": "hero-heading"
             }
           }
@@ -47,158 +94,371 @@ Elementor stores page layouts as structured JSON in WordPress post meta (`_eleme
 ]
 ```
 
-## Module Identification
+Atomic elements live in the same tree. Layout elements carry their own `elType` (for example `e-flexbox`), widgets carry a `widgetType` such as `e-heading`, and their styles are stored with the element and rendered by Elementor into a separate stylesheet.
 
-### By Custom ID (Recommended)
+Elementor element IDs are seven hex characters, and elements Respira adds get IDs in the same format. After someone has edited a page in the Elementor editor, read the page again and find elements by content or label, not by an ID you read before the editor session.
 
-Set in Elementor: Widget → Advanced → CSS ID. Then target with:
+### What a write does
 
-```json
-{ "admin_label": "hero-heading" }
-```
+A page write goes through Elementor's own document save where it can, so Elementor's save hooks run. Respira then reads `_elementor_data` back from the database and refuses to report success when it does not hold what was written. After the save it:
 
-### By Navigator Label
+- regenerates the page's Elementor CSS file,
+- clears Elementor's element cache and file cache, and on pages with Atomic elements the v4 style cache,
+- purges the page in the page caches it recognises: WP Rocket, W3 Total Cache, WP Super Cache, WP Fastest Cache, LiteSpeed Cache, SiteGround Optimizer and the Cloudflare plugin.
 
-Use Elementor's Navigator panel (right-click → Navigator) to name widgets:
+---
 
-```json
-{ "admin_label": "Hero CTA Button" }
-```
+## Finding an element
 
-### By Path
+Read the page first with `respira_get_page_outline` or `respira_extract_builder_content`, then locate the element with `respira_find_element`. It takes an `identifier_type` of `id`, `type`, `admin_label`, `class`, `content`, `text` or `path`, with an `identifier_value`, and returns a `path_string` you can pass back to an edit. `respira_update_element` takes the same pair.
 
-```json
-{ "path": "sections[0].columns[0].widgets[1]" }
-```
+### By custom ID or Navigator label (recommended)
 
-### By Type
+Set a CSS ID in Elementor (Widget, Advanced, CSS ID) or name the widget in the Navigator panel. `admin_label` matches either:
 
 ```json
-{ "type": "button", "match_content": "Get Started" }
+{ "identifier_type": "admin_label", "identifier_value": "hero-heading" }
 ```
 
-## Common Widgets
+### By element ID
 
-| Widget | Type | Key Settings |
-|--------|------|--------------|
-| Heading | `heading` | title, size, tag |
-| Text Editor | `text-editor` | editor (HTML content) |
-| Button | `button` | text, link, size |
-| Image | `image` | image (url, id, alt) |
-| Icon List | `icon-list` | icon_list (array) |
-| Form | `form` | form_fields, email_to |
-| Video | `video` | youtube_url, vimeo_url |
-| Divider | `divider` | style, weight |
-| Spacer | `spacer` | space |
-| Icon Box | `icon-box` | title, description, icon |
+```json
+{ "identifier_type": "id", "identifier_value": "a85a3a7" }
+```
 
-## Example Prompts for Elementor
+### By path
 
-**Content Updates:**
+Use the `path_string` that `respira_find_element` returns. A path names exactly one element:
+
+```json
+{ "identifier_type": "path", "identifier_value": "0.2.1" }
+```
+
+### By type and content
+
+```json
+{ "identifier_type": "type", "identifier_value": "button", "match_content": "Get Started" }
+```
+
+`respira_update_module` takes the same targets as a `module_identifier` object, for example `{ "admin_label": "hero-heading" }`, `{ "path": "0.2.1" }` or `{ "type": "button", "match_content": "Get Started" }`.
+
+When an identifier matches more than one element, the edit is refused instead of guessing: `respira_update_element` and `respira_remove_element` answer `respira_ambiguous_target`, and `respira_apply_builder_patch` answers `respira_patch_ambiguous_target` for an ID several elements share. Both return the candidate paths, so the agent picks one.
+
+---
+
+## Tools that work on Elementor
+
+Tool names below use the `respira_` prefix. The older `wordpress_` names still answer, so a saved call keeps working.
+
+### Elementor tools
+
+| Tool | What it does |
+|------|--------------|
+| `respira_list_elementor_widgets` | Lists every registered widget (Free, Pro, third-party, Atomic) and, without a category filter, every element such as containers. Each entry says atomic or classic, whether it can hold children and whether it needs Pro. Read-only. |
+| `respira_get_elementor_widget_schema` | The JSON Schema for one widget or element type: every setting it accepts, with types, defaults and allowed values, or for an Atomic type the value shape Elementor accepts. Use it before `respira_update_element`. Read-only. |
+| `respira_elementor_design_system` | Exports kit global colours and typography, plus v4 variables and global classes, each with the reference to write. Read-only. |
+| `respira_update_elementor_global_colors` | Adds or updates global colours in the active kit by `_id`, including the four system colours (primary, secondary, text, accent). Does not delete colours. Changes the live kit, with a snapshot of the kit first. |
+| `respira_update_elementor_global_typography` | Adds or updates custom global fonts in the active kit by `_id`. Changes the live kit, with a snapshot of the kit first. |
+| `respira_elementor_add_custom_js` | Adds JavaScript to a page as an HTML widget in a container you name. It writes to the page ID you pass, with no draft copy and no snapshot, so pass the ID of a draft copy. |
+| `respira_validate_elementor_json` | Checks an Elementor tree before you write it: missing margins, the custom typography flag, column widths, boxed and full width, missing mobile breakpoints. Can fix error-level issues and return the corrected tree. Read-only. |
+| `respira_add_stock_image` | Finds a stock image, adds it to the Media Library and places it as an image widget in one call. |
+
+### Builder tools that work on Elementor
+
+| Tool | What it does on Elementor |
+|------|---------------------------|
+| `respira_get_builder_info` | Detects Elementor and its version on the site. |
+| `respira_get_page_outline` | One entry per top-level section or container, with its heading, child count and child types. |
+| `respira_extract_builder_content` | The whole page tree, in a form a write can send back. Atomic nodes keep their stored shape. |
+| `respira_find_element` | Locates an element by ID, type, label, class, content, text or path. |
+| `respira_update_element` | Changes settings on one widget or element. Repeaters can grow and shrink. |
+| `respira_apply_builder_patch` | Several targeted edits in one call. |
+| `respira_move_element`, `respira_duplicate_element`, `respira_remove_element`, `respira_reorder_elements` | Change the tree one element at a time. |
+| `respira_inject_builder_content` | Replaces or appends a whole layout. Replacing a page that has content needs `confirm_replace`. |
+| `respira_build_page` | Builds a full page from a structure. |
+| `respira_convert_html_to_builder` | Respira Exhale: turns a finished HTML document into a new Elementor page built from Elementor elements. Nothing existing is touched. |
+| `respira_add_heading`, `respira_add_button`, `respira_add_image` and the other add tools | Shortcuts that write the controls Elementor reads. |
+| `respira_make_responsive` | Adds tablet and mobile overrides to a classic (v3) page without overwriting values already set. `dry_run` previews the changes. Snapshot first. |
+| `respira_invoke_ability` | Runs one of Elementor's own abilities, with a snapshot first when the call writes (see below). |
+
+The add tools were checked by reading the published page after each call: 20 of 22 rendered on Elementor 4.1.1 without Pro. The search box, gallery and pricing table are built from free widgets. The form and slider need Elementor Pro and say so.
+
+---
+
+## Site Settings colours and fonts
+
+On classic widgets, a colour or font taken from Site Settings stays linked. Respira stores the link the way Elementor stores it (in `settings.__globals__`, for example `globals/colors?id=primary`), so changing the global in Site Settings updates every element that uses it.
+
+- Writing a new literal colour on a linked control replaces the link, as it does in the Elementor editor.
+- `respira_update_elementor_global_colors` and `respira_update_elementor_global_typography` change the kit itself, which changes every linked element on the site at once. The change does not wait on a draft copy; Respira snapshots the kit first, so it can be restored.
+- On Atomic pages the equivalent is global classes and variables. `respira_elementor_design_system` returns both, with the reference to write, so the agent reuses them instead of minting a local style per element.
+
+---
+
+## Styles written as CSS
+
+An agent often thinks in CSS. On Atomic elements, a style written as plain CSS goes through Elementor's own converter and lands as Elementor's typed values: `padding: 6rem 4rem` becomes all four logical sides.
+
+- What the converter cannot take becomes that element's custom CSS.
+- What it refuses is named in a warning, not dropped in silence.
+- This needs Elementor 4.2 or newer. Older releases keep the value as sent.
+
+Since Elementor 4.2, v4 styles render into their own stylesheet files. Respira rebuilds that stylesheet after every write, so a style shows on the page without someone opening the editor first.
+
+---
+
+## Elementor's own MCP and abilities, through Respira
+
+Elementor 4.3 (22 September 2026) ships Elementor's own MCP, which builds and edits pages made of Atomic elements. Respira does not replace it, and the two can run on the same site.
+
+| | Elementor's own MCP | Through Respira |
+|---|---|---|
+| Pages it can edit | Pages built in the Atomic editor | Classic widget pages and Atomic pages |
+| Where a change lands | Elementor says it saves what it generates as a draft | A copy first, approved in WordPress, with 90 days of undo |
+| Site colours and fonts | Global classes and variables on Atomic pages | Also on classic pages: Site Settings colours and fonts stay linked |
+| Global classes, variables, default styles | Changed in place; page revisions do not hold them | Snapshotted together before the change; one restore puts all of them back |
+| Other builders | Elementor only | The same tools on every builder Respira supports |
+
+To call Elementor's abilities through Respira, opt them in under Respira > Abilities, then the agent calls them with `respira_invoke_ability`. When a call writes to a page, the page is snapshotted first. A change to global classes, variables or default styles is snapshotted as one restore point for the whole design system, and a restore brings back deleted classes under their original IDs.
+
+The full comparison, kept current, is on the [Elementor MCP server](https://www.respira.press/elementor-mcp) page. Elementor's own description is on [elementor.com/mcp](https://elementor.com/mcp/).
+
+### Elementor Angie
+
+Angie is Elementor's own AI assistant, a separate free plugin. When Angie is installed, the Respira plugin can register Respira as an MCP server inside Angie, so Angie's chat reaches Respira's tools. Respira does not need Angie, and Angie does not need Respira. See [Elementor and Angie](/elementor-angie).
+
+---
+
+## Safety rules
+
+Respira treats a live Elementor page as something a person approves before it changes.
+
+- **Copy first.** An edit to a published page lands on a draft copy. A person approves it in WordPress before it goes live, unless the site owner has turned on direct editing.
+- **Snapshot before every write.** Every page write saves the state before it, kept for 90 days by default and restorable with `respira_restore_snapshot`.
+- **Two exceptions.** The kit tools change Site Settings live (with a kit snapshot first), and `respira_elementor_add_custom_js` writes to the page ID it is given with no copy and no snapshot.
+- **No silent overwrite.** A write can name the page version it read (`expected_version`, the `content_version` every Respira response about a page carries). If the page changed in the meantime the write is refused with `respira_version_conflict` (409) and nothing is written.
+- **Untouched elements stay as stored.** Since 9.1.6, Atomic nodes a write does not change keep their stored form, including class lists.
+- **Unsupported types are refused, not dropped.** Creating or changing an Atomic type Respira does not model returns `respira_elementor_atomic_write_unsupported` (422) with the type, the element ID and whether the site's Elementor registers it. Edits to other elements on the same page still work. The same code answers an Atomic tree that fails validation, with the validator's errors.
+- **Untyped widgets are refused.** A write holding a widget with no type is refused with `respira_elementor_unresolvable_element_type` and nothing is written. The message names the first offending element's path, ID and type.
+
+<Callout kind="alert">
+Replacing a whole page that already has content with `respira_inject_builder_content` in replace mode needs `confirm_replace: true`. Without it the call returns `respira_replace_confirmation_required` (409). Use append mode, or edit single elements, when you only want to add or change part of a page.
+</Callout>
+
+### Recommended operating procedure
+
+1. **Read before you write.** Start with `respira_get_builder_info` and `respira_get_page_outline`, and find the element before you change it.
+2. **Read the design system.** Call `respira_elementor_design_system` before styling anything.
+3. **Check the schema.** For a widget you have not edited before, call `respira_get_elementor_widget_schema`.
+4. **Edit on the copy.** Let the edit land on the draft copy, review it in the Elementor editor and on the front end, then approve it.
+5. **Keep the snapshot.** If something looks wrong after approval, restore the snapshot rather than editing by hand.
+
+---
+
+## Limitations
+
+- **Atomic types outside the catalog.** Types Respira does not model yet are refused with a list of supported types. Edit those in the Elementor canvas for now.
+- **IDs after an editor session.** After someone saves the page in the Elementor editor, read it again and compare by content, not by an ID read earlier.
+- **Some Pro display conditions.** Date ranges and geolocation read fine but cannot be written through the MCP yet.
+- **Theme Builder templates.** Editing Elementor Theme Builder templates (header, footer, single, archive) and their conditions through the MCP is not supported yet. Respira's Theme Builder tools are for Divi.
+- **Global widgets and saved templates.** A widget rendered from a global widget, a saved template or a Theme Builder part lives in its own template post, so it cannot be edited through the page that shows it. Edit the template; the change applies everywhere it is used.
+- **Dynamic tags, entrance animations, responsive visibility.** Respira has no dedicated tool for them. They stay as stored when the element is edited; set them in the Elementor editor.
+- **Third-party widgets.** Support varies by add-on. Their settings appear in `respira_get_elementor_widget_schema` because the schema is read from Elementor's control registry.
+
+---
+
+## Common errors
+
+| Code | Status | What it means | What to do |
+|------|--------|---------------|------------|
+| `respira_elementor_atomic_write_unsupported` | 422 | The write creates or changes an Atomic type Respira does not model, or an Atomic tree failed validation. | Edit that element in the Elementor canvas, or use a supported type. Other elements on the page still edit. |
+| `respira_version_conflict` | 409 | The page changed after the agent read it. | Read the page again and redo the edit on the current version. |
+| `respira_replace_confirmation_required` | 409 | A replace would overwrite a page that has content. | Use append mode or element edits, or send `confirm_replace: true` if a full replace is intended. |
+| `respira_ambiguous_target` | 422 | `respira_update_element` or `respira_remove_element` matched more than one element. | Send `identifier_type: "path"` with one of the candidate paths returned. |
+| `respira_patch_ambiguous_target` | 422 | In `respira_apply_builder_patch`, several elements share the ID. | Send `{"path": ...}` with one of the candidate paths returned. |
+| `respira_elementor_unresolvable_element_type` | 500 | An element in the tree has no type. Nothing was written. | Add the missing `widgetType` and resend, or restore a snapshot taken before the page held the untyped widget. |
+
+---
+
+## Example prompts for Elementor
+
+**Content updates:**
 
 - "Update the heading widget labeled 'Hero Heading' to say 'Start Here'"
 - "Change all button colors on the pricing page to #FF5733"
 - "Replace the hero section image with /wp-content/uploads/new-hero.jpg"
 
-**Structure Queries:**
+**Structure queries:**
 
 - "Show me all sections on page 42"
 - "List all buttons and their text on the homepage"
 - "What widgets are in the first section?"
 
-**Bulk Updates:**
+**Bulk updates:**
 
 - "Find all buttons with 'Learn More' and change text to 'Get Started'"
 - "Update all heading widgets to use H2 instead of H3"
 - "Change the footer email address across all pages"
 
-## Global Widgets
+**Design system:**
 
-Respira detects Elementor Global Widgets. Updates to global widgets propagate everywhere they're used.
+- "List every colour used on pages built with Elementor that is not linked to a Site Settings global. Group them by value, and suggest which ones should become globals."
+- "Which Elementor Pro widgets are actually used on this site, and on how many pages each? Output a markdown table."
+- "Find every Elementor button widget whose text is 'Get started' on pages tagged 'campaign'. Change the text to 'Start free' and the URL to /pricing. Show me the diff first."
 
-- "List all global widgets" → Shows global widget library
-- "Update the global header phone number" → Changes it site-wide
+## When to use Respira on Elementor
 
-## Template Kits & Theme Builder
+- **Quick content updates.** Change headlines, button text or links without opening the builder.
+- **Bulk edits.** Update the same text or link across many pages.
+- **SEO workflows.** Fix heading structure or add missing alt text.
+- **Design system clean-up.** Find one-off colours and fonts and move them to globals.
+- **Client handoffs.** Make content changes after the design is locked, on a copy the client can approve.
 
-Elementor Pro's Theme Builder templates (headers, footers, single post templates) are editable through Respira:
+---
 
-- "Update the header template button to link to /contact"
-- "Change the footer copyright year to 2025"
+## New in 9.1: Elementor 4.3 pages
 
-## Limitations
+- **Pages with an Accordion can be edited again (9.1.6).** A page holding an Atomic type outside the catalog refused every write, even to a classic widget, because every write re-sends the whole page. Untouched nodes are now kept as stored, and only changing or creating an unsupported type is refused.
+- **Untouched v4 elements are left alone (9.1.6).** Edits no longer rewrite every Atomic node; written class lists use the shape the running Elementor declares.
+- **A style added to an element with a class list shows (9.1.6).**
+- **Append works with Elementor's own format (9.1.20).** Append mode reads each node on its own, so a new section is converted and saved.
+- **Headings and paragraphs on Elementor 4.3 (9.1.1).** Edits work on pages with the new v4 headings and paragraphs, and a new v4 heading no longer comes out empty.
+- **Read-only abilities in one switch (9.1.0).** Respira > Abilities has a setting, off by default, that lets an agent call any ability its plugin declares read-only and not destructive. On a site with Elementor 4.3 that includes Elementor's page structure and widget schemas. Every call still runs through Respira's activity log and the plugin's own permission check.
+- **Ability search reads the site (9.1.0).** `respira_search_abilities` searches every ability registered on the site at the moment of the call, Elementor's included.
 
-- **Visual-only settings**: Hover states, entrance animations, and responsive visibility may need the Elementor editor
-- **Custom CSS**: Per-widget custom CSS is preserved but complex styling changes may require the builder
-- **Dynamic tags**: Elementor dynamic content tokens are preserved but not directly editable
-- **Third-party widgets**: Support varies by add-on; core Elementor widgets have full support
+## New in 9.0: Elementor writes checked against Elementor
 
-## When to Use This Tool
+- **Classic Elementor keeps a global a global (9.0.3).** A colour or font from the site's globals is stored as a link.
+- **Undo for Elementor's design system (9.0.4).** Global classes, variables and default styles are snapshotted as one restore point before Elementor's own abilities change them.
+- **The add tools render on Elementor (9.0.4).** They store the tool's words where Elementor reads its controls.
+- **An edit reaches the page (9.0.5).** `respira_update_element` was checked by reading the published page after each call. Added elements get IDs in Elementor's own format, and Elementor 4.2's Loop element is treated as a container.
+- **A v4 style written as CSS reaches the page (9.0.12).** Styles go through Elementor's converter, and the v4 stylesheet is rebuilt after each write.
+- **v4 widget schemas (9.0.15).** `respira_get_elementor_widget_schema` returns the value shape Elementor accepts for Atomic types such as `e-heading`, `e-button` and `e-image`.
 
-- **Quick content updates** - Change headlines, button text, or links without opening the builder
-- **Bulk edits** - Update the same text or link across multiple pages
-- **SEO workflows** - Fix heading structure or add missing alt text
-- **Client handoffs** - Make content changes after design is locked
+## Earlier capabilities
 
-## See Also
+### Dynamic schemas (5.2.0 Elemental)
 
-- [wordpress_extract_builder_content](/tools/builders/extract-content) - View page structure
-- [wordpress_update_module](/tools/builders/update-module) - Update specific widgets
-- [wordpress_inject_builder_content](/tools/builders/inject-content) - Replace entire structure
-- [Page Builder Overview](/builders/overview) - Compare all supported builders
-
-## v5.2.0 Elemental — New Capabilities
-
-### Dynamic Schemas
-
-Respira reads the Elementor control registry at runtime and generates JSON Schemas for every widget installed on your site. This means AI agents know the exact settings, types, and valid values — including third-party widgets.
+Respira reads the Elementor control registry at runtime and generates JSON Schemas for every widget installed on your site, third-party widgets included, so the agent knows the exact settings, types and valid values.
 
 The schema generator maps Elementor control types to JSON Schema:
-- TEXT, TEXTAREA → string
-- NUMBER, SLIDER → number (with min/max)
-- SELECT, CHOOSE → string (enum)
-- COLOR → string (format: color)
-- MEDIA → object `{url, id}`
-- REPEATER → array
-- GROUP → object (recursive)
+
+- TEXT, TEXTAREA to string
+- NUMBER, SLIDER to number (with min and max)
+- SELECT, CHOOSE to string (enum)
+- COLOR to string (format: color)
+- MEDIA to object (url and id)
+- REPEATER to array
+- GROUP to object (recursive)
 
 Schemas are cached for 12 hours and invalidated when Elementor's version changes.
 
-### Settings Validator
+### Validation before save
 
-Before saving, Respira validates widget settings against the dynamic schema. If a setting name is close but not exact, you get a "did you mean?" suggestion:
+Before a write is saved, Respira checks the tree. Classic trees are checked for structure (sections hold columns, columns hold widgets). Atomic nodes the write adds or changes are checked against the value formats the running Elementor declares, so something Elementor itself saved cannot block an edit. A widget with no type stops the write.
 
-> Unknown setting 'titel' for heading widget. Did you mean 'title'?
+### Element-level operations
 
-### Element-Level Operations
+Instead of downloading the entire page JSON, an agent can target individual widgets with `respira_find_element`, `respira_update_element`, `respira_move_element`, `respira_duplicate_element` and `respira_remove_element`.
 
-Instead of downloading the entire page JSON, AI agents can now target individual widgets:
+### HTML to Elementor conversion
 
-- `find_element` — locate by ID, type, CSS class, or text content
-- `update_element` — change settings on a single widget
-- `move_element` — reposition within the page tree
-- `duplicate_element` — clone with new ID
-- `remove_element` — delete from page
+`respira_convert_html_to_builder` (Respira Exhale, the HTML to WordPress converter) turns a finished HTML document into a new Elementor page. It works in two modes:
 
-### HTML-to-Elementor Conversion
+- **fidelity**, the default when the document has a stylesheet (plugin 9.0.19 and newer): the document's structure is written as Elementor elements one to one, each class and ID lands on the element Elementor renders, and the stylesheet goes with the page, scoped to it.
+- **restyle**: CSS is mapped to Elementor's own settings: backgrounds, typography, padding and margin, borders and box shadows, and media queries to the tablet and mobile breakpoints.
 
-The `convert_html_to_builder` tool maps CSS properties directly to Elementor widget settings:
-- Background colors, gradients → background_color, background_image
-- Typography (font, size, weight) → typography_* settings
-- Spacing (padding, margin) → padding/margin settings
-- Borders, shadows → border_*, box_shadow_* settings
-- Media queries → tablet/mobile responsive breakpoints
+With `preserve_tokens` (on by default), colour custom properties declared on `:root` become Elementor global colours, and the converted content links to them. Colours the site already has are never overwritten. Other tokens, such as sizes, stay as values and are reported as unmapped. For whole HTML files, see [Respira Exhale](https://www.respira.press/exhale).
 
-CSS custom properties (design tokens) can be converted to Elementor Global Colors and Fonts when `preserve_tokens: true` is set.
+### 7.x
 
-### Support Level
+- **Elementor v4 (Atomic) writes (7.1.0).** `respira_update_element`, `respira_inject_builder_content` and `respira_build_page` write the 9 Atomic widgets and 11 layout elements, with per-breakpoint and per-state styles.
+- **Digit-leading style IDs render (7.4.11).** A style ID that starts with a digit is changed to a valid class that starts with a letter.
+- **Repeaters can shrink (7.0.64).** `respira_update_element` can remove entries from a repeater, not only add or change them.
+- **`respira_build_page` keeps declared children (7.0.64)**, and reading `_elementor_data` repairs stray invalid UTF-8.
 
-Elementor has **Full Intelligence** support — the highest tier, with dynamic schemas, element operations, HTML conversion, and settings validation.
+### Support level
 
-## Recent capabilities (plugin v7.5.x)
+Elementor has **Full Intelligence** support: dynamic schemas, element operations, HTML conversion, validation before save, and the design system tools.
 
-- **Elementor v4 (Atomic) writes.** Respira writes around 20 v4 element types (9 widgets plus 11 layout containers) with per-breakpoint and per-state styling. Applied styles are wired to the element so they actually render.
-- **Clear errors on unsupported types.** A v4 element type Respira does not support yet returns a 422 error that names the type, instead of dropping it silently.
-- **Digit-leading style ids render.** A style id that starts with a digit (for example `1probedigit`) is sanitized to a valid letter-leading class, so Elementor generates a rule the browser matches and the element carries its style.
-- **Repeaters can shrink.** `update_element` can now remove entries from a repeater, not only add or change them.
-- **`_elementor_data` decode fixed** and `build_page` no longer drops v4 children, so a full-page build keeps every element. Per-page v4 auto-detect was also corrected so v4 pages are recognized as v4.
+---
+
+## FAQ
+
+<ExpandableGroup>
+
+<Expandable title="Does Respira edit classic Elementor pages, or only Atomic ones?" default-open="true">
+
+Both. Respira reads classic widgets (v3, Free and Pro) and Atomic elements (v4), tags each one, and writes each in its own format. Elementor's own MCP works on Atomic elements; Respira also covers classic widget pages.
+
+</Expandable>
+
+<Expandable title="Elementor has its own MCP now. Do I still need Respira?">
+
+Elementor's MCP edits pages built with its Atomic elements. Respira edits those and classic widget pages, makes every change on a copy you approve, keeps 90 days of undo, and works the same way on sites that run other builders. Respira can also call Elementor's own abilities, with a snapshot of the page first.
+
+</Expandable>
+
+<Expandable title="Will a change to a global colour break my pages?">
+
+A change to a global colour or font in the kit updates every element linked to it, which is usually what you want. Before changing a global, ask the agent which pages use it. The kit change is snapshotted, so it can be restored.
+
+</Expandable>
+
+<Expandable title="What happens if my page uses an Atomic element Respira does not support?">
+
+Edits to other elements on the page work, and the unsupported element is kept exactly as stored. Only a write that creates or changes the unsupported type is refused, with an error that names the type and the element ID. Edit that element in the Elementor canvas.
+
+</Expandable>
+
+<Expandable title="Can Respira edit Elementor Theme Builder templates?">
+
+Not yet. Editing Theme Builder templates (header, footer, single, archive) and their conditions through the MCP is not supported. Pages and posts built with Elementor, and their widgets, are editable.
+
+</Expandable>
+
+<Expandable title="Does Respira work without Elementor Pro?">
+
+Yes. Respira works on Elementor Free. Pro widgets are detected and listed when Pro is active, and the add tools that need a Pro widget, such as the form and slider, say so.
+
+</Expandable>
+
+</ExpandableGroup>
+
+---
+
+## Related links
+
+<Columns cols={3}>
+
+<Card
+  title="Elementor and Angie"
+  href="/elementor-angie"
+  icon="zap"
+  cta="How Angie and Respira meet"
+/>
+
+<Card
+  title="Duplicate before edit"
+  href="/duplicate-before-edit-workflow"
+  icon="map"
+  cta="How the copy-first flow works"
+/>
+
+<Card
+  title="Bulk content updates"
+  href="/guides/bulk-content-updates"
+  icon="copy"
+  cta="Change many pages at once"
+/>
+
+</Columns>
+
+## See also
+
+- [extract_builder_content](/tools/builders/extract-content): view page structure
+- [find_element](/tools/builders/find-element): locate one element
+- [update_module](/tools/builders/update-module): update specific widgets
+- [inject_builder_content](/tools/builders/inject-content): replace or append a whole structure
+- [get_page_outline](/tools/builders/get-page-outline): a compact page outline
+- [Page Builder Overview](/builders/overview): compare all supported builders
