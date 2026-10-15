@@ -1185,6 +1185,11 @@
                 "icon": "layout"
               },
               {
+                "title": "Avada",
+                "path": "builders/avada",
+                "icon": "layout"
+              },
+              {
                 "title": "Spectra",
                 "path": "builders/spectra",
                 "icon": "layout"
