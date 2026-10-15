@@ -69,11 +69,12 @@ A common use: start on one model and move to another when the first gets stuck, 
 - The key is stored on respira.press, sealed with AES-256-GCM, and opened only inside the request that sends your message to the provider. Only its last four characters are ever shown.
 - The key is not stored in WordPress. No screen in the plugin asks for it.
 
-## Three things to try first
+## Four things to try first
 
 1. **`/run tour`** reads the site and tells you what it is built with, which pages matter most and which plugins it runs. It changes nothing.
 2. **`/security`** lists the known vulnerabilities on the site that an available update closes, one row each. Nothing runs until you tick rows and press the button. See [Cards in Respira AER](/dashboard/aer-cards).
 3. **A small page edit.** Ask in plain words, for example "change the headline on the About page to Baked fresh every morning". By default every write waits for your approval. On a published page the edit lands on a copy, not on the live page, unless direct editing was switched on for the site. The copy comes with a preview link that opens it with no WordPress login for 14 days. When the copy looks right, type `/approvals` to approve it.
+4. **`/run design-system`** reads the site and writes its design system as the art direction later builds are held to: colour roles, heading and body fonts, type and spacing scales, radii. Values it observed are plain, values it chose are marked inferred and listed for you. You approve the draft, then its activation. Read it back any time with `/run art-direction`. On a site that does not expose the art direction tools it says so and writes nothing.
 
 ## Related pages
 
