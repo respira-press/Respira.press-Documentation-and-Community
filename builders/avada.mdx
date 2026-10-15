@@ -1,0 +1,149 @@
+---
+title: 'Avada'
+description: 'How Respira reads and writes Avada Builder pages as native Avada shortcodes, and works with the Avada design system, Layouts and Library.'
+---
+
+# Avada
+
+Avada is a WordPress theme with its own page builder, Avada Builder. Respira supports it from plugin 9.2.6: pages are read and written as Avada's own shortcodes, the global colour palette and typography sets can be read and changed, Layouts and Layout Sections can be listed, built and edited, and the Library can be listed and read.
+
+Verified on a real site running Avada 7.16.2 with Avada Builder 3.16.2 and Avada Core 5.16.2: pages render, open in Avada Live, and after a save in Avada Live Respira still reads and writes them byte for byte.
+
+## How Avada stores a page
+
+An Avada Builder page keeps its layout in `post_content` as shortcodes, nested **container > row > column > element**:
+
+```text
+[fusion_builder_container type="flex"]
+  [fusion_builder_row]
+    [fusion_builder_column type="1_1" layout="1_1"]
+      [fusion_title size="1"]Fresh bread[/fusion_title]
+      [fusion_text]<p>Baked every morning.</p>[/fusion_text]
+    [/fusion_builder_column]
+  [/fusion_builder_row]
+[/fusion_builder_container]
+```
+
+Respira reads that into nodes and writes nodes back as the same shortcodes:
+
+```json
+{ "type": "fusion_text", "attributes": {}, "content": "<p>Baked every morning.</p>" }
+```
+
+- `type` is the Avada shortcode: `fusion_builder_container`, `fusion_builder_row`, `fusion_builder_column`, `fusion_title`, `fusion_text`, `fusion_button`, `fusion_imageframe`, `fusion_toggle`, `fusion_tabs`, `fusion_checklist`, `fusion_code` and the rest.
+- `attributes` holds the element's settings, as Avada stores them.
+- `content` is the body between the opening and closing tag.
+- Generic names (`section`, `heading`, `text`, `button`, `image`) are accepted too. A loose element gets the container, row and column Avada needs, and a generic section is written as a flex container.
+
+The page tools take builder `avada`. A page Respira writes opens in Avada Live like a page you built there.
+
+## What stays exactly as it was
+
+Respira changes only what a write names. Everything it does not model, a third-party shortcode, an Avada element newer than the catalog or a Library global, is kept byte for byte. A targeted edit only goes ahead when the page survives its own read and re-write unchanged; when it would not read back the same way, the write is refused with `respira_avada_roundtrip_unsafe` before anything is saved.
+
+After every page write, Respira runs Avada's own per-page CSS reset, the one Avada runs when you save a page, so the change shows on the front end.
+
+**Column widths** live on each column, in `type` (`1_6`, `1_5`, `1_4`, `1_3`, `2_5`, `1_2`, `3_5`, `2_3`, `3_4`, `4_5`, `5_6`, `1_1`, `auto`, or a custom value), with `type_medium` and `type_small` for smaller screens.
+
+**Code Block** content is written base64 encoded, the way Avada's editor stores it by default. Avada decodes it when the page renders.
+
+## Library globals
+
+A global item from the Avada Library sits in a page as a bare `[fusion_global id="N"]` reference, and Avada shows the current version of the Library item wherever that reference is. Respira reads the reference as a reference and writes new ones in the same bare form, so a placed global keeps following every later edit of the original.
+
+Avada's own editor works on an expanded copy of a global, marked with a `fusion_global` attribute, and Avada copies any element marked that way back over the Library item on every page that uses it. A write that holds such an expanded global is refused with `respira_avada_expanded_global` and nothing is saved. To place a global, send the reference; to make a local copy, remove the `fusion_global` attribute.
+
+A global is placed at the level of what it holds: a saved container goes to the top of the page as it is, never inside a new column.
+
+## The element catalog
+
+Avada lists its elements only inside wp-admin and its own editor, never on the requests Respira answers. The catalog therefore comes from a scan of a real Avada Builder 3.16.2: 143 elements, each with its child items and every setting with its type, default and allowed values. `respira_get_builder_info` returns the catalog and says which source it used.
+
+<Callout kind="info">
+Pricing Table, Tabs and Testimonials were rebuilt in Avada 7.16 and are marked experimental. After a change to one of them, check the page in Avada Live.
+</Callout>
+
+## Design system
+
+`respira_get_avada_design_system` reads the Avada design system from Global Options:
+
+- the global colour palette, `color1` to `color8` plus custom colours, each with the CSS variable elements reference it by, for example `var(--awb-color5)`,
+- the five typography sets, `typography1` (Headings) to `typography5` (Small), with their variables, for example `var(--awb-typography1-font-family)`,
+- the globals elements inherit: primary colour, links, site width, heading and body typography, buttons.
+
+Ask your AI to reference these variables instead of hard-coded colours and fonts, so a later palette change reaches every element.
+
+`respira_update_avada_design_system` changes colours and typography sets through Avada's own Global Options, then resets Avada's caches so the whole site shows the change. Because that restyles every page at once, it asks you first: a real write needs `confirm_live_edit: true` after you agree, and `dry_run: true` shows the planned changes without writing. A snapshot is taken first, and restoring it puts the old values back and clears the caches again.
+
+Design tokens from a design direction land in the Avada palette as new colours. They never overwrite a colour you already have.
+
+## Layouts and Layout Sections
+
+Avada Layouts decide the header, page title bar, content and footer a visitor sees. Each Layout points a slot at a Layout Section and carries conditions that say which pages it applies to. Avada uses the last matching Layout for a page, and the Global Layout when none matches.
+
+- `respira_list_avada_layouts` lists every Layout in match order, the Global Layout included, with the section in each slot and where it applies, plus every Layout Section and the Layouts that use it.
+- A new Layout without conditions, and a new Layout Section, start out showing nowhere, so you can look at them in Avada Live first.
+- Changing anything already live, or making something live, needs your yes: the call is refused until it carries `confirm_live_edit: true`.
+- An edit to a Layout Section resets Avada's caches for the whole site, as Avada does itself.
+- Creating or changing a Layout, and changing a Layout Section, takes a snapshot first and returns `rollback.snapshot_uuid` for `respira_restore_snapshot`.
+
+Conditions are sent as a list:
+
+```json
+[
+  { "value": "singular_page" },
+  { "value": "specific_page", "ids": [12] },
+  { "value": "front_page", "mode": "exclude" }
+]
+```
+
+Values include `singular_page`, `singular_post`, `front_page`, `not_found`, `all_archives`, `search_results`, `author_archive`, `date_archive`, a taxonomy name such as `category`, and with ids `specific_page`, `children_of_page` or `taxonomy_of_category`. `mode` is `include` (the default) or `exclude`.
+
+A content section usually holds the `fusion_tb_content` element, which prints the page's own content. A header has no separate logo element: the logo is an image element with dynamic data.
+
+## The Library
+
+`respira_list_avada_library` lists saved containers, columns, elements, post cards, mega menus and page templates, and says which are global. `respira_get_avada_library_item` returns one item's content, the pages using it when it is global, and an `insert` node: the exact piece to place in a page with `respira_inject_builder_content` or `respira_apply_builder_patch`.
+
+<Callout kind="alert">
+Layouts, Layout Sections and the Library need Avada Builder active. Without it those calls answer `respira_avada_builder_not_active`. The design system tools work with the Avada theme alone.
+</Callout>
+
+## Avada tools
+
+These 11 tools are listed only on a site whose builder is Avada.
+
+| Tool | What it does |
+|------|--------------|
+| `respira_get_avada_design_system` | Reads the colour palette, the five typography sets, their CSS variables and the globals elements inherit |
+| `respira_update_avada_design_system` | Changes palette colours and typography sets through Avada Global Options, with approval and a snapshot |
+| `respira_list_avada_layouts` | Lists every Layout in match order, the Global Layout included, with its sections, its conditions and every Layout Section |
+| `respira_get_avada_layout` | Reads one Layout, or the Global Layout with `layout_id` "global" |
+| `respira_create_avada_layout` | Creates a Layout. Without conditions it shows nowhere; with conditions it needs your yes |
+| `respira_update_avada_layout` | Assigns or empties slots, replaces conditions or renames a Layout. A live change needs your yes |
+| `respira_get_avada_layout_section` | Reads one header, page title bar, content or footer section with its content, the Layouts using it and its Avada Live link |
+| `respira_create_avada_layout_section` | Creates a Layout Section of one slot type. It shows nowhere until a Layout uses it |
+| `respira_update_avada_layout_section` | Replaces or extends a section's content, or renames it. A section in a live Layout needs your yes |
+| `respira_list_avada_library` | Lists the Library by kind and says which items are global |
+| `respira_get_avada_library_item` | Reads one Library item with the exact node to place it in a page |
+
+Single elements inside a Layout Section can also be edited with `respira_update_element` and `respira_apply_builder_patch` on the section's id.
+
+## Supported operations
+
+| Operation | Status |
+|-----------|--------|
+| Extract content | Supported |
+| Inject content | Supported |
+| build_page | Supported |
+| Element-level editing (find, update, move, remove) | Supported |
+| add_* shortcuts | Supported, as Avada elements |
+| Design system (palette, typography sets) | Supported, with approval |
+| Layouts and Layout Sections | Supported, needs Avada Builder |
+| Library | Read and place, needs Avada Builder |
+| Snapshots | Supported |
+| Edit links | Open the page in Avada Live |
+
+## Edit links
+
+The edit link Respira returns for an Avada page opens it in Avada Live, the page's permalink with `fb-edit=1`. Layout Sections open in Avada Live too.

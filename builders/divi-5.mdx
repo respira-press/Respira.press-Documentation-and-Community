@@ -37,6 +37,26 @@ Older builds could produce an "Unknown Module" error when the agent invented lay
 
 ---
 
+## New in 9.2.6: the rest of the page stays as stored
+
+Plugin 9.2.6 changes how writes treat what they did not touch on a Divi 5 page.
+
+**Global modules stay references.** Reading a page returns each `divi/global-layout` reference as a reference. Before 9.2.6 the read handed over the library item's blocks in its place, and an agent that wrote that tree back stored a detached copy: a full width global hero came back as a boxed plain section. To change a global module, edit the library item.
+
+**Inserts add only new content.** `inject_builder_content` with `mode: "append"`, `target_path` plus `position`, or `after_element_id` / `before_element_id` places only the new content into the stored page. Every other block, including global modules, Components and Slots, and third-party modules such as WPForms or Divi Supreme, stays byte for byte. The same parameters drive chunked builds: the frame first, then rows and modules by path, with a `chunk_id` that makes a retry a no-op and a `session_id` from `begin_session` that keeps one recovery snapshot for the whole build. The steps are on the [Divi page](/builders/divi).
+
+**A full rewrite keeps the blocks it did not change.** `inject_builder_content` with mode replace, `update_module` and the `add_*` tools re-emit the whole page. Each top level block handed back unchanged is now stored as Divi saved it, byte for byte. A rewrite that would restructure one of them, for example wrap a global module in a section, is refused with `respira_untouched_block_rewritten` and writes nothing.
+
+**Divi 5.15 Components and Slots survive every write.** A Component (the Divi 5.15 name for a global module) can carry the page's own copy of its content, including Slots that hold content for that one page. Extract, replace, append, insert at a position and element updates keep a Component reference, its Slots and every attribute exactly as stored, and an edit inside a Slot changes only the block that was edited. Verified on a Divi 5.15.1 site.
+
+**Pages saved by the Visual Builder can be replaced.** The placeholder root Divi wraps a page in is transparent to the validator, and a global module reference directly under a section or row is accepted.
+
+**Edit links open the Visual Builder.** Every edit link Respira returns for a Divi page opens it in the Divi Visual Builder, never in the block editor, where a Divi 5 page shows every section as an unsupported block.
+
+**A slow render check reports unverified.** When the check after a write gets no answer in time, the write reports `render_validator_pass: null` and `render_validator_state: "unverified"` with a reason, instead of a failed write. A draft reads "unverified" with the reason `not_published`.
+
+**Builder "divi5" is accepted.** Respira Exhale, which turns an HTML page into a builder page, and the other tools that take a builder name answer to `divi5` and `divi4` as well as `divi`. A `divi5` request on a Divi 4 site says so, gives the Divi version and suggests builder `divi`.
+
 ## New in 8.8: Divi's styling engine, presets, and the Library
 
 Plugin 8.8.0 and 8.8.1 (with MCP server 8.3.16 and 8.3.17) came out of a customer field report that rebuilt a 16-page site and measured everything. Four changes matter for how you work on Divi 5:
@@ -72,7 +92,7 @@ Divi 5 support in Respira focuses on safe reading and editing of both layout for
 **Respira behavior**
 
 - Respira can read, edit, and save Divi 5 pages as blocks safely.
-- Respira builds real, editable modules from a 112-module catalog (Divi 5.11). Ask for the catalog with `get_builder_inline_schemas`.
+- Respira builds real, editable modules from a catalog of 117 module types from Divi 5.15.1, including the Slot module and the Gravity Forms and Imagely Gallery modules, which Divi registers only when those plugins are active. Ask for the catalog with `get_builder_inline_schemas`.
 - Respira continues supporting Divi 4 pages by reading and writing the existing `et_pb_*` shortcodes.
 - Respira does not perform automatic conversion between these formats.
 

@@ -1,13 +1,13 @@
 ---
 title: "Page Builder Support"
-description: "How Respira edits 18 WordPress page builders plus the native Site Editor at the module level. Update buttons, text, and sections without breaking layouts."
+description: "How Respira edits 19 WordPress page builders plus the native Site Editor at the module level. Update buttons, text, and sections without breaking layouts."
 ---
 
 # Page Builder Support
 
-Respira understands 18 WordPress page builders at the module level, plus the native Site Editor. AI can update specific sections, buttons, or text blocks without affecting the rest of your page.
+Respira understands 19 WordPress page builders at the module level, plus the native Site Editor. AI can update specific sections, buttons, or text blocks without affecting the rest of your page.
 
-As of 9.2.0 the coverage line is **18 page builders plus the native Site Editor**.
+As of 9.2.6 the coverage line is **19 page builders plus the native Site Editor**.
 
 ## Supported Builders
 
@@ -26,6 +26,7 @@ As of 9.2.0 the coverage line is **18 page builders plus the native Site Editor*
 | [Breakdance](/builders/breakdance) | 130+ | JSON | ✓ Full |
 | [Flatsome UX Builder](/builders/flatsome) | 55+ | Shortcodes | ✓ Full |
 | [YOOtheme Pro](/builders/yootheme) | 75 | Layout JSON | ✓ Full |
+| [Avada](/builders/avada) | 143 | Shortcodes | ✓ Full |
 | [Spectra](/builders/spectra) | Blocks | Blocks | ✓ Full |
 | [Kadence Blocks](/builders/kadence-blocks) | Blocks | Blocks | ✓ Full |
 | [GenerateBlocks](/builders/generateblocks) | Blocks | Blocks | ✓ Full |
@@ -38,7 +39,7 @@ Plus the native WordPress Site Editor:
 |--------|---------|-------------|---------|
 | [Site Editor (FSE)](/builders/site-editor) | Templates, template parts, patterns, navigation, global styles | Block markup / `theme.json` | Read everywhere. Structural writes are an owner switch per site |
 
-> Divi counts once and covers Divi 4 and Divi 5; [Oxygen](https://www.respira.press/oxygen-mcp) counts once and covers Oxygen Classic and Oxygen 6. That makes **18 builders**, read and written, except Thrive Architect (text edits) and SeedProd. SeedProd is audit-only (agents read and report on landing pages). Brizy and Visual Composer moved from read to write in Respira 7.4.0 "Clearing". The native Site Editor became a first-class target in Respira 8.0 "Canopy" and is counted separately from the 18 builders. YOOtheme Pro joined in 9.2.0.
+> Divi counts once and covers Divi 4 and Divi 5; [Oxygen](https://www.respira.press/oxygen-mcp) counts once and covers Oxygen Classic and Oxygen 6. That makes **19 builders**, read and written, except Thrive Architect (text edits) and SeedProd. SeedProd is audit-only (agents read and report on landing pages). Brizy and Visual Composer moved from read to write in Respira 7.4.0 "Clearing". The native Site Editor became a first-class target in Respira 8.0 "Canopy" and is counted separately from the 19 builders. YOOtheme Pro joined in 9.2.0, Avada in 9.2.6.
 
 ### New in 8.0 "Canopy": the native Site Editor
 
@@ -110,15 +111,15 @@ Then: "Update the module labeled 'Hero CTA Button' to say 'Contact Us'"
 
 ### Which page builder has the best Respira support?
 
-All 18 supported builders have module-level editing, with Thrive Architect limited to text edits and SeedProd to audits. Divi and Elementor have the most comprehensive intelligence packages. Bricks has 25 dedicated tools, listed only on Bricks sites. Flatsome has a 55-element intelligence package with nesting rules and page patterns, and YOOtheme Pro reads its elements live from the running theme and has 4 tools for its site templates. The native Site Editor is covered separately on the [Site Editor](/builders/site-editor) page.
+All 19 supported builders have module-level editing, with Thrive Architect limited to text edits and SeedProd to audits. Divi and Elementor have the most comprehensive intelligence packages. Bricks has 25 dedicated tools, listed only on Bricks sites. Flatsome has a 55-element intelligence package with nesting rules and page patterns, and YOOtheme Pro reads its elements live from the running theme and has 4 tools for its site templates. Avada has 11 tools for its design system, Layouts and Library, listed only on Avada sites. The native Site Editor is covered separately on the [Site Editor](/builders/site-editor) page.
 
 ### Can Respira edit Global Modules in Divi?
 
-Yes. Respira detects Divi Global Modules and can update them. Changes to global modules propagate everywhere they are used on your site.
+Yes, through the library item. A page stores a global module as a reference to its Divi Library item, and Respira reads and writes it as that reference, so a page edit never turns it into a local copy. To change a global module, edit the library item: the change shows on every page that uses it.
 
 ### Does Respira work with custom builder modules?
 
-Core modules from all 18 builders are fully supported. Third-party add-on modules have varying support depending on how they store data. Most text-based custom modules work well.
+Core modules from all 19 builders are fully supported. Third-party add-on modules have varying support depending on how they store data. Most text-based custom modules work well.
 
 ### What happens to my styling when Respira updates a module?
 

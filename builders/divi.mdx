@@ -38,7 +38,7 @@ Use these resources for Divi 5 specific workflows:
 
 ## Data structure
 
-Divi 4 stores its builder layouts as `et_pb_*` shortcodes in `post_content`. Divi 5 uses block-based layouts where Divi modules appear as `divi/*` blocks in `post_content`. Respira works against both formats but does not perform the migration or conversion between them.
+Divi 4 stores its builder layouts as `et_pb_*` shortcodes in `post_content`. Divi 5 uses block-based layouts where Divi modules appear as `divi/*` blocks in `post_content`. Respira works against both formats but does not perform the migration or conversion between them. A page stored as Divi 4 shortcodes keeps shortcodes on every write, whatever Divi version the site runs.
 
 On Divi 4, Respira parses the shortcode tree with a quote-aware attribute parser and folds alias children (rows and columns) into the right nesting, so a rebuild keeps the section, row, and column structure intact.
 
@@ -116,10 +116,12 @@ Set in Divi: Module Settings → Advanced → Admin Label
 
 ## Global modules
 
-Respira detects Divi Global Modules. Updates to global modules appear everywhere they are used.
+A global module (in Divi 5.15, a Component) lives in the Divi Library. On Divi 5 each page that uses it stores only a reference to it, a `divi/global-layout` block. Respira keeps it that way: reading a Divi 5 page returns each global module as a reference, never as a copy of its content, and every write keeps the reference exactly as stored, so a global module never turns into a detached local copy. Inserts on Divi 4 pages leave global modules byte for byte as well.
 
-- "List all global modules" → Shows global module library
-- "Update the global footer email address" → Changes it site-wide
+To change a global module, edit the library item. The change then shows on every page that uses it.
+
+- "Save the pricing section as a global module and place it on the About and Contact pages"
+- "Add the global newsletter section from the Library to the end of this page"
 
 ## Theme Builder: the live-edit confirmation handshake
 
@@ -140,6 +142,38 @@ This is a **confirmation, not an approval.** Approval means a human reviews a st
 </Callout>
 
 Global layout writes are still snapshotted and reversible. If a confirmed write lands wrong, restore the snapshot from the Changes page in WordPress admin.
+
+## New in 9.2.6: insert without rewriting the page
+
+Adding content with `respira_inject_builder_content` now places only the new content into the stored page. Everything else stays byte for byte, including global modules, Divi 5.15 Components and Slots, and third-party modules such as WPForms or Divi Supreme. The plugin checks that before and after the write.
+
+There are three ways to say where the new content goes:
+
+- `mode: "append"` adds it after the existing content.
+- `target_path` plus `position` puts it into an existing section or column, at a 0-based index among that container's children. The path is the one `respira_extract_builder_content` or `respira_find_element` returns, for example `sections[0].rows[0].columns[0]`. On Divi 4 the target is a section or a column, not a row.
+- `after_element_id` or `before_element_id` puts it next to an element, by its id (`_nodeId` on Divi 5, `module_id` on Divi 4) or its path.
+
+The response reports the inserted node's path and ids, the bytes inserted and the bytes left untouched.
+
+On a page stored as Divi 4 shortcodes the new content is written as shortcodes, whatever Divi version the site runs. A Divi 5 shape and the generic shape (section, row, column, then text, heading, button and the other module names) are converted, in every insert mode. A type with no Divi 4 module is refused and nothing is written.
+
+### Chunked builds
+
+A large page can be built as a sequence of small inserts, on Divi 4 and Divi 5:
+
+1. `respira_begin_session` and keep its `session_id`. Inside the session the plugin keeps one recovery snapshot of the page, taken before the first write, instead of one per chunk, and `respira_restore_session` undoes the whole build.
+2. Write the frame first: the sections and rows, with empty columns.
+3. Read the paths with `respira_extract_builder_content` or `respira_find_element`.
+4. Add each row or module with `mode: "append"`, a `target_path`, a `position`, a `chunk_id` of your choosing and the `session_id`. The answer's inserted path is the target for the next piece inside what was added.
+5. Read the page back once at the end.
+
+A retried call with the same `chunk_id` and the same content is a no-op that answers `already_applied: true`, never a duplicate. A failed chunk writes nothing and leaves the frame as it was.
+
+### Also in 9.2.6
+
+- **Edit links open the Visual Builder.** Every edit link Respira returns for a Divi page, Divi 4 and 5, opens it in the Divi Visual Builder, and Theme Builder layouts open in the Theme Builder.
+- **A slow render check reports unverified, not failed.** When the check after a write gets no answer in time, the write comes back with `render_validator_pass: null` and `render_validator_state: "unverified"`, a reason (`preview_timeout`, `preview_unreachable` or `request_time_budget`) and a note, instead of a failure. A draft, which the check cannot fetch, also reads "unverified" with the reason `not_published`. A page that answers with an error status or a fatal error still fails.
+- **The builder name "divi5" is accepted**, and "divi4" too. On a Divi 4 site a "divi5" request says so and suggests builder "divi".
 
 ## Limitations
 

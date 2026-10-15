@@ -52,6 +52,33 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-10-15" description="Respira for WordPress v9.2.6 + MCP Server 8.6.1: Avada, Divi inserts that leave the rest of the page alone, chunked builds, Divi 5.15, Elementor 4.3" tags={["release", "avada", "divi", "elementor", "builders", "safety"]}>
+
+### What's New in v9.2.6
+
+**Avada is a supported builder**
+- Avada Builder pages are read and written as Avada's own shortcodes: containers, rows, columns and Avada elements, from a catalog of 143 elements scanned from Avada Builder 3.16.2. Third-party shortcodes, newer Avada elements and Library globals are kept byte for byte, and a write that would not read back the same way is refused before anything is saved.
+- After every write the page's compiled Avada CSS is cleared, and the edit link opens the page in Avada Live.
+- 11 Avada tools read and change the design system (palette and typography sets, with your yes and a snapshot), list, build and change Layouts and Layout Sections, and list and read the Library with the exact node to place. Layouts and the Library need Avada Builder active.
+- Verified on Avada 7.16.2 with Avada Builder 3.16.2. Pricing Table, Tabs and Testimonials are experimental: check them in Avada Live after a change. See [Avada](/builders/avada).
+
+**Divi: inserts add only new content**
+- `inject_builder_content` with `mode: "append"`, `target_path` plus `position`, or `after_element_id` / `before_element_id` places only the new content. Global modules, Divi 5.15 Components and Slots, and third-party modules stay byte for byte. Divi 4 shortcode pages keep shortcodes.
+- Chunked builds on Divi 4 and Divi 5: the frame first, then rows and modules by path. `chunk_id` makes a retry a no-op, and a `session_id` from `begin_session` keeps one recovery snapshot for the whole build.
+- Reading a Divi 5 page keeps global modules as references. To change a global module, edit the library item.
+- The Divi 5 catalog lists 117 module types from Divi 5.15.1, the Slot module included. Builder `divi5` is accepted. Edit links open the Visual Builder. See [Divi](/builders/divi) and [Divi 5](/builders/divi-5).
+
+**Also in this release**
+- A site runs at most six Respira calls at once and answers the next with `respira_site_busy` and a wait time. Nothing runs for a busy call, so a retry is always safe, and the MCP server retries by itself.
+- A render check that gets no answer in time reports `render_validator_pass: null` with `render_validator_state: "unverified"` and a reason, instead of a failed write. A draft reads "unverified" too.
+- Elementor 4.3's accordion, background video and list can be built and edited, and pages Respira writes on Elementor 4.3 save in the Elementor editor.
+- The post editor opens again on PHP 7.4.
+
+**MCP Server 8.6.1**
+- The 11 Avada tools, `avada` in the builder lists, and the insert parameters on `respira_inject_builder_content` (`target_path`, `position`, `after_element_id`, `before_element_id`, `chunk_id`, `session_id`) with the chunked build steps in its description.
+
+</Update>
+
 <Update label="2026-10-03" description="Respira for WordPress v9.1.19: the grok.com connector completes its sign-in" tags={["release", "grok", "fix"]}>
 
 ### What's New in v9.1.19
