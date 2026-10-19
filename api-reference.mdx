@@ -95,6 +95,113 @@ POST /builder/{builder}/patch/{post_id}
 
 ## Pages
 
+### Bind an edit or approval to the reviewed version
+
+Reads and writes for one page return `content_version` and
+`content_version_post_id`. Treat the version as an opaque string: store it
+unchanged and compare for equality only. Do not parse it, sort it, increment it
+or construct it yourself.
+
+The current format is `v2-` followed by 24 lowercase hexadecimal characters,
+for example `v2-bac62a0329c59755b20bb40e`. It is a deterministic hash of the
+stored builder payload, page content, title, status and supported SEO fields.
+Changing any of those can change the value. An unchanged state keeps the same
+value; returning to an earlier state can return an earlier value. It is not a
+timestamp, revision counter or proof that the public page head has refreshed.
+
+The format is stable within a plugin minor release line unless the changelog
+announces a format change. Plugin 9.2.10 changed the prefix from `v1-` to `v2-`
+because SEO fields joined the hash. A held `v1-` token is still checked against
+the old content-only material for compatibility. For SEO approval, read a
+current `v2-` token rather than reusing a token from before the upgrade.
+
+Send the version from the page or draft you reviewed on each write:
+
+```http
+PUT /wp-json/respira/v2/pages/123
+Content-Type: application/json
+X-Respira-API-Key: YOUR_KEY
+
+{"expected_version":"v2-bac62a0329c59755b20bb40e","seo":{"description":"Reviewed description"}}
+```
+
+A successful write returns the new version. A duplicate-first write returns
+the draft's ID and version, because that is where the edit landed. Review that
+draft, then approve its current version:
+
+```http
+POST /wp-json/respira/v2/duplicates/123/approve
+Content-Type: application/json
+X-Respira-API-Key: YOUR_KEY
+
+{"expected_version":"VERSION_RETURNED_FOR_THE_REVIEWED_DRAFT"}
+```
+
+If it changed, the request returns HTTP 409 `respira_version_conflict` and
+performs no write. A stale or made-up value is refused; an empty or non-text
+value is refused. `force` does not override a version conflict. Read the draft
+again and have the changed version reviewed before approving it. Omitting a
+version on legacy duplicate approvals provides no version binding.
+
+After an approval, `content_version_post_id` identifies the live page. Use
+that ID when checking the stored result and fetch the public page separately
+to verify what visitors receive.
+
+#### Published content with incomplete SEO
+
+From plugin 9.2.12, approval returns HTTP 200 when the content is live even if
+an SEO field fails read-back. Check `complete`, not only the HTTP status or
+`success`. The response names the fields in `warnings` and retains the
+`respira_approve_seo_not_carried` code:
+
+```json
+{
+  "success": true,
+  "published": true,
+  "complete": false,
+  "live_post_id": 42,
+  "warnings": [{
+    "code": "respira_approve_seo_not_carried",
+    "fields": [{
+      "field": "_yoast_wpseo_metadesc",
+      "where": "yoast_indexable",
+      "expected": "Reviewed description",
+      "actual": null
+    }]
+  }]
+}
+```
+
+This replaces the HTTP 500 response for this partial outcome in 9.2.10 and
+9.2.11. Update integrations that relied on that status. A completed approval
+returns `published: true`, `complete: true` and an empty `warnings` array.
+Version conflicts and permission refusals remain non-2xx. A partial approval
+has already changed the public page: do not retry the same approval. Read the
+live page and decide whether to repair its SEO through another reviewed draft
+or ask an administrator to restore the saved snapshot.
+
+### Create a new page with a Publish only key
+
+From plugin 9.2.12, use the existing creation endpoint:
+
+```http
+POST /wp-json/respira/v1/post-types/page/posts
+Content-Type: application/json
+X-Respira-API-Key: YOUR_KEY
+
+{"type":"page","title":"New page","content":"<h1>Review this page</h1>","status":"draft"}
+```
+
+For this key profile, creation accepts title, content, slug and excerpt. New page drafts include slug and excerpt in their version token, so changing either after review invalidates approval.
+`status` defaults to `draft`; other statuses and post types are refused.
+Author changes, taxonomy creation and arbitrary metadata are refused. Edit
+the returned page through `PUT /respira/v2/pages/{id}` and set its SEO there.
+Review it, then call `POST /respira/v2/duplicates/{id}/approve` with its current
+`content_version` as `expected_version`. Approval publishes the new page at
+the same ID, with `approval_mode: "publish_new_page"`. The version is required
+for this path and force-publishing is refused. Menus and redirects remain
+outside this key's permissions.
+
 ### List pages
 
 List all pages with optional filtering.
