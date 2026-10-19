@@ -180,6 +180,111 @@ has already changed the public page: do not retry the same approval. Read the
 live page and decide whether to repair its SEO through another reviewed draft
 or ask an administrator to restore the saved snapshot.
 
+### Reviewed menu and redirect changes
+
+Plugin 9.2.13 adds a separate pending-change workflow. A **Publish only** key
+can propose, read, approve, reject and undo these changes. Its direct menu and
+redirect write routes remain forbidden (HTTP 403).
+
+All paths below start at `/wp-json/respira/v2`. Use your site key in
+`X-Respira-API-Key`. Cookie-authenticated administrators use the WordPress REST
+nonce. Records are private and local to this WordPress site.
+
+| Method and path | Result |
+| --- | --- |
+| `GET /pending-changes/target?target[kind]=menu&target[id]=3` | Complete state and target version for one existing classic menu. |
+| `GET /pending-changes/target?target[kind]=redirects` | Complete readable redirect list and target version. |
+| `POST /pending-changes` | Save exact `target`, `before`, `after` and optional `expires_in` seconds. No live write. |
+| `GET /pending-changes/{id}` | Full proposal, versions, author key/user, creation, expiry, status and receipt. |
+| `POST /pending-changes/{id}/approve` | Require `expected_version` from the proposal that was reviewed. |
+| `POST /pending-changes/{id}/reject` | Reject an unexpired proposal without changing the live target. |
+| `POST /pending-changes/{id}/undo` | Create a reverse proposal; approve it separately. |
+| `GET /pending-changes?status=pending&page=1&per_page=25` | Paginated site history, optionally filtered by status and `target[kind]`/`target[id]`. |
+| `POST /pending-changes/expire` | Mark up to 100 expired records per call; repeat while `remaining` is positive. No live write. |
+
+1. Read the target. Copy its entire `state` into both `before` and `after`.
+2. Edit only `after`. Save `{ "target": {"kind":"menu","id":3}, "before": ORIGINAL_STATE, "after": PROPOSED_STATE }`.
+3. Read the returned change by its ID. Show the full before/after to the approver
+   and retain that change's `version` unchanged.
+4. Approve with `{ "expected_version": "VERSION_FROM_THE_REVIEWED_CHANGE" }`.
+5. Inspect `published`, `complete`, `warnings`, `applied` and `actual_after`, then
+   check the public URLs separately.
+
+The pending `version` (`pc1-…`) binds the exact proposal, author, site and expiry.
+The `target_version` (`pt1-…`) binds the live menu or redirect configuration.
+Both are opaque strings, distinct from page `content_version`. Creation refuses
+stale `before` with HTTP 409 `respira_version_conflict`. Approval returns the same
+409 if the reviewed proposal or the live target changed. There is no force
+override. A busy target returns 423; an expired proposal returns 410.
+
+Menu v1 edits items: add, update, remove, reorder and parent relationships.
+Keep the menu's name, description, theme, configuration and locations unchanged.
+Copy every existing item's fields and integer ID. New items use a unique
+`new:client-reference`, `configuration: null` and consecutive positions starting
+at 1; a parent is `0` or another ID/reference in the proposed menu. For a custom
+link use `type: "custom"`, `object: "custom"`, `object_id: 0` and a safe URL.
+Published post links, taxonomy links and post type archives must match their
+current URLs. Cycles and missing targets or parents are refused.
+
+Redirect v1 edits `rules` in the full state, retaining `engines` unchanged.
+Existing IDs are engine-qualified, such as `respira:2` or `redirection:5`.
+New rules use `new:client-reference`, `configuration: null`, a writable engine
+(`respira` or active `redirection`), source, target, match (`exact` or `regex`),
+query mode (`ignore`, `exact` or `pass`), status code, enabled flag and note.
+Other redirect managers remain read-only. Unsafe schemes, duplicate sources,
+loops and protected WordPress URLs are refused. Use canonical paths; validation
+refuses proposals that would need silent normalization.
+
+A complete target snapshot is limited to 1,000 items/rules. A redirect proposal
+may change at most 50 rules, with at most 200 native regular expressions.
+Oversize or incomplete reads are refused. Default expiry is seven days;
+`expires_in` accepts 1 through 2,592,000 seconds (30 days). List status values are
+`pending`, `applying`, `applied`, `rejected` and `expired`; `per_page` is capped
+at 100. Expiry preserves history and applied receipts.
+
+Approval reads the target back and stores a durable receipt:
+
+```json
+{
+  "published": true,
+  "complete": false,
+  "warnings": [{
+    "code": "respira_pending_change_not_carried",
+    "fields": [{"field":"target.items.0.title","where":"stored_target","expected":"Reviewed title","actual":"Filtered title"}]
+  }],
+  "applied": {"created":[45],"updated":[],"removed":[],"references":{"new:link":45}}
+}
+```
+
+HTTP 200 alone does not mean complete. A partial receipt includes the expected
+and actual states, attempted writes and cache purge report. Repeating an applied
+approval with the same reviewed version returns that stored receipt without
+applying again, including an incomplete receipt. Read it and propose a reviewed
+repair or undo. An interrupted `applying` record refuses blind re-execution;
+inspect the live target before recovery.
+
+Undo's `before` is the current target and its `after` is the saved prior state.
+Review it carefully: restoring that state can also remove changes made since the
+original approval. Nothing goes live until the undo's own version is approved.
+Recreating deleted entries allocates new engine IDs; the receipt maps those IDs.
+Ordinary new entries use engine defaults. Undo retains the saved configuration
+for recreated entries, including menu metadata and writable Redirection options;
+read-back reports a mismatch if an integration changes that restored state.
+
+Menus can appear throughout a site, so resource approval calls the shared
+site-wide cache purge path. `cache_purge` reports the integrations called; it
+does not prove a host/CDN cache was cleared or that a visitor received the new
+page. Fetch the public URL to verify it.
+
+The npm server (8.6.8+) exposes `wordpress_read_change_target`,
+`wordpress_create_pending_change`, `wordpress_get_pending_change`,
+`wordpress_list_pending_changes`, `wordpress_approve_pending_change`,
+`wordpress_reject_pending_change`, `wordpress_undo_pending_change` and
+`wordpress_expire_pending_changes` (also listed with the `respira_` prefix).
+The native endpoint exposes the same eight operations as `respira_wordpress_*`.
+In wp-admin, proposals appear in **Respira → Activity → Approval queue** for
+individual review.
+
 ### Create a new page with a Publish only key
 
 From plugin 9.2.12, use the existing creation endpoint:
@@ -199,8 +304,8 @@ the returned page through `PUT /respira/v2/pages/{id}` and set its SEO there.
 Review it, then call `POST /respira/v2/duplicates/{id}/approve` with its current
 `content_version` as `expected_version`. Approval publishes the new page at
 the same ID, with `approval_mode: "publish_new_page"`. The version is required
-for this path and force-publishing is refused. Menus and redirects remain
-outside this key's permissions.
+for this path and force-publishing is refused. Direct menu and redirect writes
+remain outside this key's permissions; use pending changes for those targets.
 
 ### List pages
 
