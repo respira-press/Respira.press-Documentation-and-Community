@@ -1,6 +1,6 @@
 ---
 title: "Team Accounts"
-description: "Put more than one person on a single Respira account: which plans include Teams, the three permissions, the 30 free days per person, and how a seat in use is billed at €10 a month."
+description: "Put more than one person on a single Respira account: which plans include Teams, the three permissions, joining by company email, the 30 free days per person, and how a seat in use is billed at €10 a month."
 ---
 
 # Team Accounts
@@ -44,6 +44,22 @@ A member's token keeps that member's own user id for revocation and audit, while
 ## Inviting people
 
 Invitations are sent by email from the Team page of the dashboard. Each member's edits appear in the team audit log under their own identity, so you can see who changed what across every connected site.
+
+## Joining by company email
+
+Instead of inviting each person, an owner or administrator can let everyone at the company join on their own. On the Team page, under **Join by company email**, add the domain your team's addresses use, for example `yourcompany.com`. From then on, anyone who signs in to respira.press with a verified address on that domain joins your team with the **Edit** permission, and can open Respira on the team's sites within a few minutes. Nobody has to send an invitation.
+
+A few rules keep this safe:
+
+- **Only your own domain.** You can add a domain that you, the owner or an administrator of the team has an email address on. Each domain can belong to one team only.
+- **No public email providers.** Domains such as gmail.com, outlook.com or icloud.com are refused, because anyone can have an address there.
+- **Verified addresses only.** A person joins after signing in with a magic link or with Google, which proves they own the address.
+- **Removed means removed.** Someone you removed from the team is never added back automatically. To bring them back, invite them again.
+- **Edit, not more.** People who join get the Edit permission. Change it on the Team page like any other seat.
+
+Each person who joins is a normal team seat, with the same 30 free days and the same €10 for a month in use described below. On Founder and Founder Studio Plus, seats are included, so joining costs nothing. Joining by company email is not available on Maker and legacy Starter.
+
+Removing a domain stops new people from joining. Everyone who already joined stays on the team until you remove them. Every join, and every domain added or removed, appears in the team trail.
 
 ## 30 free days for each person
 
