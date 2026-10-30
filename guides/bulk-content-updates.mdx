@@ -1,62 +1,132 @@
 ---
 title: "Bulk Content Updates"
-description: "Safely update many pages/posts with AI using Respira: inventory content, define rules, apply changes to duplicates, and approve in batches."
+description: "Update hundreds of WordPress pages with AI using Respira: preview with a dry run, run up to 100 pages at a time, and restore any page from its snapshot."
 ---
 
 # Bulk Content Updates
 
-Use Respira to apply consistent updates across many pages/posts without risking your live site.
+To change many WordPress pages with AI, list the pages, write one exact rule, preview it with a dry run, then run it in batches of up to 100 pages. Respira takes a snapshot of each page before it writes, so any page can be put back on its own.
 
-## Recommended Workflow
+The right tool depends on where the content is stored and how many pages you are changing.
 
-## Step 1: Inventory what exists
+## Pick the tool
+
+| The job | Tool | Where the write lands |
+|---|---|---|
+| Change text across many pages whose content is in the WordPress editor field | `wordpress_bulk_pages_operation` | On the page itself, after a snapshot |
+| Change several elements on one builder page | `wordpress_batch_update` | On a draft duplicate by default |
+| Change one page or post | [wordpress_update_page](/tools/pages/update-page) or [wordpress_update_post](/tools/posts/update-post) | On a draft duplicate by default |
+| Change one module on a builder page | [wordpress_update_module](/tools/builders/update-module) | On a draft duplicate by default |
+
+<Callout kind="alert">
+`wordpress_bulk_pages_operation` does not create duplicates. It changes the pages themselves, so the dry run is your review step and the snapshots are your way back.
+</Callout>
+
+## Check where your content lives first
+
+`find_and_replace` and the first pass of `strip_inline_styles` work on `post_content`, the WordPress editor field.
+
+- **Works:** the block editor, the classic editor, and builders that keep their content in that field, such as Divi and WPBakery.
+- **Does not match:** builders that keep their content in post meta, such as Elementor and Bricks. A `find_and_replace` run reports `No matches found in post content` on those pages and changes nothing.
+
+For those builders, make the change page by page with [wordpress_extract_builder_content](/tools/builders/extract-content), [wordpress_find_element](/tools/builders/find-element) and `wordpress_batch_update`.
+
+## The workflow
+
+### Step 1: Inventory what exists
 
 - Pages: [wordpress_list_pages](/tools/pages/list-pages)
 - Posts: [wordpress_list_posts](/tools/posts/list-posts)
 
-## Step 2: Define exact rules (avoid ambiguity)
+Save the list of IDs. It defines the scope of the run, and it is the list you will check at the end.
 
-Examples:
+### Step 2: Write one exact rule
 
-- Replace all occurrences of “Book a call” with “Schedule a call”
-- Update footer address everywhere
-- Change CTA button text from “Learn More” → “Get Started”
+Good rules name the exact text:
 
-<Callout kind="info">
-When doing bulk edits, be extremely explicit about what should change and what must not change. Ask the AI to show a summary before applying edits.
-</Callout>
+- Replace "Book a call" with "Schedule a call"
+- Replace the old street address with the new one
+- Change the button text "Learn More" to "Get Started"
 
-## Step 3: Use duplicates (default safety)
+"Make the calls to action stronger" is not a rule. It needs a decision on each page, so use the single-page tools and review each draft.
 
-For each page/post update, Respira creates a draft duplicate. You approve the batch after review.
+### Step 3: Preview with a dry run
 
-- Pages: [wordpress_update_page](/tools/pages/update-page)
-- Posts: [wordpress_update_post](/tools/posts/update-post)
+```json
+{
+  "page_ids": [12, 45, 78],
+  "operation": {
+    "type": "find_and_replace",
+    "options": { "find": "Book a call", "replace": "Schedule a call" }
+  },
+  "options": { "dry_run": true }
+}
+```
 
-## Step 4: Prefer module-level updates for builder sites
+A dry run writes nothing, takes no snapshot and does not count against the rate limit. Each page comes back with the status `preview` and the number of matches. Read those numbers. A page with far more matches than you expected usually means the phrase also appears somewhere you did not intend.
 
-If your site uses a page builder, module updates are safer than replacing full page HTML:
+### Step 4: Run it
 
-- [wordpress_extract_builder_content](/tools/builders/extract-content)
-- [wordpress_update_module](/tools/builders/update-module)
+Send the same call without `dry_run`. The tool is marked destructive, so the first call may answer with `respira_approval_required` and a one-time token. That question is for the person: the agent shows the predicted effect, asks, and sends the token back only after a yes.
 
-## Step 5: Verify
+Each page in the result reports its status, its changes and its `snapshot_id`. A failure on one page does not stop the others, so check `failed` as well as `succeeded`.
 
-Re-run checks after updates:
+### Step 5: Verify
+
+Open a few of the changed pages, then re-run your checks:
 
 - SEO: [wordpress_check_seo_issues](/tools/analysis/check-seo-issues)
 - Readability: [wordpress_analyze_readability](/tools/analysis/analyze-readability)
 
-## Example Bulk Update Prompt
+To undo a page, restore the snapshot named in its result with `wordpress_restore_snapshot`.
 
-```text
-I want to update 10 pages safely.
+## Limits, and how to plan around them
 
-1) List all published pages and identify the ones that contain the phrase “Book a call”.
-2) For each matching page, create a safe update that replaces ONLY that phrase with “Schedule a call”.
-3) Do not change anything else. Keep the rest of the HTML and formatting identical.
-4) Return a summary of pages changed (page ID + old snippet + new snippet).
-5) Then apply the updates using Respira’s duplicate-first workflow.
+- **100 pages per call.** More than that is refused.
+- **20 write runs per hour, per API key.** Dry runs do not count.
+- **One write run at a time.** A second run is refused with `respira_bulk_in_progress` until the first finishes.
+
+At those limits the most a single key can write is 2,000 pages an hour. For thousands of pages, split the IDs into batches of 100 and check the first batch before you send the rest.
+
+Several replacements in one call use one run:
+
+```json
+{
+  "page_ids": [12, 45, 78],
+  "operation": {
+    "type": "find_and_replace",
+    "options": {
+      "find": ["Book a call", "Learn More"],
+      "replace": ["Schedule a call", "Get Started"]
+    }
+  }
+}
 ```
 
+Replacements apply in order, so a later one sees the result of an earlier one. A replacement with no matches is not an error: it reports 0 occurrences. Set `"regex": true` in the options to treat each `find` as a regular expression.
 
+## What happens to each page
+
+1. Respira takes a snapshot of the page.
+2. It applies the operation.
+3. It reads the page back and compares the stored content with what it meant to write. If they differ, it puts the original content back and marks that page as failed.
+4. After the whole run, it purges caches once.
+
+## Example prompt
+
+```text
+I want to replace "Book a call" with "Schedule a call" across my WordPress pages.
+
+1) List all published pages.
+2) Run wordpress_bulk_pages_operation as a dry run on those page IDs.
+3) Show me a table of page ID, title and number of matches. Stop there.
+4) After I say yes, run it for real in batches of 100.
+5) Show me which pages changed, which failed, and each snapshot ID.
+
+Change nothing else. If a page uses Elementor or Bricks, list it separately instead of editing it.
+```
+
+## See also
+
+- [Multi-Site Management](/guides/multi-site-management)
+- [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients)
