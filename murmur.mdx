@@ -42,7 +42,7 @@ They can also see the requests already made on that page and whether each one is
 
 ## What you get
 
-- The request appears in your dashboard under [Feedback](https://www.respira.press/dashboard/feedback), marked as a request, with the page and the spot.
+- The request appears in your dashboard under [Murmur.link](https://www.respira.press/dashboard/feedback), in the Inbox, marked as a request, with the page and the spot.
 - The first request on a link sends you an email. Later ones on the same link arrive in an hourly digest.
 - In Respira AER, the `/reviews` card lists open notes and requests by page.
 - Your agent reads them with `respira_list_review_comments` (pass `kind: "request"` to list only requests), applies each one on a draft of the page, and marks it resolved. You approve the draft before anything is live.
@@ -62,6 +62,8 @@ A split test shows two versions of one page to real visitors and counts which on
 - **A** is the published page, as it is now.
 - **B** is a draft copy of that page, made by Respira and changed by your agent.
 
+Split tests need Respira plugin 9.2.28 and MCP server 8.7.1, or later, on the Builder plan and up.
+
 ### Start one
 
 Ask your AI app:
@@ -69,6 +71,10 @@ Ask your AI app:
 > On the Contact page, try a shorter form and a bigger phone button against the page that is live now. Count the thank-you page and phone taps.
 
 The agent makes a draft copy of the page with `respira_create_page_duplicate`, changes the copy, and starts the test with `respira_start_split_test`. It tells you what counts as a win, when the test is planned to end, and what was done about the site's caches. The live page does not change.
+
+If the page has one open draft copy, the agent can leave B out and that copy is used. If it has several, the agent asks you which one is B.
+
+In Respira AER, type the same request in the chat.
 
 When you start a test you choose:
 
@@ -119,7 +125,13 @@ A test keeps running until a person decides, even after its planned end. Past th
 To end it, tell your agent what you decided. It calls `respira_end_split_test` with one of two decisions:
 
 - **Keep A.** A stays live for everyone. B stays a draft and is not deleted, so you can keep it for later or delete it yourself.
-- **Make B live.** B goes live in place of A through the same approval every draft copy takes. The agent asks you first, and a snapshot of the page is saved before the change, so restoring it puts A back.
+- **Make B live.** B goes live in place of A through the same approval every draft copy takes. The agent asks you first, and a snapshot of the page is saved before the change, so restoring it puts A back. If A was changed after B was made, the publish stops unless you tell the agent to overwrite that change. If publishing B is refused, the test keeps running.
+
+### In the dashboard
+
+Every test on your sites is listed under **Murmur.link** in the dashboard sidebar, on the [Split tests](https://www.respira.press/dashboard/feedback?view=splits) tab: the page, the site, when it started and is due, its status, the wins and rate for A and B, and how likely B is really better, with the result in words below each row.
+
+A test that is still open has two buttons. **Keep A** ends it and leaves B a draft. **Make B live** asks once more, "Yes, publish B", and then publishes B in place of A. With more than one site, pick a site to see only its tests.
 
 ### Caches
 
