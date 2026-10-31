@@ -13,7 +13,8 @@ Bricks is the only builder they work on today. On any other builder both tools a
 
 | Name | Type | Required | What it is |
 |---|---|---|---|
-| `template_id` | number | no | The template to report, with conflicts. Leave it out to list every template with where it applies. |
+| `template_id` | number or string | no | The template to report, with conflicts. Leave it out to list every template with where it applies. |
+| `builder` | string | no | Only when several builders run on the site: which one to read. |
 
 Each template comes back with:
 
@@ -34,13 +35,20 @@ This changes the live site at once, so ask the person first.
 
 | Name | Type | Required | What it is |
 |---|---|---|---|
-| `template_id` | number | yes | The template to change. |
+| `template_id` | number or string | yes | The template to change. |
+| `builder` | string | no | Required when several builders with template conditions run on the site. |
 | `conditions` | array | yes | Neutral entries, the whole list you want. |
 | `confirm_live_edit` | boolean | yes | True once the person has agreed. Without it the answer is 409 and nothing is written. |
 | `remove_unmapped` | array | no | `native_index` values of unmapped rows the person agreed to lose. |
 | `clear_conditions` | boolean | no | Required with an empty list. A header or footer with no conditions becomes the default on the whole site. |
 
-The write is refused on Observe, on a read-only connection and on the Content, SEO and publishing profile, over REST and over the native endpoint.
+Flags must be real booleans. A template takes at most 100 conditions, and one condition at most 500 ids or terms.
+
+Sending the same call twice runs it twice, so changing a template back and forth takes effect each time. To make a retry safe after a timeout, send the same `_respira_call_id`.
+
+Each successful write and undo adds a row to the site's Activity log with the template id.
+
+The write is refused on the Observe and Content site profiles, and on read-only, Builder and Content, SEO and publishing keys, over REST and over the native endpoint. A full access key on an Everything site can use it.
 
 ## Neutral entries
 
@@ -91,9 +99,13 @@ Respira requests real pages after the write and looks for the template in them.
 |---|---|
 | `true` | The requested pages match the conditions. |
 | `false` | At least one does not, or a page failed to render. Look at `pages`, then undo. |
-| `null` | It could not check, and `reason` says why. It is not a pass. |
+| `null` | Respira could not read at least one page: blocked, redirected to another host, or no way to identify the template. `reason` says why. It is not a pass. |
 
 A page cache in front of the site can keep serving the old header or footer until it is purged. Use `wordpress_purge_cache` if visitors still see the old one.
+
+## An open builder tab can overwrite this
+
+Bricks sends every template setting each time someone saves, so a builder tab that was already open still holds the old conditions and writes them back on its next save. Bricks does not mark a template as open, so Respira cannot detect that tab. Tell the person to close any open tab of this template, or to reload it before saving. The answer repeats this in `stale_tab_warning`.
 
 ## Undo
 
@@ -109,5 +121,6 @@ A row saved in a shape Bricks cannot read also lands in `unmapped`, with the rea
 
 - Bricks only for now. Tested on Bricks 2.3.4 and 2.4.3.
 - Conflicts are checked on sample pages, not every page.
+- A template password never leaves through a read, and Respira does not write template settings through a page or post `meta` field.
 - Not tested with WPML.
 - A read-only key made before 9.3.1 keeps the tool list it was made with, so it needs replacing to read conditions. A full access key is not affected.
