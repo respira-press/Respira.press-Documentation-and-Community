@@ -675,6 +675,11 @@
                 "icon": "upload"
               },
               {
+                "title": "Template conditions",
+                "path": "tools/builders/template-conditions",
+                "icon": "layout"
+              },
+              {
                 "title": "wordpress_update_module",
                 "path": "tools/builders/update-module",
                 "icon": "sliders"
