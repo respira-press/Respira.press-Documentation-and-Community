@@ -1,0 +1,141 @@
+---
+title: "Template conditions"
+description: "Read and set where a site template applies, on Bricks, Divi, Breakdance, Oxygen, Beaver Themer, Avada, YOOtheme, Brizy and block themes, with the builder's own logic deciding which template wins."
+---
+
+# Template conditions
+
+`wordpress_get_template_conditions` and `wordpress_set_template_conditions` read and change where a site template shows: which pages get this header, this footer, this archive layout. They need plugin 9.3.1 or later.
+
+They work on the builders below. On any other builder both tools answer `supported: false`, name what is missing, and do nothing. That answer says nothing about the site's templates.
+
+| Builder | Checked with real page requests on | Notes |
+|---|---|---|
+| Bricks | 2.3.4 and 2.4 | |
+| Divi | 4.27.8 and 5.13 | Divi 4 covers child categories under a category; Divi 5.13 matches the exact term only. `template_settings` switches a template off and sets its header, body and footer. |
+| Breakdance | 2.8.3 (free) | Pro archive rules have not run on a real Pro licence yet. |
+| Oxygen 6 | 6.1.1 | |
+| Oxygen classic | 4.9.6 and 4.9.7 | `exclude` and `ids` are refused, because Oxygen never reads them when it picks a template. More than one term needs `match_all_terms: true`. Create the template in Oxygen first: Oxygen only registers templates for a signed-in user. |
+| Beaver Themer | 1.5.3 on Beaver Builder 2.11.1 | No `front_page` location: use the page id or `blog`. |
+| Avada | 7.16.2 | |
+| YOOtheme Pro | 5.0.50 | One page type per template, no excludes, no single pages. |
+| Brizy (free) | 2.8.16 | Brizy ignores an exclusion of a category archive, an author archive or the posts page beside an entire-site include, so Respira refuses that pair by name. With Brizy Pro active, the tools stand aside. |
+| Block themes | Twenty Twenty-Five | The template's slug is its condition, so a move renames a saved template (`moved_to`). A theme file is never touched. |
+
+Elementor Pro, Brizy Pro, GeneratePress Premium, Kadence Pro, Thrive Theme Builder, Blocksy Pro and SeedProd Pro answer that they are not supported yet.
+
+## wordpress_get_template_conditions
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `template_id` | number or string | no | The template to report, with conflicts. Leave it out to list every template with where it applies. |
+| `builder` | string | no | Only when several builders run on the site: which one to read. |
+
+Each template comes back with:
+
+| Field | What it is |
+|---|---|
+| `where_applies` | One sentence for a person. |
+| `neutral` | The conditions in shared words, the shape the write takes. |
+| `unmapped` | Native conditions with no shared word, each with its raw value and the reason. |
+| `raw` | The builder's own value, untouched. |
+| `conflicts` | With `template_id`: other templates that match the same sample pages, and which one wins. |
+| `checked` | With `template_id`: the sample pages, with whether this template applies and wins on each. |
+
+The builder itself decides who wins. The check runs on sample pages taken from the template's conditions, not on every page of the site, and the answer says so in `conflicts_note`.
+
+## wordpress_set_template_conditions
+
+This changes the live site at once, so ask the person first.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `template_id` | number or string | yes | The template to change. |
+| `builder` | string | no | Required when several builders with template conditions run on the site, for example Oxygen or Breakdance beside a block theme. |
+| `conditions` | array | yes | Neutral entries, the whole list you want. |
+| `confirm_live_edit` | boolean | yes | True once the person has agreed. Without it the answer is 409 and nothing is written. |
+| `remove_unmapped` | array | no | `native_index` values of unmapped rows the person agreed to lose. |
+| `clear_conditions` | boolean | no | Required with an empty list, and only counts with an empty list. What an empty list means depends on the builder; the answer says it. |
+
+Flags must be real booleans. A list that leaves out an existing exclusion is refused with `would_drop_exclusions`, so pages kept out of a template stay out unless the person agrees. Sending back a read unchanged writes nothing. A template takes at most 100 conditions, and one condition at most 500 ids or terms.
+
+Sending the same call twice runs it twice, so changing a template back and forth takes effect each time. To make a retry safe after a timeout, send the same `_respira_call_id`.
+
+Each successful write and undo adds a row to the site's Activity log with the template id.
+
+The write is refused on the Observe and Content site profiles, and on read-only, Builder and Content, SEO and publishing keys, over REST and over the native endpoint. A full access key on an Everything site can use it.
+
+## Neutral entries
+
+Every entry has a `kind` and can have `exclude: true`.
+
+| Kind | Fields | What it matches |
+|---|---|---|
+| `entire_site` | | Every page. |
+| `front_page` | | The front page. |
+| `post_type` | `post_types` | Single posts of those types. |
+| `post_type_archive` | `post_types` | Those archive pages. Leave `post_types` out for every post type. |
+| `ids` | `ids`, `include_children` | Those posts or pages, and their children if asked. |
+| `term` | `applies_to`, `terms`, `all_terms`, `include_children` | `posts_with_term` is posts carrying the term. `term_archive` is the term's own archive page. |
+| `author` | | Author archives. |
+| `date` | | Date archives. |
+| `search` | | Search results. |
+| `404` | | The 404 page. |
+
+`terms` is a list like `[{"taxonomy": "category", "term_id": 4}]`. On `term_archive`, `{"taxonomy": "post_tag", "all_terms": true}` means every term of that taxonomy.
+
+Some builders have no `blog` condition; Bricks is one, so there use `ids` with the posts page's id. Anything a builder cannot express is refused by name and nothing is written.
+
+## Example
+
+Show this header on every page except two:
+
+```json
+{
+  "name": "wordpress_set_template_conditions",
+  "arguments": {
+    "template_id": 591,
+    "confirm_live_edit": true,
+    "conditions": [
+      { "kind": "post_type", "post_types": ["page"] },
+      { "kind": "ids", "ids": [583, 582], "exclude": true }
+    ]
+  }
+}
+```
+
+The answer carries `snapshot_uuid`, the template as it now stands, and `render_check`.
+
+## What render_check means
+
+Respira requests real pages after the write and looks for the template in them.
+
+| `confirmed` | Meaning |
+|---|---|
+| `true` | The requested pages match the conditions. |
+| `false` | At least one does not, or a page failed to render. Look at `pages`, then undo. |
+| `null` | Respira could not read at least one page: blocked, redirected to another host, or no way to identify the template. `reason` says why. It is not a pass. |
+
+A page cache in front of the site can keep serving the old header or footer until it is purged. Use `wordpress_purge_cache` if visitors still see the old one.
+
+## An open builder tab can overwrite this
+
+On Bricks, the builder sends every template setting each time someone saves, so a builder tab that was already open still holds the old conditions and writes them back on its next save. Bricks does not mark a template as open, so Respira cannot detect that tab. Tell the person to close any open tab of this template, or to reload it before saving. The answer repeats this in `stale_tab_warning`.
+
+## Undo
+
+Call `wordpress_restore_snapshot` with the `snapshot_uuid` from the answer. It puts the conditions back as they were, byte for byte, and changes no other setting on the template.
+
+## Conditions from other plugins
+
+A condition Respira has no word for stays where it is. It shows up in `unmapped`, and a write leaves it untouched unless you name it in `remove_unmapped`. That includes Bricks' All archives, which can be kept but not created through this tool.
+
+A row saved in a shape Bricks cannot read also lands in `unmapped`, with the reason. On Bricks 2.3.4 a `postType` saved as a string takes down every post and page, so if you see that reason, tell the person and remove the row.
+
+## Limits
+
+- The builders and versions in the table above.
+- Conflicts are checked on sample pages, not every page.
+- A Bricks template password and Breakdance or Oxygen custom PHP never leave through a read, and Respira does not write template settings through a page or post `meta` field.
+- Not tested with WPML.
+- A read-only key made before 9.3.1 keeps the tool list it was made with, so it needs replacing to read conditions. A full access key is not affected.
