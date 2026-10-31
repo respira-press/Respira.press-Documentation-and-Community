@@ -1,0 +1,113 @@
+---
+title: "Template conditions"
+description: "Read and set where a site template applies, with the builder's own logic deciding which template wins. Bricks for now."
+---
+
+# Template conditions
+
+`wordpress_get_template_conditions` and `wordpress_set_template_conditions` read and change where a site template shows: which pages get this header, this footer, this archive layout. They need plugin 9.3.1 or later.
+
+Bricks is the only builder they work on today. On any other builder both tools answer `supported: false` and do nothing. That answer says nothing about the site's templates.
+
+## wordpress_get_template_conditions
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `template_id` | number | no | The template to report, with conflicts. Leave it out to list every template with where it applies. |
+
+Each template comes back with:
+
+| Field | What it is |
+|---|---|
+| `where_applies` | One sentence for a person. |
+| `neutral` | The conditions in shared words, the shape the write takes. |
+| `unmapped` | Native conditions with no shared word, each with its raw value and the reason. |
+| `raw` | The builder's own value, untouched. |
+| `conflicts` | With `template_id`: other templates that match the same sample pages, and which one wins. |
+| `checked` | With `template_id`: the sample pages, with whether this template applies and wins on each. |
+
+Bricks itself decides who wins. The check runs on sample pages taken from the template's conditions, not on every page of the site, and the answer says so in `conflicts_note`.
+
+## wordpress_set_template_conditions
+
+This changes the live site at once, so ask the person first.
+
+| Name | Type | Required | What it is |
+|---|---|---|---|
+| `template_id` | number | yes | The template to change. |
+| `conditions` | array | yes | Neutral entries, the whole list you want. |
+| `confirm_live_edit` | boolean | yes | True once the person has agreed. Without it the answer is 409 and nothing is written. |
+| `remove_unmapped` | array | no | `native_index` values of unmapped rows the person agreed to lose. |
+| `clear_conditions` | boolean | no | Required with an empty list. A header or footer with no conditions becomes the default on the whole site. |
+
+The write is refused on Observe, on a read-only connection and on the Content, SEO and publishing profile, over REST and over the native endpoint.
+
+## Neutral entries
+
+Every entry has a `kind` and can have `exclude: true`.
+
+| Kind | Fields | What it matches |
+|---|---|---|
+| `entire_site` | | Every page. |
+| `front_page` | | The front page. |
+| `post_type` | `post_types` | Single posts of those types. |
+| `post_type_archive` | `post_types` | Those archive pages. Leave `post_types` out for every post type. |
+| `ids` | `ids`, `include_children` | Those posts or pages, and their children if asked. |
+| `term` | `applies_to`, `terms`, `all_terms`, `include_children` | `posts_with_term` is posts carrying the term. `term_archive` is the term's own archive page. |
+| `author` | | Author archives. |
+| `date` | | Date archives. |
+| `search` | | Search results. |
+| `404` | | The 404 page. |
+
+`terms` is a list like `[{"taxonomy": "category", "term_id": 4}]`. On `term_archive`, `{"taxonomy": "post_tag", "all_terms": true}` means every term of that taxonomy.
+
+Bricks has no `blog` condition. Its blog is the posts page, so use `ids` with that page's id. Anything Bricks cannot express is refused by name and nothing is written.
+
+## Example
+
+Show this header on every page except two:
+
+```json
+{
+  "name": "wordpress_set_template_conditions",
+  "arguments": {
+    "template_id": 591,
+    "confirm_live_edit": true,
+    "conditions": [
+      { "kind": "post_type", "post_types": ["page"] },
+      { "kind": "ids", "ids": [583, 582], "exclude": true }
+    ]
+  }
+}
+```
+
+The answer carries `snapshot_uuid`, the template as it now stands, and `render_check`.
+
+## What render_check means
+
+Respira requests real pages after the write and looks for the template in them.
+
+| `confirmed` | Meaning |
+|---|---|
+| `true` | The requested pages match the conditions. |
+| `false` | At least one does not, or a page failed to render. Look at `pages`, then undo. |
+| `null` | It could not check, and `reason` says why. It is not a pass. |
+
+A page cache in front of the site can keep serving the old header or footer until it is purged. Use `wordpress_purge_cache` if visitors still see the old one.
+
+## Undo
+
+Call `wordpress_restore_snapshot` with the `snapshot_uuid` from the answer. It puts the conditions back as they were, byte for byte, and changes no other setting on the template.
+
+## Conditions from other plugins
+
+A condition Respira has no word for stays where it is. It shows up in `unmapped`, and a write leaves it untouched unless you name it in `remove_unmapped`. That includes Bricks' All archives. It can be kept but not created through this tool.
+
+A row saved in a shape Bricks cannot read also lands in `unmapped`, with the reason. On Bricks 2.3.4 a `postType` saved as a string takes down every post and page, so if you see that reason, tell the person and remove the row.
+
+## Limits
+
+- Bricks only for now. Tested on Bricks 2.3.4 and 2.4.3.
+- Conflicts are checked on sample pages, not every page.
+- Not tested with WPML.
+- A read-only key made before 9.3.1 keeps the tool list it was made with, so it needs replacing to read conditions. A full access key is not affected.
