@@ -1,9 +1,9 @@
 ---
-title: Host blocks the browser connector (nginx 403 on an automated user agent)
-description: When the browser or ChatGPT connector fails at sign-in but the local connectors work, your host may be blocking Claude's automated user agent at the origin. How to confirm it, and the one fix.
+title: Host blocks the browser connector (nginx 403)
+description: "When the browser or ChatGPT connector fails at sign-in but the local connectors work, your host may be blocking Claude's automated user agent at the origin…"
 ---
 
-# Host blocks the browser connector (nginx 403 on an automated user agent)
+## Host blocks the browser connector (nginx 403 on an automated user agent)
 
 Some managed hosts (WP Engine is the common one) block automated HTTP clients at the origin server, before the request ever reaches WordPress or the Respira plugin. Claude's servers fetch your site's sign-in files identifying as `python-httpx`, and a host that blocks that user agent returns a plain `403 Forbidden` from nginx. The browser connector then fails at the very first step, so it never reaches the sign-in screen.
 
