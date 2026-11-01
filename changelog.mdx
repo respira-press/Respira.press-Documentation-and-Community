@@ -52,6 +52,27 @@ Not a WP-CLI replacement. WP-CLI is excellent for server-side WordPress administ
 
 ## WordPress Plugin Releases
 
+<Update label="2026-10-30" description="Respira for WordPress v9.2.28 + MCP Server 8.7.1: Murmur split tests, two versions of one page shown to half the visitors each" tags={["release", "murmur", "split-tests"]}>
+
+### What's New in v9.2.28
+
+**Murmur split tests**
+- Ask your agent to test a page. It makes a draft copy (B), changes it, and starts the test. Half the visitors see the published page (A) and half see B, at the same address, and each keeps the version they first saw.
+- A win is a visit to the thank-you page after a form, a tap on a phone number link, or both, and each visitor wins at most once. Editors, search engines and other bots, page builder editors and anyone opening a review or share link always see A and are never counted.
+- The result comes back in words, for example "B is ahead: 93% likely it is really better. Another week gives a firmer answer."
+- Nothing ends by itself. A test runs 1 to 90 days, 14 by default, and past that date it keeps counting until a person decides: keep A, and B stays a draft, or make B live through the normal approval, with a snapshot first.
+- While a test runs the page is never cached: WP Rocket, LiteSpeed, W3 Total Cache, WP Super Cache, WP Fastest Cache, Cache Enabler, SiteGround Optimizer, Hummingbird, Breeze and Cloudflare are handled. NitroPack needs the page added to its excluded URLs by hand.
+- One running test per page. Starting a test and making B live need a key whose WordPress user is an administrator. Part of Murmur, on the Builder plan and up.
+- Every test is listed in the dashboard under Murmur.link, on the [Split tests](https://www.respira.press/dashboard/feedback?view=splits) tab. See [Murmur](/murmur#split-tests).
+
+**Also in this release**
+- Clearing the Cloudflare cache through the Cloudflare plugin now really clears it. Respira used to report the page cleared while nothing was.
+
+**MCP Server 8.7.1**
+- `respira_start_split_test`, `respira_get_split_test`, `respira_list_split_tests` and `respira_end_split_test`.
+
+</Update>
+
 <Update label="2026-10-15" description="Respira for WordPress v9.2.6 + MCP Server 8.6.1: Avada, Divi inserts that leave the rest of the page alone, chunked builds, Divi 5.15, Elementor 4.3" tags={["release", "avada", "divi", "elementor", "builders", "safety"]}>
 
 ### What's New in v9.2.6

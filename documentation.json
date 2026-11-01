@@ -217,7 +217,7 @@
                 "icon": "graduation-cap"
               },
               {
-                "title": "Murmur: Review and Request Links",
+                "title": "Murmur: Review Links, Request Links and Split Tests",
                 "path": "murmur",
                 "icon": "message-square"
               },
@@ -673,6 +673,11 @@
                 "title": "wordpress_inject_builder_content",
                 "path": "tools/builders/inject-content",
                 "icon": "upload"
+              },
+              {
+                "title": "Template conditions",
+                "path": "tools/builders/template-conditions",
+                "icon": "layout"
               },
               {
                 "title": "wordpress_update_module",
