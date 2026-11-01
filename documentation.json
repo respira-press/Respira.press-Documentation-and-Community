@@ -1,5 +1,5 @@
 {
-  "name": "Respira for WordPress Documentation",
+  "name": "Respira Docs",
   "initialRoute": "introduction",
   "colors": {
     "light": {
@@ -917,6 +917,11 @@
                 "title": "Divi 4 to Divi 5 Migration Guide",
                 "path": "guides/divi-4-to-divi-5",
                 "icon": "list-checks"
+              },
+              {
+                "title": "REST Route Fallback",
+                "path": "guides/rest-route-fallback",
+                "icon": "refresh-cw"
               },
               {
                 "title": "Host Blocks the Browser Connector",
