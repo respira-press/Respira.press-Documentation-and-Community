@@ -229,6 +229,339 @@
             ]
           },
           {
+            "group": "Guides",
+            "icon": "map",
+            "pages": [
+              {
+                "title": "SEO Audit Workflow",
+                "path": "guides/seo-audit-workflow",
+                "icon": "search"
+              },
+              {
+                "title": "Bulk Content Updates",
+                "path": "guides/bulk-content-updates",
+                "icon": "layers"
+              },
+              {
+                "title": "Multi-Site Management",
+                "path": "guides/multi-site-management",
+                "icon": "globe"
+              },
+              {
+                "title": "Team Workflows",
+                "path": "guides/team-workflows",
+                "icon": "users"
+              },
+              {
+                "title": "Divi 4 to Divi 5 Migration Guide",
+                "path": "guides/divi-4-to-divi-5",
+                "icon": "list-checks"
+              },
+              {
+                "title": "REST Route Fallback",
+                "path": "guides/rest-route-fallback",
+                "icon": "refresh-cw"
+              },
+              {
+                "title": "Host Blocks the Browser Connector",
+                "path": "guides/host-user-agent-block",
+                "icon": "shield-off"
+              },
+              {
+                "title": "Plan mode for MCP clients",
+                "path": "guides/plan-mode-for-mcp-clients",
+                "icon": "list-checks"
+              }
+            ]
+          },
+          {
+            "group": "Toolkits",
+            "icon": "wrench",
+            "pages": [
+              {
+                "title": "Divi 5 Migration Copilot",
+                "path": "toolkits/divi-5-migration-copilot",
+                "icon": "bot"
+              },
+              {
+                "title": "Migration Readiness Report",
+                "path": "toolkits/divi-5-migration-readiness-report",
+                "icon": "file-scan"
+              },
+              {
+                "title": "Divi 5 Migration Prompt Pack",
+                "path": "toolkits/divi-5-migration-prompt-pack",
+                "icon": "clipboard-type"
+              }
+            ]
+          },
+          {
+            "group": "Security",
+            "icon": "lock",
+            "pages": [
+              {
+                "title": "How It Works",
+                "path": "security/how-it-works",
+                "icon": "shield"
+              },
+              {
+                "title": "API Key Management",
+                "path": "security/api-key-management",
+                "icon": "key"
+              },
+              {
+                "title": "OAuth sign-in",
+                "path": "security/oauth-sign-in",
+                "icon": "log-in"
+              },
+              {
+                "title": "Undo and verifying a restore",
+                "path": "security/verified-undo",
+                "icon": "rotate-ccw"
+              },
+              {
+                "title": "Usage limits",
+                "path": "security/usage-limits",
+                "icon": "gauge"
+              },
+              {
+                "title": "Audit Logging",
+                "path": "security/audit-logging",
+                "icon": "clipboard-list"
+              },
+              {
+                "title": "Data Privacy",
+                "path": "security/data-privacy",
+                "icon": "eye-off"
+              },
+              {
+                "title": "Security scan",
+                "path": "security/security-scan",
+                "icon": "radar"
+              },
+              {
+                "title": "Guarded plugin update",
+                "path": "security/guarded-plugin-update",
+                "icon": "shield-check"
+              },
+              {
+                "title": "Owner approval",
+                "path": "security/owner-approval",
+                "icon": "user-check"
+              }
+            ]
+          },
+          {
+            "group": "Reference",
+            "icon": "book",
+            "pages": [
+              {
+                "title": "Error Codes",
+                "path": "reference/error-codes",
+                "icon": "alert-octagon"
+              }
+            ]
+          },
+          {
+            "group": "WooCommerce Add-on",
+            "icon": "shopping-cart",
+            "pages": [
+              {
+                "title": "Overview",
+                "path": "woocommerce/overview",
+                "icon": "book-open"
+              },
+              {
+                "title": "Agent-Ready Commerce",
+                "path": "woocommerce/agent-ready-commerce"
+              },
+              {
+                "title": "Installation",
+                "path": "woocommerce/installation",
+                "icon": "download"
+              },
+              {
+                "title": "Safety Features",
+                "path": "woocommerce/safety",
+                "icon": "shield"
+              },
+              {
+                "title": "Tools Reference",
+                "path": "woocommerce/tools",
+                "icon": "wrench"
+              },
+              {
+                "title": "Example Prompts",
+                "path": "woocommerce/prompts",
+                "icon": "zap"
+              },
+              {
+                "title": "Troubleshooting",
+                "path": "woocommerce/troubleshooting",
+                "icon": "alert-triangle"
+              }
+            ]
+          },
+          {
+            "group": "Respira ARC (free)",
+            "icon": "store",
+            "pages": [
+              {
+                "title": "Respira ARC",
+                "path": "arc",
+                "icon": "gift"
+              }
+            ]
+          },
+          {
+            "group": "Support",
+            "icon": "help-circle",
+            "pages": [
+              {
+                "title": "Getting Support",
+                "path": "support/getting-support",
+                "icon": "life-buoy"
+              },
+              {
+                "title": "Troubleshooting",
+                "path": "troubleshooting",
+                "icon": "alert-circle"
+              },
+              {
+                "title": "Divi 5 Troubleshooting",
+                "path": "troubleshooting/divi-5",
+                "icon": "alert-triangle"
+              },
+              {
+                "title": "FAQ",
+                "path": "support/faq",
+                "icon": "help-circle"
+              },
+              {
+                "title": "Contact",
+                "path": "support/contact",
+                "icon": "mail"
+              }
+            ]
+          },
+          {
+            "group": "Page Builders",
+            "icon": "layout-template",
+            "pages": [
+              {
+                "title": "Overview",
+                "path": "builders/overview",
+                "icon": "book-open"
+              },
+              {
+                "title": "Divi (Divi 4 + Divi 5)",
+                "path": "builders/divi",
+                "icon": "layout"
+              },
+              {
+                "title": "Divi 5 Support",
+                "path": "builders/divi-5",
+                "icon": "grid-2x2"
+              },
+              {
+                "title": "Elementor",
+                "path": "builders/elementor",
+                "icon": "layout"
+              },
+              {
+                "title": "Bricks",
+                "path": "builders/bricks",
+                "icon": "layout"
+              },
+              {
+                "title": "Oxygen",
+                "path": "builders/oxygen",
+                "icon": "layout"
+              },
+              {
+                "title": "Gutenberg",
+                "path": "builders/gutenberg",
+                "icon": "layout"
+              },
+              {
+                "title": "Site Editor (FSE)",
+                "path": "builders/site-editor",
+                "icon": "layout"
+              },
+              {
+                "title": "WPBakery",
+                "path": "builders/wpbakery",
+                "icon": "layout"
+              },
+              {
+                "title": "Beaver Builder",
+                "path": "builders/beaver-builder",
+                "icon": "layout"
+              },
+              {
+                "title": "Brizy",
+                "path": "builders/brizy",
+                "icon": "layout"
+              },
+              {
+                "title": "Visual Composer",
+                "path": "builders/visual-composer",
+                "icon": "layout"
+              },
+              {
+                "title": "Thrive Architect",
+                "path": "builders/thrive-architect",
+                "icon": "layout"
+              },
+              {
+                "title": "Breakdance",
+                "path": "builders/breakdance",
+                "icon": "layout"
+              },
+              {
+                "title": "Flatsome",
+                "path": "builders/flatsome",
+                "icon": "layout"
+              },
+              {
+                "title": "YOOtheme Pro",
+                "path": "builders/yootheme",
+                "icon": "layout"
+              },
+              {
+                "title": "Avada",
+                "path": "builders/avada",
+                "icon": "layout"
+              },
+              {
+                "title": "Spectra",
+                "path": "builders/spectra",
+                "icon": "layout"
+              },
+              {
+                "title": "Kadence Blocks",
+                "path": "builders/kadence-blocks",
+                "icon": "layout"
+              },
+              {
+                "title": "GenerateBlocks",
+                "path": "builders/generateblocks",
+                "icon": "layout"
+              },
+              {
+                "title": "SeedProd",
+                "path": "builders/seedprod",
+                "icon": "layout"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Tools",
+        "icon": "wrench",
+        "groups": [
+          {
             "group": "Context & Site Intelligence",
             "icon": "info",
             "pages": [
@@ -891,333 +1224,6 @@
                 "title": "wordpress_flush_rewrites",
                 "path": "tools/other/flush-rewrites",
                 "icon": "refresh-cw"
-              }
-            ]
-          },
-          {
-            "group": "Guides",
-            "icon": "map",
-            "pages": [
-              {
-                "title": "SEO Audit Workflow",
-                "path": "guides/seo-audit-workflow",
-                "icon": "search"
-              },
-              {
-                "title": "Bulk Content Updates",
-                "path": "guides/bulk-content-updates",
-                "icon": "layers"
-              },
-              {
-                "title": "Multi-Site Management",
-                "path": "guides/multi-site-management",
-                "icon": "globe"
-              },
-              {
-                "title": "Team Workflows",
-                "path": "guides/team-workflows",
-                "icon": "users"
-              },
-              {
-                "title": "Divi 4 to Divi 5 Migration Guide",
-                "path": "guides/divi-4-to-divi-5",
-                "icon": "list-checks"
-              },
-              {
-                "title": "REST Route Fallback",
-                "path": "guides/rest-route-fallback",
-                "icon": "refresh-cw"
-              },
-              {
-                "title": "Host Blocks the Browser Connector",
-                "path": "guides/host-user-agent-block",
-                "icon": "shield-off"
-              },
-              {
-                "title": "Plan mode for MCP clients",
-                "path": "guides/plan-mode-for-mcp-clients",
-                "icon": "list-checks"
-              }
-            ]
-          },
-          {
-            "group": "Toolkits",
-            "icon": "wrench",
-            "pages": [
-              {
-                "title": "Divi 5 Migration Copilot",
-                "path": "toolkits/divi-5-migration-copilot",
-                "icon": "bot"
-              },
-              {
-                "title": "Migration Readiness Report",
-                "path": "toolkits/divi-5-migration-readiness-report",
-                "icon": "file-scan"
-              },
-              {
-                "title": "Divi 5 Migration Prompt Pack",
-                "path": "toolkits/divi-5-migration-prompt-pack",
-                "icon": "clipboard-type"
-              }
-            ]
-          },
-          {
-            "group": "Security",
-            "icon": "lock",
-            "pages": [
-              {
-                "title": "How It Works",
-                "path": "security/how-it-works",
-                "icon": "shield"
-              },
-              {
-                "title": "API Key Management",
-                "path": "security/api-key-management",
-                "icon": "key"
-              },
-              {
-                "title": "OAuth sign-in",
-                "path": "security/oauth-sign-in",
-                "icon": "log-in"
-              },
-              {
-                "title": "Undo and verifying a restore",
-                "path": "security/verified-undo",
-                "icon": "rotate-ccw"
-              },
-              {
-                "title": "Usage limits",
-                "path": "security/usage-limits",
-                "icon": "gauge"
-              },
-              {
-                "title": "Audit Logging",
-                "path": "security/audit-logging",
-                "icon": "clipboard-list"
-              },
-              {
-                "title": "Data Privacy",
-                "path": "security/data-privacy",
-                "icon": "eye-off"
-              },
-              {
-                "title": "Security scan",
-                "path": "security/security-scan",
-                "icon": "radar"
-              },
-              {
-                "title": "Guarded plugin update",
-                "path": "security/guarded-plugin-update",
-                "icon": "shield-check"
-              },
-              {
-                "title": "Owner approval",
-                "path": "security/owner-approval",
-                "icon": "user-check"
-              }
-            ]
-          },
-          {
-            "group": "Reference",
-            "icon": "book",
-            "pages": [
-              {
-                "title": "Error Codes",
-                "path": "reference/error-codes",
-                "icon": "alert-octagon"
-              }
-            ]
-          },
-          {
-            "group": "WooCommerce Add-on",
-            "icon": "shopping-cart",
-            "pages": [
-              {
-                "title": "Overview",
-                "path": "woocommerce/overview",
-                "icon": "book-open"
-              },
-              {
-                "title": "Agent-Ready Commerce",
-                "path": "woocommerce/agent-ready-commerce"
-              },
-              {
-                "title": "Installation",
-                "path": "woocommerce/installation",
-                "icon": "download"
-              },
-              {
-                "title": "Safety Features",
-                "path": "woocommerce/safety",
-                "icon": "shield"
-              },
-              {
-                "title": "Tools Reference",
-                "path": "woocommerce/tools",
-                "icon": "wrench"
-              },
-              {
-                "title": "Example Prompts",
-                "path": "woocommerce/prompts",
-                "icon": "zap"
-              },
-              {
-                "title": "Troubleshooting",
-                "path": "woocommerce/troubleshooting",
-                "icon": "alert-triangle"
-              }
-            ]
-          },
-          {
-            "group": "Respira ARC (free)",
-            "icon": "store",
-            "pages": [
-              {
-                "title": "Respira ARC",
-                "path": "arc",
-                "icon": "gift"
-              }
-            ]
-          },
-          {
-            "group": "Support",
-            "icon": "help-circle",
-            "pages": [
-              {
-                "title": "Getting Support",
-                "path": "support/getting-support",
-                "icon": "life-buoy"
-              },
-              {
-                "title": "Troubleshooting",
-                "path": "troubleshooting",
-                "icon": "alert-circle"
-              },
-              {
-                "title": "Divi 5 Troubleshooting",
-                "path": "troubleshooting/divi-5",
-                "icon": "alert-triangle"
-              },
-              {
-                "title": "FAQ",
-                "path": "support/faq",
-                "icon": "help-circle"
-              },
-              {
-                "title": "Contact",
-                "path": "support/contact",
-                "icon": "mail"
-              }
-            ]
-          },
-          {
-            "group": "Page Builders",
-            "icon": "layout-template",
-            "pages": [
-              {
-                "title": "Overview",
-                "path": "builders/overview",
-                "icon": "book-open"
-              },
-              {
-                "title": "Divi (Divi 4 + Divi 5)",
-                "path": "builders/divi",
-                "icon": "layout"
-              },
-              {
-                "title": "Divi 5 Support",
-                "path": "builders/divi-5",
-                "icon": "grid-2x2"
-              },
-              {
-                "title": "Elementor",
-                "path": "builders/elementor",
-                "icon": "layout"
-              },
-              {
-                "title": "Bricks",
-                "path": "builders/bricks",
-                "icon": "layout"
-              },
-              {
-                "title": "Oxygen",
-                "path": "builders/oxygen",
-                "icon": "layout"
-              },
-              {
-                "title": "Gutenberg",
-                "path": "builders/gutenberg",
-                "icon": "layout"
-              },
-              {
-                "title": "Site Editor (FSE)",
-                "path": "builders/site-editor",
-                "icon": "layout"
-              },
-              {
-                "title": "WPBakery",
-                "path": "builders/wpbakery",
-                "icon": "layout"
-              },
-              {
-                "title": "Beaver Builder",
-                "path": "builders/beaver-builder",
-                "icon": "layout"
-              },
-              {
-                "title": "Brizy",
-                "path": "builders/brizy",
-                "icon": "layout"
-              },
-              {
-                "title": "Visual Composer",
-                "path": "builders/visual-composer",
-                "icon": "layout"
-              },
-              {
-                "title": "Thrive Architect",
-                "path": "builders/thrive-architect",
-                "icon": "layout"
-              },
-              {
-                "title": "Breakdance",
-                "path": "builders/breakdance",
-                "icon": "layout"
-              },
-              {
-                "title": "Flatsome",
-                "path": "builders/flatsome",
-                "icon": "layout"
-              },
-              {
-                "title": "YOOtheme Pro",
-                "path": "builders/yootheme",
-                "icon": "layout"
-              },
-              {
-                "title": "Avada",
-                "path": "builders/avada",
-                "icon": "layout"
-              },
-              {
-                "title": "Spectra",
-                "path": "builders/spectra",
-                "icon": "layout"
-              },
-              {
-                "title": "Kadence Blocks",
-                "path": "builders/kadence-blocks",
-                "icon": "layout"
-              },
-              {
-                "title": "GenerateBlocks",
-                "path": "builders/generateblocks",
-                "icon": "layout"
-              },
-              {
-                "title": "SeedProd",
-                "path": "builders/seedprod",
-                "icon": "layout"
               }
             ]
           }
