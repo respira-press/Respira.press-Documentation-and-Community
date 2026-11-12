@@ -370,6 +370,8 @@ Instead of downloading the entire page JSON, an agent can target individual widg
 
 With `preserve_tokens` (on by default), colour custom properties declared on `:root` become Elementor global colours, and the converted content links to them. Colours the site already has are never overwritten. Other tokens, such as sizes, stay as values and are reported as unmapped. For whole HTML files, see [Respira Exhale](https://www.respira.press/exhale).
 
+A document styled by the Tailwind CDN script (the Play CDN or the Tailwind 4 browser build) has its CSS compiled on respira.press from its own Tailwind setup before it converts, from plugin 9.3.13; the report says `tailwind_compiled`. Send such a page as it is. See [Tailwind to WordPress](https://www.respira.press/tailwind-to-wordpress).
+
 ### 7.x
 
 - **Elementor v4 (Atomic) writes (7.1.0).** `respira_update_element`, `respira_inject_builder_content` and `respira_build_page` write the 9 Atomic widgets and 11 layout elements, with per-breakpoint and per-state styles.
