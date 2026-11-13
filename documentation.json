@@ -268,6 +268,11 @@
                 "icon": "shield-off"
               },
               {
+                "title": "Cloudflare and Cloudflare Access",
+                "path": "guides/cloudflare-allowlist",
+                "icon": "cloud"
+              },
+              {
                 "title": "Plan mode for MCP clients",
                 "path": "guides/plan-mode-for-mcp-clients",
                 "icon": "list-checks"
