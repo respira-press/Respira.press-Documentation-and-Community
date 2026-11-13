@@ -1,6 +1,6 @@
 ---
 title: Cloudflare allowlist for Respira routes
-description: Configure Cloudflare so its security rules do not block the Respira plugin's REST routes. The literal rule expression to allowlist is included.
+description: Configure Cloudflare so its security rules or Cloudflare Access do not block the Respira plugin's REST routes. The literal rule expression and the Access bypass are included.
 ---
 
 # Cloudflare allowlist for Respira routes
@@ -30,6 +30,46 @@ and not (http.request.uri.path contains "/wp-json/respira/")
 If your block rule uses an OR-of-AND structure, add the negation to each branch. If you maintain the rule via Terraform or the API, the same expression goes into the `expression` field after the existing predicates.
 
 After saving, wait 30 seconds for Cloudflare to propagate, then re-run `respira_diagnose_connection`. The `write_method_blocked` field should flip to `false` and `edge_hints.cloudflare` will still show the cf-ray header (Cloudflare is still in front of the site, but it now passes Respira traffic through).
+
+## A site behind Cloudflare Access (Zero Trust)
+
+Cloudflare Access is a different gate from the WAF rules above. It puts a Cloudflare sign-in page in front of a site, or part of one, so only people who sign in reach it. A person can pass that page; an AI agent cannot. When Access covers `/wp-json/`, no AI client can connect to the site: Claude, ChatGPT, Cursor, Hermes Agent or the Respira MCP server all get the sign-in page instead of WordPress.
+
+The plugin can still look healthy. Its own check-in goes out from the site to respira.press, which Access does not gate, so the dashboard shows the site as recently seen while every agent request fails.
+
+### How to confirm it
+
+Request a Respira address from outside the site:
+
+```bash
+curl -sI https://your-site.example/wp-json/respira/v1/mcp
+```
+
+Access answers with a redirect to your Access team's sign-in page instead of a response from WordPress:
+
+```text
+HTTP/2 302
+location: https://your-team.cloudflareaccess.com/cdn-cgi/access/login/your-site.example?...
+set-cookie: CF_AppSession=...
+```
+
+### The fix: a bypass for Respira's path only
+
+In the Cloudflare Zero Trust dashboard, under Access, Applications:
+
+1. Add a self-hosted application for your site's domain, with the path `wp-json/respira`.
+2. Give it one policy with the action **Bypass**, including **Everyone**.
+3. Save, then run the `curl` above again. It should answer from WordPress, such as a 401 when no key is sent, instead of redirecting.
+
+Access applies the application with the most specific path, so the rest of the site stays behind your sign-in. The opening is only for Respira's own namespace, and Respira checks its own key or OAuth token on every request to it, so a request without your site's Respira key is still refused.
+
+If you connect an AI client by OAuth (claude.ai, ChatGPT), the client also reads `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server` at the root of the site. If Access covers the whole domain, add those two paths to the same bypass application.
+
+Respira's clients do not send Cloudflare Access service-token headers, so a service-token policy does not work for them. The path bypass above is the supported setup.
+
+### Check the origin too
+
+A site that is private while it is being built often has a second gate on the server itself: a host firewall, a country block or a security plugin that answers 403 to everyone outside. If `curl` returns `403 Forbidden` from your web server (the body names LiteSpeed, nginx or Apache rather than Cloudflare) after the bypass is in place, ask your host to allow `/wp-json/respira/` as well.
 
 ## Why this happens
 
