@@ -36,6 +36,20 @@ Make sure you have:
 3. Go to **Plugins** in WordPress Admin
 4. Find **Respira for WordPress** and click **Activate**
 
+### Upload says the file is too large
+
+Some hosts cap uploads at 2 MB, and WordPress then stops with "The uploaded file exceeds the upload_max_filesize directive in php.ini." The Respira zip is about 6.5 MB. Any of these gets it in:
+
+- **The small installer.** Download [respira-installer.zip](https://www.respira.press/downloads/respira-installer.zip) (about 10 KB), upload it under **Plugins → Add New → Upload Plugin** and activate it. It opens **Install Respira** with one button: your server downloads Respira from respira.press, checks it against the sha256 checksum respira.press publishes, installs and activates it, then removes the installer. The upload limit does not apply to downloads the server makes itself. If your host blocks outgoing requests, the installer says so and lists the routes below.
+- **Raise the limit.** Ask your host to set `upload_max_filesize` and `post_max_size` to 16M, then upload the zip again.
+- **WP-CLI.** On the server, run:
+
+  ```bash
+  wp plugin install "https://www.respira.press/api/plugin-updates/download?plugin=respira-for-wordpress" --activate
+  ```
+
+- **SFTP.** Unzip `respira-for-wordpress-x.x.x.zip` on your computer and upload the `respira-for-wordpress` folder to `wp-content/plugins/respira-for-wordpress/`, then activate it under **Plugins**.
+
 <Callout kind="info">
 **Locked-down hosting?** If your WordPress database user does not have `CREATE TABLE` / `ALTER TABLE` privileges (common on managed enterprise hosting and some compliance-locked shared hosts), the activation hook can't provision Respira's three tables and the setup wedges at the API key step. See [Manual table provisioning](/troubleshooting/manual-install) for the workaround: a one-time SQL bundle your DBA can run via phpMyAdmin / wp-cli / mysql client. Your WordPress user never needs elevated privileges, before or after.
 </Callout>
