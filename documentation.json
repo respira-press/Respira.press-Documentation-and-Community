@@ -59,6 +59,11 @@
                 "icon": "download"
               },
               {
+                "title": "Respira Code",
+                "path": "respira-code",
+                "icon": "code"
+              },
+              {
                 "title": "Configuration",
                 "path": "configuration",
                 "icon": "settings"

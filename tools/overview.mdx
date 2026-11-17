@@ -1,13 +1,13 @@
 ---
 title: "Tools Reference"
-description: "Reference for Respira's MCP tools in the 33 categories of the public catalog: pages, posts, builders, YOOtheme Pro, redirects, snapshots, menus, SEO analysis…"
+description: "Reference for Respira's MCP tools in the 34 categories of the public catalog: pages, posts, builders, YOOtheme Pro, redirects, snapshots, menus, SEO analysis…"
 ---
 
 ## Tools Reference
 
 Every plan includes 300+ tools (302 on 17 November 2026). The paid [WooCommerce add-on](/woocommerce/overview) adds 104 more, which makes 400+ with the add-on (406). Those two figures count each tool once, whether it is offered through the MCP server or as a WordPress Ability.
 
-The [public tools catalog](https://www.respira.press/tools) lists more entries than that: 498 tools in 33 categories on 17 November 2026. It is longer because it also includes the tools that appear only where they apply:
+The [public tools catalog](https://www.respira.press/tools) lists more entries than that: 508 tools in 34 categories on 17 November 2026. It is longer because it also includes the tools that appear only where they apply:
 
 - 54 ACF tools, only when Advanced Custom Fields is active
 - 25 Bricks tools, only on Bricks
@@ -16,6 +16,7 @@ The [public tools catalog](https://www.respira.press/tools) lists more entries t
 - 6 Yoast SEO tools, only when Yoast SEO is active
 - 4 YOOtheme Pro template tools, only on YOOtheme Pro
 - 3 Blocksy tools, only on the Blocksy theme
+- 10 Respira Code tools, only on a site with the Respira Code add-on
 
 The catalog is counted from the code on every release, so it is the place to check the current numbers. This page follows the same categories. Tool names here use the `wordpress_` prefix, as the catalog does; an MCP client lists the same tools as `respira_*`.
 
@@ -442,6 +443,21 @@ Connection diagnosis, server compatibility, cache purge, and listing and running
 - `wordpress_list_updates`
 - `wordpress_run_updates`
 
+### Respira Code (10 tools)
+
+Tools of the [Respira Code](/respira-code) add-on: deploy, roll back, read and pull apps, a guarded SQL query and write, the site brief and the developer-access check. Listed only on a site that has the add-on, and the add-on refuses a call from a key without developer access.
+
+- `wordpress_app_deploy`
+- `wordpress_app_rollback`
+- `wordpress_app_status`
+- `wordpress_app_logs`
+- `wordpress_app_pull`
+- `wordpress_db_query`
+- `wordpress_db_write`
+- `wordpress_site_brief`
+- `wordpress_code_status`
+- `wordpress_wp_api_search`
+
 ### Memory, Skills & Playbooks (12 tools)
 
 Playbooks, notes the agent keeps for a site, and the site's own skills: instructions for agents kept under Respira > AI Skills (new in 9.1). See [Playbooks](/playbooks) and [Site Skills](/site-skills).
@@ -532,7 +548,8 @@ One wordpress.org plugin, one advisory, with a restore point before, four health
 | Updates & Site Health | 5 | 3 | 2 |
 | Memory, Skills & Playbooks | 12 | 5 | 7 |
 | Other | 17 | 7 | 10 |
-| **Total** | **498** | **208** | **290** |
+| Respira Code | 10 | 7 | 3 |
+| **Total** | **508** | **215** | **293** |
 
 > This table follows the public catalog. Some categories are listed only when the matching builder, plugin or add-on is present, so the total is higher than what a single site sees. Read-only counts the tools that only read; Write counts every tool that can change the site.
 
@@ -556,7 +573,7 @@ Starting in v5.2.0, the MCP server lists every core tool under its `respira_*` n
 
 ### How many tools does Respira have?
 
-Every plan includes 300+ tools (302 on 17 November 2026), and 400+ with the WooCommerce add-on (406). The public catalog lists 498 entries in 33 categories, because it also counts the tools that appear only on a site that runs ACF, Bricks, Elementor, Avada, Yoast SEO, YOOtheme Pro or Blocksy. One site sees fewer than the catalog, depending on its builder and plugins. The [live tools catalog](https://www.respira.press/tools) is counted from the code on every release.
+Every plan includes 300+ tools (302 on 17 November 2026), and 400+ with the WooCommerce add-on (406). The public catalog lists 508 entries in 34 categories, because it also counts the tools that appear only on a site that runs the Respira Code add-on, ACF, Bricks, Elementor, Avada, Yoast SEO, YOOtheme Pro or Blocksy. One site sees fewer than the catalog, depending on its builder and plugins. The [live tools catalog](https://www.respira.press/tools) is counted from the code on every release.
 
 ### What's the difference between read-only and write tools?
 
