@@ -53,28 +53,27 @@ After restarting MCP and confirming the license and plugin status, you should se
 
 ## License activation failed
 
-License activation fails or MCP reports an invalid license key.
+The add-on is inactive, or MCP reports a license or subscription error.
 
 ### Symptoms
 
-- The license field in **WP Admin → Respira → WooCommerce** shows an error after activation.
+- The add-on does not become active after you install it.
 - MCP shows license or subscription errors when you try to use WooCommerce tools.
 - Tools previously available are now disabled with a licensing message.
 
 ### Likely causes
 
-- The full license key was not copied, or extra whitespace was included.
-- The subscription is not active in LemonSqueezy.
-- The site URL in WordPress does not match the site URL attached to the subscription.
-- The license has been used on a different site than the one configured.
+- The Respira plugin on this site is not connected to your Respira account, or its licence has ended.
+- Your plan does not include the add-on and you have not subscribed to it (Maker and Builder pay €95/year; Studio and Founder include it).
+- The add-on subscription has ended.
+- The site cannot reach respira.press. The add-on keeps working for 3 days after the last check that confirmed the licence, then goes inactive.
 
 ### Steps to fix
 
-- Copy the license key again from your purchase email or LemonSqueezy, and paste it into the license field without spaces before or after it.
-- Log into LemonSqueezy and confirm the WooCommerce add-on subscription is active.
-- Compare the **WordPress Address (URL)** and **Site Address (URL)** in **Settings → General** with the site URL shown in your LemonSqueezy subscription.
-- If the site URL changed (for example, from staging to production), update the URL in your subscription or deactivate the license on the old site.
-- Try activating the license again in **WP Admin → Respira → WooCommerce**.
+- Open [Billing](https://www.respira.press/dashboard/billing) and confirm the WooCommerce add-on shows as active.
+- In WordPress, confirm the Respira plugin is connected to your account (**Respira → Setup**).
+- Compare the **WordPress Address (URL)** and **Site Address (URL)** in **Settings → General** with the site shown under Sites in your dashboard. If the site address changed, for example from staging to production, connect the site again.
+- The add-on checks again by itself within 10 minutes while it is inactive, so wait a little after fixing the cause.
 
 <Callout kind="alert">
 

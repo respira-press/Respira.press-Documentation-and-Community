@@ -18,6 +18,6 @@ Common mistakes:
 
 Docs:
 
-- [Quick Start Guide](https://docs.respira.press/quick-start-guide)
-- [Safety Philosophy](https://docs.respira.press/safety-philosophy)
-- [Create Page Duplicate](https://docs.respira.press/tools/pages/create-duplicate)
+- [Quick Start Guide](https://www.respira.press/docs/quick-start-guide)
+- [Safety Philosophy](https://www.respira.press/docs/safety-philosophy)
+- [Create Page Duplicate](https://www.respira.press/docs/tools/pages/create-duplicate)

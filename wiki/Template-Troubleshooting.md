@@ -69,7 +69,7 @@ Conflicts with:
 
 ## If This Doesn't Work
 
-- Check: [Official docs troubleshooting page](https://docs.respira.press/troubleshooting)
+- Check: [Official docs troubleshooting page](https://www.respira.press/docs/troubleshooting)
 - Ask: [GitHub Discussions](https://github.com/respira-press/Respira.press-Documentation-and-Community/discussions)
 - Report: [GitHub Issues](https://github.com/respira-press/Respira.press-Documentation-and-Community/issues) (if it's a bug)
 
