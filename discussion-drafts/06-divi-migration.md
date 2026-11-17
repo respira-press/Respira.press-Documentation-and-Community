@@ -40,6 +40,6 @@ Format as actionable steps.
 
 Docs:
 
-- [Divi 4 to Divi 5 Migration Guide](https://docs.respira.press/guides/divi-4-to-divi-5)
-- [Divi 5 Migration Prompt Pack](https://docs.respira.press/toolkits/divi-5-migration-prompt-pack)
-- [Divi 5 Migration Readiness Report](https://docs.respira.press/toolkits/divi-5-migration-readiness-report)
+- [Divi 4 to Divi 5 Migration Guide](https://www.respira.press/docs/guides/divi-4-to-divi-5)
+- [Divi 5 Migration Prompt Pack](https://www.respira.press/docs/toolkits/divi-5-migration-prompt-pack)
+- [Divi 5 Migration Readiness Report](https://www.respira.press/docs/toolkits/divi-5-migration-readiness-report)

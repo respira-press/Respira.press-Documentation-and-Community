@@ -118,5 +118,5 @@ REPO=respira-press/Respira.press-Documentation-and-Community node scripts/publis
 
 - [ ] `https://github.com/respira-press/Respira.press-Documentation-and-Community` loads
 - [ ] Discussions tab visible
-- [ ] docs.respira.press still works (Documentation.ai may need repo re-link)
+- [ ] www.respira.press/docs still works (Documentation.ai may need repo re-link)
 - [ ] Redirect: `github.com/respira-press/Respira.press-Documentation-and-Community` → `github.com/respira-press/Respira.press-Documentation-and-Community` (GitHub provides this automatically for a while)

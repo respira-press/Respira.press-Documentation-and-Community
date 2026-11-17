@@ -1,36 +1,32 @@
 ---
 title: "Tools Reference"
-description: "Reference for Respira's MCP tools in the 30 categories of the public catalog: pages, posts, builders, YOOtheme Pro, redirects, snapshots, menus, SEO analysis…"
+description: "Reference for Respira's MCP tools in the 33 categories of the public catalog: pages, posts, builders, YOOtheme Pro, redirects, snapshots, menus, SEO analysis…"
 ---
 
 ## Tools Reference
 
-As of plugin 9.2.3 and MCP server 8.5.0 (npm `@respira/wordpress-mcp-server`), the MCP server lists **252 core tools, 356 with the WooCommerce add-on**. 91 more tools come from modules that list them where they apply:
+Every plan includes 300+ tools (302 on 17 November 2026). The paid [WooCommerce add-on](/woocommerce/overview) adds 104 more, which makes 400+ with the add-on (406). Those two figures count each tool once, whether it is offered through the MCP server or as a WordPress Ability.
+
+The [public tools catalog](https://www.respira.press/tools) lists more entries than that: 498 tools in 33 categories on 17 November 2026. It is longer because it also includes the tools that appear only where they apply:
 
 - 54 ACF tools, only when Advanced Custom Fields is active
 - 25 Bricks tools, only on Bricks
 - 8 tools from the Elementor module: 7 only on Elementor, and `respira_add_stock_image`, which every site sees
+- 11 Avada tools, only on Avada
+- 6 Yoast SEO tools, only when Yoast SEO is active
 - 4 YOOtheme Pro template tools, only on YOOtheme Pro
+- 3 Blocksy tools, only on the Blocksy theme
 
-The [public tools catalog](https://www.respira.press/tools) counts all of them: 447 tools in 30 categories. It is counted from the code on every release, so it is the place to check the current numbers. This page follows the same categories. Tool names here use the `wordpress_` prefix, as the catalog does; an MCP client lists the same tools as `respira_*`.
+The catalog is counted from the code on every release, so it is the place to check the current numbers. This page follows the same categories. Tool names here use the `wordpress_` prefix, as the catalog does; an MCP client lists the same tools as `respira_*`.
 
 ## What one site sees
 
-A site sees fewer tools than the catalog, because the server lists only the tools for the site's builder and plugins. Measured `tools/list` counts:
-
-| Site | Tools listed |
-|------|--------------|
-| Core, on Gutenberg | 253 |
-| Core, with ACF | 307 |
-| With the WooCommerce add-on | 357 |
-| YOOtheme Pro site | 257 |
-| WooCommerce and ACF, on Elementor | 418 |
-| WooCommerce and ACF, on Bricks | 436 (the most one site can see) |
+A site sees fewer tools than the catalog, because the server lists only the tools for the site's builder and plugins. A Gutenberg site without WooCommerce, ACF or a builder module sees the core tools only. Turning on the WooCommerce add-on, ACF or a builder module adds its tools. A tool switched off in Respira under Tools, or hidden by a key's profile, does not appear either. Ask your client for its tool list to see the exact number for a site.
 
 ## Other surfaces
 
-- **The site's own MCP endpoint**, used by the claude.ai and ChatGPT connectors, lists 353 tools named `respira_wordpress_*`. 10 of them are only there. They are listed further down this page.
-- **WordPress Abilities**: the plugin registers 360. Across the MCP server and the abilities that makes 366 distinct tools and abilities (360+), or 262 (260+) without the paid WooCommerce add-on.
+- **The site's own MCP endpoint**, used by the claude.ai and ChatGPT connectors, names the tools `respira_wordpress_*`. A few tools exist only there and not on the npm server, among them the guarded update tools. They are listed further down this page.
+- **WordPress Abilities**: the plugin registers 400 abilities, so browser AI can reach almost every tool.
 
 ## Tool Categories
 
@@ -101,7 +97,7 @@ Register custom post types and work with their posts.
 - [wordpress_update_custom_post](/tools/custom-posts/update-custom-post)
 - [wordpress_delete_custom_post](/tools/custom-posts/delete-custom-post)
 
-### Media (7 tools)
+### Media (9 tools)
 
 Upload, read, update and delete media, update many items in one call, and import an image from a URL into the Media Library.
 
@@ -112,6 +108,8 @@ Upload, read, update and delete media, update many items in one call, and import
 - `wordpress_update_media_batch`
 - [wordpress_delete_media](/tools/media/delete-media)
 - `wordpress_sideload_image`
+- `wordpress_request_upload`
+- `wordpress_transform_media`
 
 ### Menus (14 tools)
 
@@ -197,7 +195,7 @@ Experimental plugin management: list, install, activate, deactivate, update and 
 - [wordpress_update_plugin](/tools/plugins/update-plugin)
 - [wordpress_delete_plugin](/tools/plugins/delete-plugin)
 
-### Page Builder Core (19 tools)
+### Page Builder Core (25 tools)
 
 Work directly with page builder structures (Divi, Elementor, Bricks, YOOtheme Pro and the rest): detect the builder, extract and inject content, patch it, convert HTML into native builder elements, and find, update, move, duplicate, remove and reorder single elements (new in 5.2).
 
@@ -220,6 +218,12 @@ Work directly with page builder structures (Divi, Elementor, Bricks, YOOtheme Pr
 - `wordpress_batch_update`
 - `wordpress_reorder_elements`
 - `wordpress_convert_html_to_builder`
+- `wordpress_get_template_conditions`
+- `wordpress_set_template_conditions`
+- `wordpress_duplicate_theme_builder_template`
+- `wordpress_get_theme_builder_template`
+- `wordpress_reject_theme_builder_template`
+- `wordpress_apply_theme_builder_template`
 
 The three Divi Theme Builder tools, new in 7.6, discover and edit Divi's global Theme Builder templates (headers, footers and body layouts), not only regular pages: list the templates on a site, edit a header in place (for example to build a mega menu), or create a new global template with page assignments. Every edit is snapshot-protected. Divi 5.
 
@@ -249,6 +253,41 @@ Listed only when YOOtheme Pro is the site's builder. A YOOtheme template is a bu
 - [wordpress_get_yootheme_template](/tools/yootheme/get-yootheme-template)
 - [wordpress_create_yootheme_template](/tools/yootheme/create-yootheme-template)
 - [wordpress_update_yootheme_template](/tools/yootheme/update-yootheme-template)
+
+### Avada (11 tools)
+
+Avada design system, Layouts and Library: read and change the global colour palette and typography sets through Avada's own Global Options, list, read, create and change Layouts and Layout Sections (header, page title bar, content, footer) with their conditions, and read Library items with the exact piece to place in a page. Listed only on sites that use it.
+
+- `wordpress_get_avada_design_system`
+- `wordpress_update_avada_design_system`
+- `wordpress_list_avada_layouts`
+- `wordpress_get_avada_layout`
+- `wordpress_create_avada_layout`
+- `wordpress_update_avada_layout`
+- `wordpress_get_avada_layout_section`
+- `wordpress_create_avada_layout_section`
+- `wordpress_update_avada_layout_section`
+- `wordpress_list_avada_library`
+- `wordpress_get_avada_library_item`
+
+### Yoast SEO (6 tools)
+
+Yoast SEO, read and written through Yoast's own APIs: what Yoast holds and prints for a post, page, custom post or term (title, description, robots, canonical, social cards, the schema graph, breadcrumbs, scores, internal link counts, sitemap inclusion), term SEO, and the Search Appearance templates and noindex settings. Listed only on sites that use it.
+
+- `wordpress_get_yoast_seo`
+- `wordpress_update_yoast_term_seo`
+- `wordpress_get_yoast_search_appearance`
+- `wordpress_update_yoast_search_appearance`
+- `wordpress_get_yoast_settings`
+- `wordpress_update_yoast_settings`
+
+### Blocksy (3 tools)
+
+Blocksy theme design system, read and written through Blocksy's own Customizer settings: the global colour palette and the CSS variable each slot prints, the base, heading and button typography, container width and spacing, and a read-only summary of the Header and Footer Builder. Listed only on sites that use it.
+
+- `wordpress_get_blocksy_design_system`
+- `wordpress_update_blocksy_color_palette`
+- `wordpress_update_blocksy_typography`
 
 ### Advanced Custom Fields (58 tools) <span style={{color: '#10b981'}}>NEW in 6.6</span>
 
@@ -286,7 +325,7 @@ Read-only analysis of SEO, readability, performance, images, structured data and
 - `wordpress_scan_page_accessibility`
 - `wordpress_apply_accessibility_fixes`
 
-### Safety & Approvals (14 tools)
+### Safety & Approvals (23 tools)
 
 Snapshots, rollback, sessions, plan mode, duplicate approval and owner approval links. Every write in a plan-mode session answers a proposed step instead of changing the site; the person reads the plan and one call applies it (new in 9.1). See [Plan mode for MCP clients](/guides/plan-mode-for-mcp-clients).
 
@@ -304,6 +343,15 @@ Snapshots, rollback, sessions, plan mode, duplicate approval and owner approval 
 - [respira_discard_plan](/tools/other/discard-plan)
 - `wordpress_create_approval_link`
 - `wordpress_revoke_approval_link`
+- `wordpress_read_change_target`
+- `wordpress_create_pending_change`
+- `wordpress_get_pending_change`
+- `wordpress_list_pending_changes`
+- `wordpress_approve_pending_change`
+- `wordpress_reject_pending_change`
+- `wordpress_undo_pending_change`
+- `wordpress_expire_pending_changes`
+- `wordpress_propose_status_change`
 
 ### Theme Docs (2 tools)
 
@@ -356,7 +404,7 @@ Design tokens (the Site Editor's global styles), saved design directions, design
 - [wordpress_mint_design_preview](/tools/other/mint-design-preview)
 - `wordpress_get_design_apply_reports`
 
-### Divi Presets & Library (7 tools)
+### Divi Presets & Library (8 tools)
 
 Divi presets, the Divi Library and the Divi 5 migration readiness report.
 
@@ -367,8 +415,9 @@ Divi presets, the Divi Library and the Divi 5 migration readiness report.
 - `wordpress_save_divi_library_item`
 - `wordpress_apply_divi_library_item`
 - `wordpress_resolve_divi_preset`
+- `wordpress_classify_divi_posts`
 
-### Security (7 tools)
+### Security (11 tools)
 
 Security audit, core security updates, theme updates, revoking an application password, quarantining a plugin and flushing rewrite rules.
 
@@ -379,6 +428,9 @@ Security audit, core security updates, theme updates, revoking an application pa
 - [wordpress_quarantine_plugin](/tools/plugins/quarantine-plugin)
 - [wordpress_restore_quarantined_plugin](/tools/plugins/restore-quarantined-plugin)
 - [wordpress_flush_rewrites](/tools/other/flush-rewrites)
+- `wordpress_list_backups`
+- `wordpress_get_backup_status`
+- `wordpress_get_backup_restore_link`
 
 ### Updates & Site Health (5 tools)
 
@@ -407,7 +459,7 @@ Playbooks, notes the agent keeps for a site, and the site's own skills: instruct
 - [respira_write_skill](/tools/context/write-skill) (write, only when the user asked)
 - [respira_delete_skill](/tools/context/delete-skill) (write, approval-gated)
 
-### Other (12 tools)
+### Other (17 tools)
 
 Abilities from other plugins, WPML translations, theme files, issue reports and token redemption. The WPML tools (new in 7.6) create and update translations: a created translation joins the page's existing language group so WPML treats it as a real translation, and the builder content is carried across into the new copy.
 
@@ -423,10 +475,16 @@ Abilities from other plugins, WPML translations, theme files, issue reports and 
 - `wordpress_append_theme_file`
 - `wordpress_report_issue`
 - `wordpress_redeem_token`
+- `wordpress_update_translation_strings`
+- `wordpress_get_front_page`
+- `wordpress_switch_front_page`
+- `wordpress_list_code_snippets`
+- `wordpress_read_debug_log`
+
 
 ## Only on the site's own MCP endpoint
 
-The site's own MCP endpoint, used by the claude.ai and ChatGPT connectors, lists 353 tools named `respira_wordpress_*`. 10 of them are only there and not on the npm server, among them the guarded update tools:
+The site's own MCP endpoint, used by the claude.ai and ChatGPT connectors, names its tools `respira_wordpress_*`. A few of them are only there and not on the npm server, among them the guarded update tools:
 
 ### Guarded update and backups (4 tools) <span style={{color: '#10b981'}}>NEW in 9.1</span>
 
@@ -445,7 +503,7 @@ One wordpress.org plugin, one advisory, with a restore point before, four health
 | Pages | 10 | 5 | 5 |
 | Posts | 5 | 2 | 3 |
 | Custom Post Types | 11 | 5 | 6 |
-| Media | 7 | 2 | 5 |
+| Media | 9 | 2 | 7 |
 | Menus | 14 | 5 | 9 |
 | Taxonomies & Terms | 11 | 5 | 6 |
 | Users | 5 | 2 | 3 |
@@ -453,25 +511,28 @@ One wordpress.org plugin, one advisory, with a restore point before, four health
 | Options & Settings | 4 | 2 | 2 |
 | Redirects | 4 | 1 | 3 |
 | Plugins | 6 | 1 | 5 |
-| Page Builder Core | 19 | 6 | 13 |
+| Page Builder Core | 25 | 8 | 17 |
 | Widget Shortcuts | 27 | 0 | 27 |
 | Elementor Intelligence | 7 | 3 | 4 |
 | Bricks Intelligence | 25 | 7 | 18 |
 | YOOtheme Pro | 4 | 2 | 2 |
+| Avada | 11 | 6 | 5 |
+| Yoast SEO | 6 | 3 | 3 |
+| Blocksy | 3 | 1 | 2 |
 | Advanced Custom Fields | 58 | 25 | 33 |
 | WooCommerce | 104 | 49 | 55 |
 | Audits & Analysis | 18 | 17 | 1 |
-| Safety & Approvals | 14 | 4 | 10 |
+| Safety & Approvals | 23 | 7 | 16 |
 | Theme Docs | 2 | 2 | 0 |
 | Stock Imagery | 1 | 1 | 0 |
-| Review & Sharing | 8 | 4 | 4 |
+| Review & Sharing | 12 | 6 | 6 |
 | Art Direction | 16 | 7 | 9 |
-| Divi Presets & Library | 7 | 3 | 4 |
-| Security | 7 | 1 | 6 |
+| Divi Presets & Library | 8 | 4 | 4 |
+| Security | 11 | 4 | 7 |
 | Updates & Site Health | 5 | 3 | 2 |
 | Memory, Skills & Playbooks | 12 | 5 | 7 |
-| Other | 12 | 4 | 8 |
-| **Total** | **447** | **184** | **263** |
+| Other | 17 | 7 | 10 |
+| **Total** | **498** | **208** | **290** |
 
 > This table follows the public catalog. Some categories are listed only when the matching builder, plugin or add-on is present, so the total is higher than what a single site sees. Read-only counts the tools that only read; Write counts every tool that can change the site.
 
@@ -495,7 +556,7 @@ Starting in v5.2.0, the MCP server lists every core tool under its `respira_*` n
 
 ### How many tools does Respira have?
 
-As of plugin 9.2.3 and MCP server 8.5.0: 252 core tools, 356 with the WooCommerce add-on. 91 more come from modules listed where they apply (ACF, Bricks, Elementor and YOOtheme Pro), so the public catalog counts 447 tools in 30 categories. One site sees between 253 and 436, depending on its builder and plugins. The plugin also registers 360 WordPress Abilities. The [live tools catalog](https://www.respira.press/tools) has the current numbers.
+Every plan includes 300+ tools (302 on 17 November 2026), and 400+ with the WooCommerce add-on (406). The public catalog lists 498 entries in 33 categories, because it also counts the tools that appear only on a site that runs ACF, Bricks, Elementor, Avada, Yoast SEO, YOOtheme Pro or Blocksy. One site sees fewer than the catalog, depending on its builder and plugins. The [live tools catalog](https://www.respira.press/tools) is counted from the code on every release.
 
 ### What's the difference between read-only and write tools?
 

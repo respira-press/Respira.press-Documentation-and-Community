@@ -284,13 +284,13 @@ The lesson, almost verbatim from that report: **MCP safety protects content, not
 - Keep a known path to your files (SFTP, host file manager, or container shell) so you can rename a plugin directory if the site stops booting.
 - Treat plugin activation as a higher-risk operation than content edits. Respira ships with plugin management off by default for exactly this reason.
 
-### If your subscription expired
+### If your plan ends or a payment fails
 
-If your Respira subscription lapses:
+- **A declined renewal does not switch anything off.** When your bank declines a renewal, the plan keeps working while the payment is retried and I email you. Once the payment goes through, nothing has changed.
+- **When a plan ends, new AI operations stop.** That happens at the end of the period you paid for, after you cancel or when the plan runs out. Your live site does not break: existing content and published pages continue to serve as usual.
+- **Your snapshots and the audit log stay on your site.** They are stored in your WordPress database, not at respira.press, so you can still read them and restore from them in wp-admin after a plan ends.
 
-- Existing content and published pages continue to serve as usual.
-- You have a **7-day grace period** where you can still access recent audit logs and recovery information.
-- After the grace period, new AI operations will stop until you renew, but your live site does not break.
+See [Billing](/dashboard/billing) for how pausing, cancelling and refunds work.
 
 <Callout kind="info">
 If you are locked out of AI tools but need help rolling back or auditing changes, contact support at `word@respira.press` and include your site URL.

@@ -26,6 +26,6 @@ When you share scan results, redact:
 
 Docs:
 
-- [Analyze Images](https://docs.respira.press/tools/analysis/analyze-images) (alt text and image accessibility)
-- [Analyze AEO](https://docs.respira.press/tools/analysis/analyze-aeo) (AI Engine Optimization, content structure)
-- [Check Structured Data](https://docs.respira.press/tools/analysis/check-structured-data)
+- [Analyze Images](https://www.respira.press/docs/tools/analysis/analyze-images) (alt text and image accessibility)
+- [Analyze AEO](https://www.respira.press/docs/tools/analysis/analyze-aeo) (AI Engine Optimization, content structure)
+- [Check Structured Data](https://www.respira.press/docs/tools/analysis/check-structured-data)

@@ -125,6 +125,11 @@
                 "icon": "accessibility"
               },
               {
+                "title": "Billing and refunds",
+                "path": "dashboard/billing",
+                "icon": "credit-card"
+              },
+              {
                 "title": "Partner Program",
                 "path": "dashboard/partner",
                 "icon": "handshake"

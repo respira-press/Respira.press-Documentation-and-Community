@@ -13,7 +13,7 @@ Internal reference for the respira-docs → community hub transition.
 ## How Docs Build
 
 - No local build step in this repo.
-- Documentation.ai pulls from the repo and renders docs at docs.respira.press.
+- Documentation.ai pulls from the repo and renders docs at www.respira.press/docs.
 - Push to main triggers automatic deployment (via Documentation.ai integration, not GitHub Actions in this repo).
 
 ## Where Repo Name Appears

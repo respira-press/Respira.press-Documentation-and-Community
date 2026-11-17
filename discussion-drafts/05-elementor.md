@@ -17,11 +17,11 @@ Known gotchas (from docs):
 
 Recommended workflows:
 
-- [Read page](https://docs.respira.press/tools/pages/read-page) → inspect structure
-- [Create duplicate](https://docs.respira.press/tools/pages/create-duplicate) → safe copy
-- [Update page](https://docs.respira.press/tools/pages/update-page) → edit the duplicate
+- [Read page](https://www.respira.press/docs/tools/pages/read-page) → inspect structure
+- [Create duplicate](https://www.respira.press/docs/tools/pages/create-duplicate) → safe copy
+- [Update page](https://www.respira.press/docs/tools/pages/update-page) → edit the duplicate
 - Approve in WordPress Admin (Respira → Approve Edits)
 
 Docs:
 
-- [Elementor Builder Reference](https://docs.respira.press/builders/elementor)
+- [Elementor Builder Reference](https://www.respira.press/docs/builders/elementor)

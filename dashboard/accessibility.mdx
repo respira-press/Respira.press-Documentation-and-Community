@@ -1,90 +1,64 @@
 ---
 title: "WCAG Scanner"
-description: "Free WCAG 2.1 AA scanner for any public URL. Paste a link, get a shareable accessibility report. No account required."
+description: "The accessibility scanner in your Respira dashboard: paste a public URL, get a Lighthouse report with fix prompts and a shareable link. 10 scans a month with every paid plan."
 ---
 
 ## WCAG Scanner
 
-The Respira [WCAG Scanner](https://www.respira.press/dashboard/accessibility) at `dashboard/accessibility` is a free, anonymous WCAG 2.1 AA scanner. Paste any public URL, get a structured accessibility report. No account needed for the scan itself; an account lets you save reports and rerun them.
+The [WCAG Scanner](https://www.respira.press/dashboard/accessibility) in your Respira dashboard checks any public page for accessibility problems. Paste a URL, wait for the report, and get a score, the list of failures and a fix prompt for each one. It is in public beta, and it is included with every paid plan: 10 scans a month, no separate purchase and no add-on. A free plan sees an upgrade card instead of the scanner.
+
+You need to be signed in. There is no anonymous scan.
 
 ## What it does
 
-The scanner runs a headless browser against the URL you give it, then evaluates the rendered DOM against the WCAG 2.1 AA success criteria using axe-core plus a small set of Respira-specific rules tuned for WordPress page builders.
+When you press **Run scan**, Respira asks Google PageSpeed Insights to load the page. PageSpeed runs a Lighthouse accessibility audit, and those audits use axe-core rules. Respira turns the result into a report. The scan usually takes 30 to 60 seconds.
 
-For each issue it finds, the report shows:
+For each failure the report shows:
 
-- **Severity** — critical / serious / moderate / minor
-- **WCAG criterion** — the specific clause (e.g. *1.4.3 Contrast (Minimum)*)
-- **Affected element** — DOM selector + a snippet of the source HTML
-- **Why it matters** — plain-language explanation of the user impact
-- **How to fix** — actionable guidance (often a snippet of CSS or alt-text suggestion)
+- **Severity**: critical, serious, moderate or minor
+- **The rule** that failed, and the WCAG success criterion it belongs to
+- **The affected element**, with a selector and a snippet of its HTML
+- **A fix prompt** you can paste into Claude, Cursor or Codex. On a WordPress site the prompt is written for the page's builder.
 
-It does **not** evaluate AAA criteria, manual-only criteria (like keyboard testing of complex widgets), or browser-specific rendering. It's a coverage check, not a sign-off — sites that pass the scanner can still have accessibility issues that need human review.
+The scanner sees what any visitor sees: the public HTML, CSS and accessibility tree. It cannot see logged-in pages, private pages, localhost, an intranet, or a page that blocks Google PageSpeed. It does not need the Respira plugin on the site, and it does not touch the site.
+
+## What a scan does not tell you
+
+WCAG 2.2 has 86 success criteria. Lighthouse checks the part of the Level A and AA rules that a machine can test automatically. That is a subset of WCAG, and some criteria cannot be tested by a machine at all. A clean report does not mean the page is accessible, and it does not mean it is legally compliant with the ADA, WCAG, the European Accessibility Act or any other rule. It is information, not legal advice.
+
+A scan cannot judge:
+
+- **Keyboard use** of complex widgets, which needs a person.
+- **Screen reader order and wording**, which needs a real screen reader.
+- **Motion and animation** for people who ask for less motion.
+- **How clear the language and the task flow are.**
+
+Use the scan to catch the mechanical problems: missing alt text, low contrast, heading order, form labels, ARIA. Then test the rest by hand.
 
 ## Running a scan
 
-1. Open [dashboard/accessibility](https://www.respira.press/dashboard/accessibility)
-2. Paste a URL into the input (must be publicly reachable)
-3. Click *Scan*
-4. Wait 5–15 seconds while the headless browser loads the page
-
-The result page shows the issue count grouped by severity at the top, then the full issue list below. Use the filter chips to narrow by severity or WCAG criterion.
+1. Open [dashboard/accessibility](https://www.respira.press/dashboard/accessibility).
+2. Paste a public URL.
+3. Press **Run scan**.
+4. Read the score and the failures. Open **Fix prompts** on any report to copy the prompt for a failure.
 
 ## Sharing reports
 
-Every scan gets a permanent shareable URL. Click *Copy share link* on the report page — the URL embeds the scan ID and renders the same report for anyone who opens it (no Respira account needed to view).
-
-Useful for:
-
-- Sending a client a before/after report on accessibility improvements
-- Pasting in a GitHub issue when a PR needs to address an accessibility regression
-- Embedding in your own internal QA dashboard
-
-Shared reports are read-only. Only the account that ran the scan can rerun it.
-
-## Rerunning a scan
-
-If you've fixed issues and want to re-check, click *Rerun scan* on any saved report. This requires a Respira account so the rerun gets attributed and stored in your scan history.
-
-The rerun produces a fresh report with the same shareable URL pattern but a new scan ID. The dashboard's [Sites](/dashboard/sites) audit log links to all your scan reruns for that site.
+Every scan gets a public report link. Press **Copy link** on a row of your scan history and send it to a client or a colleague. Anyone with the link can read the report without a Respira account. The report is read only.
 
 ## Limits
 
-| Plan | Scans per month | Saved scans | Rerun history |
-| --- | --- | --- | --- |
-| Anonymous (no account) | unlimited (rate-limited per IP) | 0 (one-shot URLs only) | — |
-| Lite (free) | 50 | 30 days | last 5 reruns |
-| Maker / Builder / Studio | unlimited | unlimited | unlimited |
+| What | Limit |
+| --- | --- |
+| Scans | 10 a month for each signed-in person, counted by calendar month. The count resets on the 1st. |
+| Plans | Every paid plan. Not on a free plan. |
+| Reports kept | 90 days. |
 
-If you hit the rate limit as an anonymous user, sign up for a free Lite account — same email you'd use for the trial.
-
-## What it doesn't catch
-
-The scanner is a useful baseline but not a complete accessibility audit. Things it can't evaluate:
-
-- **Keyboard navigation** of complex JavaScript widgets — needs human testing
-- **Screen reader announcement order** — needs a real screen reader
-- **Motion sensitivity** for users who set `prefers-reduced-motion` — partial coverage only
-- **Cognitive load** of language complexity, layout density, or task flow — entirely out of scope
-- **Performance issues** that affect users on slow connections or older devices
-
-Use the scanner to catch the obvious, mechanical issues (alt text, contrast, heading hierarchy, ARIA labels, form labels). Then layer on manual testing for the rest.
-
-## Scanning sites you've connected to Respira
-
-If the URL belongs to a [connected site](/dashboard/sites), the report links back to the site's audit log entry. Reruns from connected sites are attributed and tracked there.
-
-You can also run scans directly from the [CLI](https://www.respira.press/cli/docs):
-
-```
-respira scan accessibility https://example.com
-```
-
-Same scanner, same report format, callable from any terminal where the CLI is installed.
+When you have used your 10 scans, the dashboard says so and the next scan waits for the 1st. The limit applies to each signed-in person.
 
 ## Scanning from an AI agent
 
-The same WCAG scanner is available as MCP tools, so an agent connected to a site can scan, review, and fix accessibility issues in one conversation. Four tools cover the flow.
+Separate from the dashboard scanner, the Respira plugin has MCP tools that scan a page of a connected site, so an agent can scan, review and fix accessibility issues in one conversation. Four tools cover the flow. They run on your site through the plugin, not through Google PageSpeed Insights, and they do not use the 10 scans a month of the dashboard scanner.
 
 ### respira_scan_page_accessibility
 
@@ -127,4 +101,4 @@ Anything the auto-fixer cannot handle stays in the report for manual work, the s
 
 ## Privacy
 
-Scans against public URLs are stored in our database with the URL, the report, and (if logged in) your account ID. We do not retain page content beyond the snapshot needed to render the report. Anonymous scans are rate-limited per IP and not associated with any account.
+A scan stores the address you scanned, the page title, the score, the failures it found with the HTML snippet of each affected element, and your account. Reports expire after 90 days.

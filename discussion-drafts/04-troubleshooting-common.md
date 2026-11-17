@@ -20,5 +20,5 @@ When you post, include:
 
 Docs:
 
-- [Troubleshooting](https://docs.respira.press/troubleshooting)
-- [Divi 5 Troubleshooting](https://docs.respira.press/troubleshooting/divi-5)
+- [Troubleshooting](https://www.respira.press/docs/troubleshooting)
+- [Divi 5 Troubleshooting](https://www.respira.press/docs/troubleshooting/divi-5)

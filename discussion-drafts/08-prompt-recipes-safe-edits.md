@@ -27,6 +27,6 @@ Share your best recipes here. If you post a prompt, include:
 
 Docs:
 
-- [Safety Philosophy](https://docs.respira.press/safety-philosophy)
-- [Create Page Duplicate](https://docs.respira.press/tools/pages/create-duplicate)
-- [Update Page](https://docs.respira.press/tools/pages/update-page)
+- [Safety Philosophy](https://www.respira.press/docs/safety-philosophy)
+- [Create Page Duplicate](https://www.respira.press/docs/tools/pages/create-duplicate)
+- [Update Page](https://www.respira.press/docs/tools/pages/update-page)
