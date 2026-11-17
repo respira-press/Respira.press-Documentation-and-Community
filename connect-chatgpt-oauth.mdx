@@ -9,13 +9,13 @@ This guide shows you how to add your Respira MCP server to **ChatGPT** as a cust
 
 This path sits alongside the API key and connect-by-link methods. Those still work exactly as before. For Claude Desktop, claude.ai, Cursor, Codex and other clients, see [Connect Claude Desktop (OAuth)](/connect-claude-desktop-oauth) and [MCP Setup](/mcp-install).
 
-> **This is a settings action, not a chat message.** You add the connector in ChatGPT's settings. Pasting the URL into a chat will not connect anything.
+> **This is a settings action, not a chat message.** You add the server on ChatGPT's Plugins page. Pasting the URL into a chat will not connect anything.
 
 ## What you need
 
 - The Respira for WordPress plugin installed and active on the site, on a version that supports OAuth connections.
 - A Respira account at [respira.press](https://www.respira.press). A free trial works.
-- A ChatGPT plan that allows custom connectors (Plus, Pro, Team, Enterprise or Edu). On some plans the connector option lives behind **Developer Mode** in settings.
+- A ChatGPT plan that allows custom MCP servers. The flow below is ChatGPT's own **Add custom MCP server** dialog on chatgpt.com in a desktop browser; there is no Developer Mode step.
 
 ## Find your site's MCP URL
 
@@ -29,15 +29,15 @@ Replace `your-site.com` with your own WordPress domain. You can also copy the ex
 
 ## Connect, step by step
 
-### Step 1: Open ChatGPT settings
+### Step 1: Open Plugins
 
-In ChatGPT, click your name in the bottom-left corner, then click **Settings**.
+In a desktop browser open **chatgpt.com/plugins**.
 
-### Step 2: Open the connector form
+### Step 2: Open the custom MCP server form
 
-Go to **Advanced settings**, then click **Create app**. A window called **New App** opens.
+Select **+**, then **Add custom MCP server**. A form opens.
 
-### Step 3: Fill in the New App form
+### Step 3: Fill in the form
 
 <Image
   src="https://www.respira.press/images/docs/chatgpt-new-app-connector.png"
@@ -47,7 +47,7 @@ Go to **Advanced settings**, then click **Create app**. A window called **New Ap
 />
 
 - **Icon** (optional). Upload an icon if you want one.
-- **Name**. A name for the connector, for example `Respira WordPress` or `Respira - MaxAd`.
+- **Name**. A name for it, for example `Respira WordPress` or `Respira - MaxAd`.
 - **Description** (optional, recommended). For example: `Connects ChatGPT to my WordPress site through Respira.`
 - **Connection**. Choose **Server URL**, then paste your Respira MCP URL into the **Server URL** field.
 - **Authentication**. Choose **OAuth**. You normally do not need to fill in the advanced OAuth settings by hand. ChatGPT discovers them from the MCP server URL.
@@ -58,7 +58,7 @@ ChatGPT shows a warning that custom MCP servers introduce risk. Read it, then ch
 
 ### Step 5: Create the app
 
-Click **Create**. ChatGPT tries to connect to your Respira MCP server.
+Choose **Create as a plugin**, then **Connect**. ChatGPT tries to connect to your Respira MCP server.
 
 ### Step 6: Approve the connection in Respira
 
