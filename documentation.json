@@ -286,6 +286,21 @@
                 "title": "Plan mode for MCP clients",
                 "path": "guides/plan-mode-for-mcp-clients",
                 "icon": "list-checks"
+              },
+              {
+                "title": "When MCP fails to reconnect",
+                "path": "guides/mcp-reconnect",
+                "icon": "refresh-cw"
+              },
+              {
+                "title": "Troubleshooting tool timeouts",
+                "path": "guides/troubleshooting-timeouts",
+                "icon": "clock"
+              },
+              {
+                "title": "Page builder gotchas",
+                "path": "guides/builder-gotchas",
+                "icon": "wrench"
               }
             ]
           },

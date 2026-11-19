@@ -19,7 +19,7 @@ This path sits alongside the API key and connect-by-link methods. Those still wo
 
 Browser sign-in works with any MCP client that has shipped remote-server OAuth. Confirmed today:
 
-- **Claude Desktop** and **claude.ai (web)** — Settings → Connectors → Add custom connector (paid plans).
+- **Claude Desktop** and **claude.ai (web)**: **Customize → Connectors → + Add → Add custom connector**. Custom connectors are not limited to paid plans: a Free plan can add one. On a Team or Enterprise plan an owner adds the connector first under **Organization settings → Connectors**, then each person opens **Customize → Connectors** and chooses **Connect**.
 - **Claude Code** — `claude mcp add --transport http respira <your MCP URL>`.
 - **ChatGPT** (Plus, Pro, Team, Enterprise, Edu) — add the site as a custom connector by URL. See the full walkthrough: [Connect ChatGPT (OAuth)](/connect-chatgpt-oauth).
 - **Cursor** — native MCP OAuth since v1.0; add the server URL and authorize in the browser.
@@ -54,16 +54,16 @@ You can also copy the exact URL from two places:
 
 ### Claude Desktop
 
-1. Open **Settings → Connectors** and choose **Add custom connector**.
-2. Paste your site's MCP URL and confirm.
+1. Open **Customize → Connectors**, choose **+ Add**, then **Add custom connector**.
+2. Enter a name, paste your site's MCP URL, and choose **Continue**.
 3. A browser window opens at respira.press. Sign in to your Respira account.
 4. Review the consent screen. It shows the app, the target site, the permissions, and your account email. Click **Approve**.
 5. Claude Desktop finishes the connection and the Respira tools appear. Try a read action like listing pages to confirm.
 
 ### claude.ai
 
-1. Open the connectors settings and choose **Add custom connector**.
-2. Paste your site's MCP URL.
+1. Open **Customize → Connectors**, choose **+ Add**, then **Add custom connector**.
+2. Enter a name, paste your site's MCP URL, and choose **Continue**.
 3. Sign in at respira.press and **Approve** the same consent screen.
 4. The Respira tools appear in your chat.
 

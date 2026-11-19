@@ -18,10 +18,10 @@ This page explains how to install the Respira WordPress MCP server. Recommended 
 ### Method 1: One-command install with add-mcp (Quickest)
 
 ```bash
-npx add-mcp "npx -y @respira/wordpress-mcp-server"
+npx add-mcp "npx -y @respira/wordpress-mcp-server" --name respira-mysite --env WORDPRESS_URL=https://your-site.com --env WORDPRESS_API_KEY=your-key --yes -g -a cursor
 ```
 
-Auto-detects your AI client and writes the MCP config. Set `WORDPRESS_URL` and `WORDPRESS_API_KEY` env vars afterward.
+Writes a Respira server with your site address and key already in it. Replace `cursor` with your tool (`vscode`, `opencode`, `antigravity`, `claude-code`, `codex`; run `npx add-mcp list-agents` to see them all) or leave `-a` out and it asks. Without the two `--env` values the server is written with no site and exits when it starts. Your dashboard's **MCP Setup** page shows this command with your site and key filled in.
 
 ### Method 2: Dashboard MCP setup (Recommended)
 
@@ -168,7 +168,7 @@ Add to `~/.claude.json`:
 
 ### Claude Cowork
 
-Install the plugin in Cowork: open **Customize > Plugins**, click the **Personal** tab, then **+ > Add marketplace > Add from a repository** and enter `respira-press/cowork-plugin-wordpress`, then **Sync > Install** and **Continue** on the "local MCP servers" notice. (On Claude Code: `/plugin marketplace add respira-press/cowork-plugin-wordpress`.) Then click **Connect Cowork** on the [respira.press dashboard](https://respira.press/dashboard/mcp): a fresh Cowork chat opens with a one-time setup token pre-filled, hit send, and Claude redeems the token so the MCP server writes `~/.respira/config.json` for you. No file download, no folder hunting. If you already use Respira through Claude Desktop, the config file is already on your machine and Cowork picks it up on the next chat. See the [full Cowork configuration guide](/configuration#claude-cowork).
+Install the plugin in Cowork: open the **Cowork** tab, then **Customize**, then **Plugins**, choose **Add marketplace**, then **Add from a repository**, and enter `respira-press/cowork-plugin-wordpress`. Add the Respira plugin from that marketplace (Anthropic's guide names the **Discover** tab and **Add**). The notice about local MCP servers is expected. (On Claude Code: `/plugin marketplace add respira-press/cowork-plugin-wordpress`.) Then click **Connect Cowork** on the [respira.press dashboard](https://respira.press/dashboard/mcp): a fresh Cowork chat opens with a one-time setup token pre-filled, hit send, and Claude redeems the token so the MCP server writes `~/.respira/config.json` for you. No file download, no folder hunting. If you already use Respira through Claude Desktop, the config file is already on your machine and Cowork picks it up on the next chat. See the [full Cowork configuration guide](/configuration#claude-cowork).
 
 ### Windsurf
 
