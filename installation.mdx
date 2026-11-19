@@ -100,10 +100,10 @@ The account-wide config (above) and per-site configs are not exclusive — you c
 The fastest way to connect any MCP-compatible AI tool. One command auto-detects your client (Cursor, Claude Code, Windsurf, etc.) and writes the config:
 
 ```bash
-npx add-mcp "npx -y @respira/wordpress-mcp-server"
+npx add-mcp "npx -y @respira/wordpress-mcp-server" --name respira-mysite --env WORDPRESS_URL=https://your-site.com --env WORDPRESS_API_KEY=your-key --yes -g -a cursor
 ```
 
-Then set environment variables `WORDPRESS_URL` and `WORDPRESS_API_KEY` in your client. The easy way to get both is your dashboard's **MCP Setup** page (respira.press/dashboard/mcp): pick your client and copy the command or config, which already holds the site address and a key. To make a key by hand, open **WordPress Admin → Respira → Settings → API keys & MCP** and choose **New key**; the site address is shown on the same screen. A key is shown once, so copy it when it is made.
+The two `--env` values put your site address and key into the config. Without them the server is written with no site and exits when it starts. Replace `cursor` with your tool, or leave `-a` out and it asks. The easy way to get both is your dashboard's **MCP Setup** page (respira.press/dashboard/mcp): pick your client and copy the command or config, which already holds the site address and a key. To make a key by hand, open **WordPress Admin → Respira → Settings → API keys & MCP** and choose **New key**; the site address is shown on the same screen. A key is shown once, so copy it when it is made.
 
 ### Local/CLI setup fallback
 
