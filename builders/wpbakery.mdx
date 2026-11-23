@@ -15,6 +15,21 @@ Technical documentation for using Respira with [WPBakery Page Builder](https://w
 
 WPBakery is full read and write (read moved to write in Respira 7.4.0 "Clearing"). Respira builds, edits and round-trips shortcode layouts, and the same class handles the popular WPBakery forks: Uncode and TagDiv/Newspaper are recognized and their `uncode_*` / `tdb_*` shortcodes surface as first-class elements.
 
+## Themes built on WPBakery
+
+Many popular themes ship their own copy of WPBakery instead of the plugin from wpbakery.com. Respira detects that copy as WPBakery, so pages built with it are read and edited the same way, on a copy first and with undo.
+
+| Theme | WPBakery it ships | What Respira edits |
+| --- | --- | --- |
+| Salient | Salient WPBakery Page Builder (`js_composer_salient`) | Standard WPBakery elements. Salient's own Nectar elements are kept exactly as they are; their settings are not edited yet. |
+| Uncode | Uncode WPBakery Page Builder (`uncode-js_composer`) | Standard WPBakery elements and Uncode's own `uncode_*` elements. |
+| The7 | WPBakery Page Builder | Standard WPBakery elements. The7's own elements are kept as they are. |
+| Bridge | WPBakery Page Builder | Standard WPBakery elements. Bridge's own elements are kept as they are. |
+| Jupiter, WoodMart | WPBakery Page Builder | Standard WPBakery elements. Theme elements are kept as they are. |
+| Newspaper, Newsmag | tagDiv Composer | Detected as "WPBakery (TagDiv)"; standard elements and tagDiv's `tdb_*` elements. |
+
+A theme element Respira does not model yet is never dropped: if a write would lose one, it is refused and the page stays exactly as it was. The7, Bridge, Jupiter and WoodMart can also build pages with Elementor; on a site that does, Respira works through [Elementor](/builders/elementor) instead.
+
 ## Data Structure
 
 WPBakery stores layouts as nested shortcodes in `post_content`:
@@ -119,7 +134,7 @@ Respira works with content regardless of which editor was used. Both Backend Edi
 
 - **Design Options**: Padding, margins, and responsive settings may need the visual editor
 - **Custom CSS**: Per-element custom CSS is preserved but complex styling changes may require the builder
-- **Third-party add-ons**: Support varies; core WPBakery elements have full support
+- **Third-party add-ons and theme elements**: core WPBakery elements have full support; Uncode and tagDiv elements are edited too; other theme elements (Salient's Nectar, The7, Bridge) are kept intact but not edited yet. See [Themes built on WPBakery](#themes-built-on-wpbakery).
 - **Row/column structure**: Layout-level changes (column widths, row settings) are best done in the builder
 
 ## Recent capabilities (7.x)
