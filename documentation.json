@@ -79,6 +79,11 @@
                 "icon": "link"
               },
               {
+                "title": "Focus",
+                "path": "focus",
+                "icon": "focus"
+              },
+              {
                 "title": "Connect Claude Desktop (OAuth)",
                 "path": "connect-claude-desktop-oauth",
                 "icon": "shield-check"

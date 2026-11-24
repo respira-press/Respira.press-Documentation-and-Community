@@ -96,6 +96,20 @@ npx @respira/wordpress-mcp-server --test    # Test connection to default site
 npx @respira/wordpress-mcp-server --help    # Show help
 ```
 
+## Focus (optional)
+
+Focus shows your AI app six tools instead of the full list. It finds the others by searching. It is off until you switch it on, and it needs MCP server 8.8.0 or newer. Set an environment variable, or add a key to `~/.respira/config.json`:
+
+```bash
+RESPIRA_FOCUS=1
+```
+
+```json
+{ "focus": true }
+```
+
+More in [Focus](https://www.respira.press/docs/focus).
+
 ## License Requirements
 
 The MCP server requires a valid license and API key. The install link only adds the MCP server entry to your MCP client—it does not activate or configure the WordPress connection.
