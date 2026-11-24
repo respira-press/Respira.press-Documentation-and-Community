@@ -862,10 +862,10 @@ For the agent:
 
 - Goal: Read the catalog readiness score and the fix list.
 - Step 1: woocommerce_catalog_ai_readiness.
-- Step 2: woocommerce_readiness_fixlist: Read the list and tell the person each item in priority order. Then end.
-- Step 3: woocommerce_product_ai_readiness: Read the weakest products.
+- Step 2: woocommerce_product_ai_readiness: Read the weakest products.
+- Step 3: woocommerce_readiness_fixlist: Read the list and tell the person each item in priority order. Then end.
 
-Tools, in order: `woocommerce_catalog_ai_readiness`, `woocommerce_readiness_fixlist`, `woocommerce_product_ai_readiness`
+Tools, in order: `woocommerce_catalog_ai_readiness`, `woocommerce_product_ai_readiness`, `woocommerce_readiness_fixlist`
 
 Check: The agent tells the person the score and the fix list in priority order, and the person then says which item to fix.
 
