@@ -84,7 +84,7 @@ For the agent:
 
 - Goal: A new page, kept as a draft.
 - Step 1: respira_get_builder_info.
-- Step 2: respira_build_page: In the builder's own structure, with status draft.
+- Step 2: Ask the person before this step. respira_build_page: In the builder's own structure, with status draft.
 
 Tools, in order: `respira_get_builder_info`, `respira_build_page`
 
@@ -392,7 +392,7 @@ For the agent:
 
 - Goal: A new page from a description.
 - Step 1: respira_get_builder_info.
-- Step 2: respira_build_page: In the builder's vocabulary. Compare the element count.
+- Step 2: Ask the person before this step. respira_build_page: In the builder's vocabulary. Compare the element count.
 - Step 3: respira_read_page: Read the draft back.
 
 Tools, in order: `respira_get_builder_info`, `respira_build_page`, `respira_read_page`
@@ -415,7 +415,7 @@ For the agent:
 
 - Goal: A labeled skeleton.
 - Step 1: respira_get_builder_info.
-- Step 2: respira_build_page: With placeholder labels.
+- Step 2: Ask the person before this step. respira_build_page: With placeholder labels.
 - Step 3: respira_read_page: Every label must be in the right column.
 
 Tools, in order: `respira_get_builder_info`, `respira_build_page`, `respira_read_page`
@@ -535,7 +535,7 @@ For the agent:
 
 - Goal: A labeled skeleton first, copy second.
 - Step 1: respira_get_builder_info.
-- Step 2: respira_build_page: With placeholder labels.
+- Step 2: Ask the person before this step. respira_build_page: With placeholder labels.
 - Step 3: respira_read_page: Check the structure.
 - Step 4: respira_update_element: One label at a time when the copy arrives. Read back after each fill.
 
@@ -561,7 +561,7 @@ For the agent:
 - Step 1: respira_list_post_types: To see what exists.
 - Step 2: Ask the person before this step. respira_create_post_type.
 - Step 3: Ask the person before this step. respira_create_acf_field_group.
-- Step 4: respira_build_page: For the template.
+- Step 4: Ask the person before this step. respira_build_page: For the template.
 - Step 5: Ask the person before this step. respira_create_custom_post: From the notes.
 - Step 6: respira_get_custom_post: Check each field.
 
@@ -855,19 +855,19 @@ Recipe id: `shops-readiness`
 What the person types:
 
 ```text
-score my catalog for AI shopping assistants and show me the weakest products. then work through the fix list, starting with the easiest wins.
+score my catalog for AI shopping assistants and show me the weakest products and the fix list, in order of priority.
 ```
 
 For the agent:
 
-- Goal: Raise the catalog readiness score.
+- Goal: Read the catalog readiness score and the fix list.
 - Step 1: woocommerce_catalog_ai_readiness.
-- Step 2: woocommerce_readiness_fixlist: Work it top down with the tool each item names.
-- Step 3: woocommerce_product_ai_readiness: Score again and compare before and after.
+- Step 2: woocommerce_readiness_fixlist: Read the list and tell the person each item in priority order. Then end.
+- Step 3: woocommerce_product_ai_readiness: Read the weakest products.
 
 Tools, in order: `woocommerce_catalog_ai_readiness`, `woocommerce_readiness_fixlist`, `woocommerce_product_ai_readiness`
 
-Check: The agent scores again after the fixes and says what changed.
+Check: The agent tells the person the score and the fix list in priority order, and the person then says which item to fix.
 
 Needs: WooCommerce add-on (Respira ARC)
 
