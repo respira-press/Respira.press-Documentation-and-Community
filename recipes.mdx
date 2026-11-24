@@ -104,7 +104,7 @@ today is read-only: audit, analyze, report. don't write anything to the site unl
 
 For the agent:
 
-- Goal: Report on the site and change nothing.
+- Goal: Look at the site and change nothing.
 - Step 1: respira_get_site_context.
 - Step 2: respira_read_page.
 - Step 3: respira_analyze_seo.
@@ -178,13 +178,13 @@ What the person types:
 For the agent:
 
 - Goal: Do the job at the stated effort.
-- Step 1: respira_read_page: Read again after the change and report any difference.
+- Step 1: respira_read_page: Read the page first.
 - Step 2: respira_find_element.
-- Step 3: respira_update_element.
+- Step 3: respira_update_element: Then read the page again and name any difference.
 
 Tools, in order: `respira_read_page`, `respira_find_element`, `respira_update_element`
 
-Check: The agent reads the page back and reports any difference from the request.
+Check: The agent reads the page back and names any difference from the request.
 
 ---
 
@@ -284,7 +284,7 @@ Check: The agent reads the page back after the restore and says which snapshot i
 
 <a id="confirm-site"></a>
 
-### Confirm the site first
+### Check the site first
 
 Recipe id: `confirm-site`
 
@@ -296,13 +296,13 @@ confirm which site you're connected to before you do anything.
 
 For the agent:
 
-- Goal: Never write to the wrong site.
+- Goal: Write only to the intended site.
 - Step 1: respira_get_active_site.
 - Step 2: respira_list_sites: When several sites exist, list them and let the person pick.
 
 Tools, in order: `respira_get_active_site`, `respira_list_sites`
 
-Check: The agent says the active site's URL and waits for a yes when you manage more than one.
+Check: The agent says the active site's URL and pauses for a reply when you manage more than one.
 
 ---
 
@@ -348,7 +348,7 @@ For the agent:
 
 - Goal: Restructure a page.
 - Step 1: respira_extract_builder_content.
-- Step 2: Ask the person before this step. respira_inject_builder_content: After changing the tree, read back and compare section count and text.
+- Step 2: respira_inject_builder_content: After changing the tree, read back and compare section count and text.
 
 Tools, in order: `respira_extract_builder_content`, `respira_inject_builder_content`
 
@@ -491,7 +491,7 @@ For the agent:
 - Goal: Fix the mechanical SEO findings on one page.
 - Step 1: respira_analyze_seo.
 - Step 2: respira_check_seo_issues.
-- Step 3: Ask the person before this step. respira_update_page: For title, description, headings, alt text and links.
+- Step 3: respira_update_page: For title, description, headings, alt text and links.
 
 Tools, in order: `respira_analyze_seo`, `respira_check_seo_issues`, `respira_update_page`
 
@@ -513,7 +513,7 @@ For the agent:
 
 - Goal: Fix safe accessibility issues on one page.
 - Step 1: respira_scan_page_accessibility.
-- Step 2: Ask the person before this step. respira_apply_accessibility_fixes: For alt text, labels and heading order. Then scan again and report the rest.
+- Step 2: Ask the person before this step. respira_apply_accessibility_fixes: For alt text, labels and heading order. Then scan again and list the rest.
 
 Tools, in order: `respira_scan_page_accessibility`, `respira_apply_accessibility_fixes`
 
@@ -559,10 +559,10 @@ For the agent:
 
 - Goal: A custom post type with one entry.
 - Step 1: respira_list_post_types: To see what exists.
-- Step 2: respira_create_post_type.
-- Step 3: respira_create_acf_field_group.
+- Step 2: Ask the person before this step. respira_create_post_type.
+- Step 3: Ask the person before this step. respira_create_acf_field_group.
 - Step 4: respira_build_page: For the template.
-- Step 5: respira_create_custom_post: From the notes.
+- Step 5: Ask the person before this step. respira_create_custom_post: From the notes.
 - Step 6: respira_get_custom_post: Check each field.
 
 Tools, in order: `respira_list_post_types`, `respira_create_post_type`, `respira_create_acf_field_group`, `respira_build_page`, `respira_create_custom_post`, `respira_get_custom_post`
@@ -583,12 +583,12 @@ run a Divi 5 migration readiness audit on my site. tell me which pages and modul
 
 For the agent:
 
-- Goal: A read only readiness report.
+- Goal: A read only readiness summary.
 - Step 1: respira_get_divi_migration_readiness: Summarise what converts, what does not and what to fix first.
 
 Tools, in order: `respira_get_divi_migration_readiness`
 
-Check: The report names pages and modules from the scan, and no write tool is called.
+Check: The summary names pages and modules from the scan, and no write tool is called.
 
 <a id="monday-audit"></a>
 
@@ -636,7 +636,7 @@ For the agent:
 - Goal: Use a tool that is not in the short list.
 - Step 1: respira_find_tools: With what you want to do.
 - Step 2: respira_read: For a read.
-- Step 3: respira_write: For a change. Read the state back after.
+- Step 3: Ask the person before this step. respira_write: For a change. Read the state back after.
 
 Tools, in order: `respira_find_tools`, `respira_read`, `respira_write`
 
@@ -662,12 +662,12 @@ For the agent:
 - Step 1: respira_get_site_context.
 - Step 2: respira_begin_session: With mode plan. The writes are collected, not run.
 - Step 3: respira_get_plan: Show it to the person.
-- Step 4: Ask the person before this step. respira_apply_plan: Only after a yes.
-- Step 5: respira_discard_plan: Instead, when the answer is no.
+- Step 4: Ask the person before this step. respira_apply_plan: Runs the collected steps.
+- Step 5: Ask the person before this step. respira_discard_plan: Instead, when the person turns the plan down.
 
 Tools, in order: `respira_get_site_context`, `respira_begin_session`, `respira_get_plan`, `respira_apply_plan`, `respira_discard_plan`
 
-Check: The plan lists each step with its tool and predicted effect, and the receipt after the yes lists each step's outcome.
+Check: The plan lists each step with its tool and predicted effect, and the receipt lists each step's outcome once the plan has run.
 
 Needs: plugin 9.1 or newer
 
@@ -709,7 +709,7 @@ For the agent:
 
 - Goal: Standing instructions for this site.
 - Step 1: respira_list_skills.
-- Step 2: respira_write_skill: With the steps the person chose.
+- Step 2: Ask the person before this step. respira_write_skill: With the steps the person chose.
 - Step 3: respira_get_skill: Name and body must match.
 
 Tools, in order: `respira_list_skills`, `respira_write_skill`, `respira_get_skill`
@@ -731,14 +731,13 @@ show me everything changed in this session, then undo all of it if I say so.
 For the agent:
 
 - Goal: Roll back one whole session.
-- Step 1: respira_list_snapshots: For the session.
-- Step 2: respira_begin_session.
-- Step 3: Ask the person before this step. respira_restore_session.
-- Step 4: respira_end_session: Then read one changed page back.
+- Step 1: respira_list_snapshots: For the session, to find its id.
+- Step 2: Ask the person before this step. respira_restore_session: Then read one changed page back.
+- Step 3: respira_end_session: Only if an explicit session is still open.
 
-Tools, in order: `respira_list_snapshots`, `respira_begin_session`, `respira_restore_session`, `respira_end_session`
+Tools, in order: `respira_list_snapshots`, `respira_restore_session`, `respira_end_session`
 
-Check: After the restore, the agent reads a changed page back and it matches its earlier version.
+Check: After the restore, the agent reads a changed page back and it matches the version from before the session.
 
 ---
 
@@ -812,8 +811,8 @@ For the agent:
 
 - Goal: Current shopping feeds.
 - Step 1: woocommerce_get_feed_status.
-- Step 2: woocommerce_configure_feed: With no params to read, then update the formats.
-- Step 3: woocommerce_generate_feed.
+- Step 2: Ask the person before this step. woocommerce_configure_feed: With no params to read, then update the formats.
+- Step 3: Ask the person before this step. woocommerce_generate_feed.
 - Step 4: woocommerce_validate_feed: Look for failures.
 
 Tools, in order: `woocommerce_get_feed_status`, `woocommerce_configure_feed`, `woocommerce_generate_feed`, `woocommerce_validate_feed`
@@ -838,7 +837,7 @@ For the agent:
 
 - Goal: Every category mapped.
 - Step 1: woocommerce_get_feed_status.
-- Step 2: woocommerce_set_feed_category_mapping: With no params to list, then again with the pairs. List again afterwards.
+- Step 2: Ask the person before this step. woocommerce_set_feed_category_mapping: With no params to list, then again with the pairs. List again afterwards.
 - Step 3: woocommerce_validate_feed.
 
 Tools, in order: `woocommerce_get_feed_status`, `woocommerce_set_feed_category_mapping`, `woocommerce_validate_feed`
@@ -864,11 +863,11 @@ For the agent:
 - Goal: Raise the catalog readiness score.
 - Step 1: woocommerce_catalog_ai_readiness.
 - Step 2: woocommerce_readiness_fixlist: Work it top down with the tool each item names.
-- Step 3: woocommerce_product_ai_readiness: Score again and report before and after.
+- Step 3: woocommerce_product_ai_readiness: Score again and compare before and after.
 
 Tools, in order: `woocommerce_catalog_ai_readiness`, `woocommerce_readiness_fixlist`, `woocommerce_product_ai_readiness`
 
-Check: The agent scores again after the fixes and reports the before and after.
+Check: The agent scores again after the fixes and says what changed.
 
 Needs: WooCommerce add-on (Respira ARC)
 
@@ -894,7 +893,7 @@ For the agent:
 
 - Goal: Know if apps can run here.
 - Step 1: respira_code_status.
-- Step 2: respira_site_brief: Report status, expiry and what is missing.
+- Step 2: respira_site_brief: State the status, expiry and what is missing.
 
 Tools, in order: `respira_code_status`, `respira_site_brief`
 
@@ -942,10 +941,10 @@ something looks off with the [app name] app. read what it is doing and tell me b
 For the agent:
 
 - Goal: Diagnose without touching.
-- Step 1: respira_app_logs: Report only what the logs show.
-- Step 2: respira_app_status: For the slug.
+- Step 1: respira_app_status: For the slug.
+- Step 2: respira_app_logs: Quote only what the logs show.
 
-Tools, in order: `respira_app_logs`, `respira_app_status`
+Tools, in order: `respira_app_status`, `respira_app_logs`
 
 Check: The agent quotes the log lines and the deploy state it read, and changes nothing.
 
@@ -966,12 +965,12 @@ roll the [app name] app back to the release before this one.
 For the agent:
 
 - Goal: Return to the previous release.
-- Step 1: respira_app_status: Afterwards it must show the previous release serving.
-- Step 2: Ask the person before this step. respira_app_rollback.
+- Step 1: respira_app_status: Read the current release and the ones before it first.
+- Step 2: Ask the person before this step. respira_app_rollback: Then read the status again: the previous release must be serving.
 
 Tools, in order: `respira_app_status`, `respira_app_rollback`
 
-Check: The status read afterwards shows the earlier release serving.
+Check: The status read afterwards shows the previous release serving.
 
 Needs: Respira Code; the site owner arms developer access in wp-admin
 
@@ -991,7 +990,7 @@ For the agent:
 
 - Goal: Move an app between sites.
 - Step 1: respira_app_pull: On the source site.
-- Step 2: respira_switch_site: To the target site.
+- Step 2: Ask the person before this step. respira_switch_site: To the target site.
 - Step 3: Ask the person before this step. respira_app_deploy.
 - Step 4: respira_app_status: On the target. Then switch back to the original site.
 
@@ -1023,7 +1022,7 @@ For the agent:
 
 - Goal: A no login review link.
 - Step 1: respira_list_review_links: To see what exists.
-- Step 2: respira_create_review_link: For the page the person named.
+- Step 2: Ask the person before this step. respira_create_review_link: For the page the person named.
 
 Tools, in order: `respira_list_review_links`, `respira_create_review_link`
 
@@ -1074,8 +1073,8 @@ For the agent:
 - Step 2: respira_find_element: For each request.
 - Step 3: respira_update_element: One request at a time.
 - Step 4: respira_read_page: Read the page back before replying.
-- Step 5: respira_reply_to_review_comment.
-- Step 6: respira_resolve_review_comment.
+- Step 5: Ask the person before this step. respira_reply_to_review_comment.
+- Step 6: Ask the person before this step. respira_resolve_review_comment.
 
 Tools, in order: `respira_list_review_comments`, `respira_find_element`, `respira_update_element`, `respira_read_page`, `respira_reply_to_review_comment`, `respira_resolve_review_comment`
 
@@ -1115,7 +1114,7 @@ Two questions worth asking on any site.
 
 <a id="builder-question"></a>
 
-### Ask what you are on
+### What builder is this site on
 
 Recipe id: `builder-question`
 
@@ -1150,7 +1149,7 @@ For the agent:
 
 - Goal: A safe multilingual copy.
 - Step 1: respira_get_site_context: To see whether WPML or Polylang is set up.
-- Step 2: respira_duplicate_with_translations: Check the returned map lists every language.
+- Step 2: Ask the person before this step. respira_duplicate_with_translations: Check the returned map lists every language.
 
 Tools, in order: `respira_get_site_context`, `respira_duplicate_with_translations`
 
@@ -1180,7 +1179,7 @@ For the agent:
 
 - Goal: A named routine on the site.
 - Step 1: respira_list_playbooks.
-- Step 2: respira_create_playbook: With the steps. Saving must pass without a validation error.
+- Step 2: Ask the person before this step. respira_create_playbook: With the steps. Saving must pass without a validation error.
 
 Tools, in order: `respira_list_playbooks`, `respira_create_playbook`
 
@@ -1194,7 +1193,7 @@ Reports from the audit log.
 
 <a id="client-report"></a>
 
-### A client report from the audit log
+### A client summary from the audit log
 
 Recipe id: `client-report`
 
@@ -1206,9 +1205,9 @@ generate an activity report for the last 30 days and write it up as a client upd
 
 For the agent:
 
-- Goal: A client ready report.
+- Goal: A client ready summary.
 - Step 1: respira_generate_activity_report: For the period the person named. Write it up in the person's voice.
 
 Tools, in order: `respira_generate_activity_report`
 
-Check: Every line of the report traces to an entry in the activity data.
+Check: Every line of the summary traces to an entry in the activity data.
