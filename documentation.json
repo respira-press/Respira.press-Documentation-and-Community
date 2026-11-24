@@ -104,6 +104,11 @@
                 "icon": "sparkles"
               },
               {
+                "title": "Agent recipes",
+                "path": "recipes",
+                "icon": "list-checks"
+              },
+              {
                 "title": "Usage Guide",
                 "path": "usage",
                 "icon": "file-text"
